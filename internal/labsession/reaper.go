@@ -4,7 +4,15 @@ import (
 	"context"
 	"log"
 	"time"
+
+	"github.com/google/uuid"
 )
+
+// maxStopAttempts is how many consecutive sweeps may fail to gracefully stop a
+// running session's nodes before the reaper escalates to a forced teardown
+// (DeleteProject). This bounds how long leaked-but-DB-counted nodes can hold
+// RAM on the compute host when GNS3 is unresponsive.
+const maxStopAttempts = 3
 
 // Reaper is a background goroutine that reclaims stale lab sessions.
 //
@@ -15,21 +23,40 @@ import (
 // The reaper is what makes the global concurrency cap (GNS3MaxSessions)
 // meaningful in practice — without it every "close tab" is a permanently
 // occupied slot for the next GNS3IdleTimeout window.
+//
+// Invariant it must preserve: a session's DB status is only advanced to a
+// state that frees a capacity slot (ended) once the underlying GNS3 resources
+// are actually gone. Advancing status on a *failed* teardown is what makes the
+// cap fiction — the DB frees the slot, new launches pile onto the still-running
+// nodes, and the host melts. So on teardown failure we keep the slot counted
+// and retry, escalating to a forced delete rather than optimistically ending.
 type Reaper struct {
 	repo         *Repository
 	gns3         GNS3Client
 	idleTimeout  time.Duration
 	sessionTTL   time.Duration
 	tickInterval time.Duration
+	opTimeout    time.Duration // per-call deadline for each GNS3 REST op
+
+	// stopAttempts tracks consecutive failed graceful-stop attempts per session.
+	// Single-goroutine access (only touched inside sweep), so no lock needed.
+	stopAttempts map[uuid.UUID]int
 }
 
-func NewReaper(repo *Repository, gns3 GNS3Client, idleTimeout, sessionTTL, tickInterval time.Duration) *Reaper {
+func NewReaper(repo *Repository, gns3 GNS3Client, idleTimeout, sessionTTL, tickInterval, opTimeout time.Duration) *Reaper {
+	if opTimeout <= 0 || opTimeout >= tickInterval {
+		// A per-op timeout that is unset or >= the tick would let a single
+		// stuck call stall the whole sweep. Clamp to half the tick.
+		opTimeout = tickInterval / 2
+	}
 	return &Reaper{
 		repo:         repo,
 		gns3:         gns3,
 		idleTimeout:  idleTimeout,
 		sessionTTL:   sessionTTL,
 		tickInterval: tickInterval,
+		opTimeout:    opTimeout,
+		stopAttempts: make(map[uuid.UUID]int),
 	}
 }
 
@@ -44,8 +71,8 @@ func (r *Reaper) loop(ctx context.Context) {
 	ticker := time.NewTicker(r.tickInterval)
 	defer ticker.Stop()
 
-	log.Printf("reaper: started (idle_timeout=%v, session_ttl=%v, tick=%v)",
-		r.idleTimeout, r.sessionTTL, r.tickInterval)
+	log.Printf("reaper: started (idle_timeout=%v, session_ttl=%v, tick=%v, op_timeout=%v)",
+		r.idleTimeout, r.sessionTTL, r.tickInterval, r.opTimeout)
 
 	for {
 		select {
@@ -58,6 +85,15 @@ func (r *Reaper) loop(ctx context.Context) {
 	}
 }
 
+// op runs a single GNS3 REST call under a bounded, per-operation deadline so a
+// starved/unresponsive GNS3 cannot stall the whole sweep. It does NOT inherit
+// the server-lifetime ctx's (absent) deadline.
+func (r *Reaper) op(parent context.Context, fn func(context.Context) error) error {
+	octx, cancel := context.WithTimeout(parent, r.opTimeout)
+	defer cancel()
+	return fn(octx)
+}
+
 func (r *Reaper) sweep(ctx context.Context) {
 	// ── Tier 1: idle-running sessions → suspend ────────────────────────
 	staleRunning, err := r.repo.StaleRunning(ctx, int(r.idleTimeout.Minutes()))
@@ -65,18 +101,7 @@ func (r *Reaper) sweep(ctx context.Context) {
 		log.Printf("reaper: StaleRunning query: %v", err)
 	} else {
 		for _, sess := range staleRunning {
-			if sess.GNS3ProjectID == nil {
-				// Safety: no GNS3 project yet, just mark failed.
-				_ = r.repo.SetStatus(ctx, sess.ID, StatusFailed)
-				continue
-			}
-			if err := r.gns3.StopNodes(ctx, *sess.GNS3ProjectID); err != nil {
-				// GNS3 project may have been deleted (404) — treat as suspended anyway.
-				log.Printf("reaper: stop nodes session=%s (will force idle): %v", sess.ID, err)
-			}
-			_ = r.repo.SetStatus(ctx, sess.ID, StatusIdleStopped)
-			log.Printf("reaper: suspended session=%s user=%s lab=%d",
-				sess.ID, sess.UserID, sess.LabID)
+			r.suspend(ctx, sess)
 		}
 	}
 
@@ -86,14 +111,86 @@ func (r *Reaper) sweep(ctx context.Context) {
 		log.Printf("reaper: StaleIdle query: %v", err)
 	} else {
 		for _, sess := range staleIdle {
-			if sess.GNS3ProjectID != nil {
-				if err := r.gns3.DeleteProject(ctx, *sess.GNS3ProjectID); err != nil {
-					log.Printf("reaper: delete project session=%s: %v", sess.ID, err)
-				}
-			}
-			_ = r.repo.End(ctx, sess.ID)
-			log.Printf("reaper: ended session=%s user=%s lab=%d",
-				sess.ID, sess.UserID, sess.LabID)
+			r.teardown(ctx, sess)
 		}
 	}
+}
+
+// suspend handles a single idle-running session (Tier 1).
+func (r *Reaper) suspend(ctx context.Context, sess *Session) {
+	if sess.GNS3ProjectID == nil {
+		// No GNS3 project yet — nothing running to leak; mark failed.
+		_ = r.repo.SetStatus(ctx, sess.ID, StatusFailed)
+		delete(r.stopAttempts, sess.ID)
+		return
+	}
+
+	err := r.op(ctx, func(c context.Context) error {
+		return r.gns3.StopNodes(c, *sess.GNS3ProjectID)
+	})
+	if err == nil {
+		// Nodes are stopped. Slot stays counted (idle_stopped still counts
+		// toward the cap) until Tier 2 tears it down.
+		_ = r.repo.SetStatus(ctx, sess.ID, StatusIdleStopped)
+		delete(r.stopAttempts, sess.ID)
+		log.Printf("reaper: suspended session=%s user=%s lab=%d",
+			sess.ID, sess.UserID, sess.LabID)
+		return
+	}
+
+	// Graceful stop failed — the emulated nodes may still be running and
+	// consuming RAM. Do NOT advance to idle_stopped on the strength of a failed
+	// stop; keep the session 'running' so it stays in the Tier-1 queue and the
+	// slot stays honestly counted. Retry, then escalate to a forced teardown.
+	r.stopAttempts[sess.ID]++
+	attempts := r.stopAttempts[sess.ID]
+	log.Printf("reaper: stop nodes session=%s FAILED (attempt %d/%d): %v",
+		sess.ID, attempts, maxStopAttempts, err)
+
+	if attempts >= maxStopAttempts {
+		// Escalation: force the whole project down to guarantee the host gets
+		// its RAM back. This destroys a resumable session, which is the right
+		// trade on a small compute host — a wedged session is worse than a lost
+		// one. Only free the slot (End) if the forced delete actually succeeds.
+		derr := r.op(ctx, func(c context.Context) error {
+			return r.gns3.DeleteProject(c, *sess.GNS3ProjectID)
+		})
+		if derr != nil {
+			log.Printf("reaper: FORCE delete session=%s FAILED after %d stop attempts: %v "+
+				"(slot kept counted; GNS3 host may need manual attention)",
+				sess.ID, attempts, derr)
+			return // keep 'running', keep slot, try again next sweep
+		}
+		_ = r.repo.End(ctx, sess.ID)
+		delete(r.stopAttempts, sess.ID)
+		log.Printf("reaper: force-ended wedged session=%s user=%s lab=%d after %d failed stops",
+			sess.ID, sess.UserID, sess.LabID, attempts)
+	}
+}
+
+// teardown handles a single long-idle session (Tier 2).
+func (r *Reaper) teardown(ctx context.Context, sess *Session) {
+	if sess.GNS3ProjectID == nil {
+		// Nothing to delete on the compute host — safe to end.
+		_ = r.repo.End(ctx, sess.ID)
+		delete(r.stopAttempts, sess.ID)
+		return
+	}
+
+	err := r.op(ctx, func(c context.Context) error {
+		return r.gns3.DeleteProject(c, *sess.GNS3ProjectID)
+	})
+	if err != nil {
+		// Critical: do NOT End() here. Ending would set status=ended and free a
+		// capacity slot while the GNS3 project (and its nodes) still exist on the
+		// host — the exact divergence that lets orphans accumulate and the cap
+		// become fiction. Leave the session idle_stopped (still counted) and
+		// retry on the next sweep.
+		log.Printf("reaper: delete project session=%s FAILED (slot kept counted, will retry): %v",
+			sess.ID, err)
+		return
+	}
+	_ = r.repo.End(ctx, sess.ID)
+	delete(r.stopAttempts, sess.ID)
+	log.Printf("reaper: ended session=%s user=%s lab=%d", sess.ID, sess.UserID, sess.LabID)
 }

@@ -124,7 +124,7 @@ func main() {
 	// ── Reaper: reclaim stale GNS3 sessions ───────────────────────────
 	if gns3Client != nil {
 		reaper := labsession.NewReaper(sessionRepo, gns3Client,
-			cfg.GNS3IdleTimeout, cfg.GNS3SessionTTL, cfg.GNS3ReaperTick)
+			cfg.GNS3IdleTimeout, cfg.GNS3SessionTTL, cfg.GNS3ReaperTick, cfg.GNS3OpTimeout)
 		reaper.Start(context.Background())
 	}
 

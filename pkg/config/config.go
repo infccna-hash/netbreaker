@@ -2,12 +2,21 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
 )
+
+// gns3RecommendedMaxSessions is a conservative ceiling for a single modest
+// compute host (e.g. a 2-core / ~8GB laptop-class GNS3 server). Each live lab
+// session runs several emulated nodes (Kali QEMU + IOU + Dynamips), so a cap
+// much above this will exhaust RAM/CPU and trigger the reaper death-spiral
+// (stops time out, nodes leak, orphans accumulate). Raise the env var only if
+// the GNS3 host is genuinely larger.
+const gns3RecommendedMaxSessions = 4
 
 type Config struct {
 	Port        string
@@ -45,6 +54,7 @@ type Config struct {
 	GNS3IdleTimeout  time.Duration // running session idle → suspend
 	GNS3SessionTTL   time.Duration // idle_stopped → full teardown
 	GNS3ReaperTick   time.Duration // how often the reaper goroutine polls
+	GNS3OpTimeout    time.Duration // per-call deadline for each GNS3 REST op in a sweep
 }
 
 func Load() (*Config, error) {
@@ -78,7 +88,7 @@ func Load() (*Config, error) {
 		GNS3ComputeHost:  getEnv("GNS3_COMPUTE_HOST", ""),
 		GNS3Username:     getEnv("GNS3_USERNAME", ""),
 		GNS3Password:    getEnv("GNS3_PASSWORD", ""),
-		GNS3MaxSessions: getIntEnv("GNS3_MAX_SESSIONS", 8),
+		GNS3MaxSessions: getIntEnv("GNS3_MAX_SESSIONS", 3),
 	}
 
 	var err error
@@ -102,6 +112,22 @@ func Load() (*Config, error) {
 	cfg.GNS3ReaperTick, err = parseDuration("GNS3_REAPER_TICK", "30s")
 	if err != nil {
 		return nil, err
+	}
+	// Per-operation deadline for each GNS3 REST call the reaper makes. Must be
+	// shorter than the tick so one starved/unresponsive GNS3 call cannot stall
+	// the whole sweep (the underlying HTTP client's own timeout is 30s, which
+	// serializes badly when several sessions are stuck at once).
+	cfg.GNS3OpTimeout, err = parseDuration("GNS3_OP_TIMEOUT", "20s")
+	if err != nil {
+		return nil, err
+	}
+
+	if cfg.GNS3MaxSessions > gns3RecommendedMaxSessions {
+		log.Printf("WARNING: GNS3_MAX_SESSIONS=%d exceeds the recommended ceiling of %d "+
+			"for a single modest GNS3 host. Each session runs multiple emulated nodes; "+
+			"an over-provisioned cap is the primary cause of RAM exhaustion, reaper stop "+
+			"timeouts, and orphaned-project pileup. Lower it unless the GNS3 host is large.",
+			cfg.GNS3MaxSessions, gns3RecommendedMaxSessions)
 	}
 
 	return cfg, nil
