@@ -1,0 +1,12 @@
+.env
+.env.*
+keys/
+frontend/
+bin/
+*.log
+.git/
+.gitignore
+README.md
+DEPLOY.md
+docker-compose.yml
+Caddyfile

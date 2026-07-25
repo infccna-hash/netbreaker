@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS lab_configs;
+DROP TABLE IF EXISTS lab_topologies;
+DROP TABLE IF EXISTS lab_phases;
+DROP TABLE IF EXISTS labs;

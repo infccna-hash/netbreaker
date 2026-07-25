@@ -1,0 +1,22 @@
+{$SITE_ADDRESS} {
+	encode gzip zstd
+
+	# API → Go backend
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	# React SPA — static files with client-side routing fallback
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}

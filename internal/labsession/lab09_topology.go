@@ -1,0 +1,83 @@
+package labsession
+
+// Lab 09 — NAT Gateway / PAT
+// Topology: R1 (NAT gw, inside/outside), R2 (ISP), SW1 (inside), SW2 (outside), PC1, PC2, KALI
+// Inside: PC1 → SW1 Et0/1 → R1 Fa0/0 (inside, 192.168.1.1/24)
+// Outside: R1 Fa0/1 (10.0.0.1) → SW2 Et0/0, R2 Fa0/0 (10.0.0.2) → SW2 Et0/1, KALI → SW2 Et0/2
+// PC2 → R2 Fa0/1 (203.0.113.x) — direct link
+//
+// R1 = c3725 (Fa0/0 inside, Fa0/1 outside)
+// R2 = c3725 (Fa0/0 = 10.0.0.2, Fa0/1 = 203.0.113.1)
+// NOTE: Lab text says Gi0/0 for R1 — should be Fa0/0 (c3725). TEXT FIX PENDING.
+var Lab09Topology = TopologyTemplate{
+	ComputeID: "local",
+	Nodes: []NodeTemplate{
+		{
+			Name:     "R1",
+			NodeType: "dynamips",
+			Properties: map[string]any{
+				"platform": "c3725",
+				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
+				"ram":      256,
+				"slot0":    "GT96100-FE",
+			},
+		},
+		{
+			Name:     "R2",
+			NodeType: "dynamips",
+			Properties: map[string]any{
+				"platform": "c3725",
+				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
+				"ram":      256,
+				"slot0":    "GT96100-FE",
+			},
+		},
+		{
+			Name:     "SW1",
+			NodeType: "iou",
+			Properties: map[string]any{
+				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+			},
+		},
+		{
+			Name:     "SW2",
+			NodeType: "iou",
+			Properties: map[string]any{
+				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+			},
+		},
+		{
+			Name:     "PC1",
+			NodeType: "vpcs",
+		},
+		{
+			Name:     "PC2",
+			NodeType: "vpcs",
+		},
+		{
+			Name:       "KALI",
+			NodeType:   "qemu",
+			TemplateID: "6f7a251b-65ec-4de2-9fb7-7bf9b63dd473",
+			Properties: map[string]any{
+				"qemu_path":           "/usr/bin/qemu-system-x86_64",
+				"ram":                 1024,
+				"adapters":            2,
+				"adapter_type":        "e1000",
+				"console_type":        "telnet",
+				"kernel_command_line": "console=ttyS0",
+				"hda_disk_image":      "kali-linux-2026.1.qcow2",
+				"linked_clone":        true,
+				"boot_priority":       "c",
+				"console_auto_start":  false,
+			},
+		},
+	},
+	Links: []LinkTemplate{
+		{NodeA: "R1", IfaceA: "Fa0/0", NodeB: "SW1", IfaceB: "Et0/0"},
+		{NodeA: "PC1", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/1"},
+		{NodeA: "R1", IfaceA: "Fa0/1", NodeB: "SW2", IfaceB: "Et0/0"},
+		{NodeA: "R2", IfaceA: "Fa0/0", NodeB: "SW2", IfaceB: "Et0/1"},
+		{NodeA: "KALI", IfaceA: "eth0", NodeB: "SW2", IfaceB: "Et0/2"},
+		{NodeA: "R2", IfaceA: "Fa0/1", NodeB: "PC2", IfaceB: "eth0"},
+	},
+}

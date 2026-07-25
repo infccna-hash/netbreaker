@@ -1,0 +1,82 @@
+package labsession
+
+// Lab 15 — Hub / Switch / Firewall (Collision Domains)
+// Text: "Cable: PC1+PC2 → H1 hub → SW1, PC3+KALI → SW1, SW1 → R1, R1 → FW1"
+// 8 nodes: H1 (ethernet hub), SW1 (IOU L2), R1 (dynamips), FW1 (dynamips),
+//         PC1/PC2/PC3 (VPCS), KALI (QEMU)
+// Hub creates a single collision domain for PC1+PC2; SW1 splits CD for PC3+KALI.
+// R1 routes between subnets; FW1 is another router acting as firewall.
+var Lab15Topology = TopologyTemplate{
+	ComputeID: "local",
+	Nodes: []NodeTemplate{
+		{
+			Name:     "H1",
+			NodeType: "ethernet_hub",
+		},
+		{
+			Name:     "SW1",
+			NodeType: "iou",
+			Properties: map[string]any{
+				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+			},
+		},
+		{
+			Name:     "R1",
+			NodeType: "dynamips",
+			Properties: map[string]any{
+				"platform": "c3725",
+				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
+				"ram":      256,
+				"slot0":    "GT96100-FE",
+			},
+		},
+		{
+			Name:     "FW1",
+			NodeType: "dynamips",
+			Properties: map[string]any{
+				"platform": "c3725",
+				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
+				"ram":      256,
+				"slot0":    "GT96100-FE",
+			},
+		},
+		{
+			Name:     "PC1",
+			NodeType: "vpcs",
+		},
+		{
+			Name:     "PC2",
+			NodeType: "vpcs",
+		},
+		{
+			Name:     "PC3",
+			NodeType: "vpcs",
+		},
+		{
+			Name:       "KALI",
+			NodeType:   "qemu",
+			TemplateID: "6f7a251b-65ec-4de2-9fb7-7bf9b63dd473",
+			Properties: map[string]any{
+				"qemu_path":           "/usr/bin/qemu-system-x86_64",
+				"ram":                 1024,
+				"adapters":            2,
+				"adapter_type":        "e1000",
+				"console_type":        "telnet",
+				"kernel_command_line": "console=ttyS0",
+				"hda_disk_image":      "kali-linux-2026.1.qcow2",
+				"linked_clone":        true,
+				"boot_priority":       "c",
+				"console_auto_start":  false,
+			},
+		},
+	},
+	Links: []LinkTemplate{
+		{NodeA: "PC1", IfaceA: "eth0", NodeB: "H1", IfaceB: "e0"},
+		{NodeA: "PC2", IfaceA: "eth0", NodeB: "H1", IfaceB: "e1"},
+		{NodeA: "H1", IfaceA: "e2", NodeB: "SW1", IfaceB: "Et0/0"},
+		{NodeA: "PC3", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/1"},
+		{NodeA: "KALI", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/2"},
+		{NodeA: "SW1", IfaceA: "Et0/3", NodeB: "R1", IfaceB: "Fa0/0"},
+		{NodeA: "R1", IfaceA: "Fa0/1", NodeB: "FW1", IfaceB: "Fa0/0"},
+	},
+}

@@ -1,0 +1,69 @@
+services:
+  api:
+    build: .
+    container_name: netbreaker-api
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    volumes:
+      - ./keys:/app/keys:ro
+    expose:
+      - "8080"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: netbreaker-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: netbreaker
+      POSTGRES_USER: netbreaker
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U netbreaker"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: netbreaker-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY}
+    volumes:
+      - minio_data:/data
+    expose:
+      - "9000"
+      - "9001"
+
+  # Edge: builds the React SPA, serves it, terminates TLS, and proxies /api → api.
+  web:
+    build:
+      context: ./frontend
+    container_name: netbreaker-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  minio_data:
+  caddy_data:
+  caddy_config:

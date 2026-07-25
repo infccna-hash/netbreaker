@@ -1,0 +1,69 @@
+package labsession
+
+// Lab 16 — Crossover Cables / MDIX
+// Text: "Cable SW1↔SW2 with a straight-through cable (the wrong type)"
+// Topology: SW1↔SW2 (direct IOU-IOU), PC1→SW1, PC2→SW2, R1→SW1, KALI→SW2
+// Port mapping (IOU 4-port):
+//   SW1: Et0/0=PC1, Et0/1=R1, Et0/2=SW2
+//   SW2: Et0/0=KALI, Et0/1=SW1, Et0/2=PC2
+var Lab16Topology = TopologyTemplate{
+	ComputeID: "local",
+	Nodes: []NodeTemplate{
+		{
+			Name:     "SW1",
+			NodeType: "iou",
+			Properties: map[string]any{
+				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+			},
+		},
+		{
+			Name:     "SW2",
+			NodeType: "iou",
+			Properties: map[string]any{
+				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+			},
+		},
+		{
+			Name:     "R1",
+			NodeType: "dynamips",
+			Properties: map[string]any{
+				"platform": "c3725",
+				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
+				"ram":      256,
+				"slot0":    "GT96100-FE",
+			},
+		},
+		{
+			Name:     "PC1",
+			NodeType: "vpcs",
+		},
+		{
+			Name:     "PC2",
+			NodeType: "vpcs",
+		},
+		{
+			Name:       "KALI",
+			NodeType:   "qemu",
+			TemplateID: "6f7a251b-65ec-4de2-9fb7-7bf9b63dd473",
+			Properties: map[string]any{
+				"qemu_path":           "/usr/bin/qemu-system-x86_64",
+				"ram":                 1024,
+				"adapters":            2,
+				"adapter_type":        "e1000",
+				"console_type":        "telnet",
+				"kernel_command_line": "console=ttyS0",
+				"hda_disk_image":      "kali-linux-2026.1.qcow2",
+				"linked_clone":        true,
+				"boot_priority":       "c",
+				"console_auto_start":  false,
+			},
+		},
+	},
+	Links: []LinkTemplate{
+		{NodeA: "PC1", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/0"},
+		{NodeA: "R1", IfaceA: "Fa0/0", NodeB: "SW1", IfaceB: "Et0/1"},
+		{NodeA: "SW1", IfaceA: "Et0/2", NodeB: "SW2", IfaceB: "Et0/1"},
+		{NodeA: "KALI", IfaceA: "eth0", NodeB: "SW2", IfaceB: "Et0/0"},
+		{NodeA: "PC2", IfaceA: "eth0", NodeB: "SW2", IfaceB: "Et0/2"},
+	},
+}

@@ -1,0 +1,329 @@
+package labsession
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"time"
+)
+
+// HTTPGNS3Client implements GNS3Client against a GNS3 v2 controller.
+type HTTPGNS3Client struct {
+	baseURL  string // e.g. "http://10.0.0.5:3080"
+	username string
+	password string
+	http     *http.Client
+}
+
+func NewHTTPGNS3Client(baseURL, username, password string) *HTTPGNS3Client {
+	return &HTTPGNS3Client{
+		baseURL:  baseURL,
+		username: username,
+		password: password,
+		http:     &http.Client{Timeout: 30 * time.Second},
+	}
+}
+
+func (c *HTTPGNS3Client) do(ctx context.Context, method, path string, body any, out any) error {
+	var reqBody io.Reader
+	if body != nil {
+		b, err := json.Marshal(body)
+		if err != nil {
+			return err
+		}
+		reqBody = bytes.NewReader(b)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, reqBody)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	if c.username != "" {
+		req.SetBasicAuth(c.username, c.password)
+	}
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := io.ReadAll(resp.Body)
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("gns3 %s %s: status %d: %s", method, path, resp.StatusCode, string(respBody))
+	}
+	if out != nil && len(respBody) > 0 {
+		if err := json.Unmarshal(respBody, out); err != nil {
+			return fmt.Errorf("gns3 %s %s: decode response: %w", method, path, err)
+		}
+	}
+	return nil
+}
+
+// --- CreateProject ---
+
+type gns3Project struct {
+	ProjectID string `json:"project_id"`
+	Name      string `json:"name"`
+}
+
+func (c *HTTPGNS3Client) CreateProject(ctx context.Context, computeID string, userID, labID int) (string, error) {
+	// Name must be unique per GNS3 controller. Scoping by user+lab is the
+	// isolation guarantee — never reuse a project across students, per spec.
+	name := fmt.Sprintf("nb-u%d-l%d-%d", userID, labID, time.Now().Unix())
+
+	var proj gns3Project
+	err := c.do(ctx, http.MethodPost, "/v2/projects", map[string]any{
+		"name": name,
+	}, &proj)
+	if err != nil {
+		return "", err
+	}
+	return proj.ProjectID, nil
+}
+
+// --- ProvisionTopology ---
+
+type gns3NodeCreate struct {
+	Name       string         `json:"name"`
+	NodeType   string         `json:"node_type"`
+	ComputeID  string         `json:"compute_id"`
+	TemplateID string         `json:"template_id,omitempty"`
+	Properties map[string]any `json:"properties,omitempty"`
+}
+
+type gns3Node struct {
+	NodeID      string `json:"node_id"`
+	Name        string `json:"name"`
+	Console     int    `json:"console"`
+	ConsoleType string `json:"console_type"`
+	Status      string `json:"status"`
+}
+
+type gns3LinkNode struct {
+	NodeID        string `json:"node_id"`
+	AdapterNumber int    `json:"adapter_number"`
+	PortNumber    int    `json:"port_number"`
+}
+
+type gns3LinkCreate struct {
+	Nodes []gns3LinkNode `json:"nodes"`
+}
+
+func (c *HTTPGNS3Client) ProvisionTopology(ctx context.Context, projectID string, template TopologyTemplate) (NodeMap, error) {
+	nodes := make(NodeMap)
+
+	// created holds name -> gns3 node, so link creation (next step, not yet
+	// wired since link topology isn't in TopologyTemplate yet) can reference
+	// node IDs by name.
+	created := make(map[string]gns3Node)
+
+	for _, nt := range template.Nodes {
+		payload := gns3NodeCreate{
+			Name:       nt.Name,
+			NodeType:   nt.NodeType,
+			ComputeID:  template.ComputeID,
+			TemplateID: nt.TemplateID,
+		}
+
+		// Merge explicit properties from the topology template with
+		// node-type-specific defaults. Explicit properties win.
+		props := make(map[string]any)
+		if nt.Properties != nil {
+			for k, v := range nt.Properties {
+				props[k] = v
+			}
+		}
+
+		switch nt.NodeType {
+		case "iou":
+			if nt.StartupConfig != "" {
+				props["startup_config_content"] = nt.StartupConfig
+			}
+		case "dynamips":
+			// Properties from the topology template must include
+			// platform, image, ram etc. — no defaults to guess.
+			if nt.StartupConfig != "" {
+				props["startup_config_content"] = nt.StartupConfig
+			}
+		case "qemu":
+			// QEMU nodes boot from their disk image, no startup config.
+			// Properties (disk image, adapters) come from the template.
+		case "vpcs":
+			// Built-in Virtual PC Simulator — no startup config, no properties.
+		case "ethernet_hub":
+			// Virtual Ethernet hub — no startup config, no properties.
+		default:
+			return nil, fmt.Errorf("unsupported node type %q for node %q", nt.NodeType, nt.Name)
+		}
+
+		if len(props) > 0 {
+			payload.Properties = props
+		}
+
+		var node gns3Node
+		path := fmt.Sprintf("/v2/projects/%s/nodes", projectID)
+		if err := c.do(ctx, http.MethodPost, path, payload, &node); err != nil {
+			return nil, fmt.Errorf("create node %q: %w", nt.Name, err)
+		}
+
+		created[nt.Name] = node
+		nodes[nt.Name] = NodeInfo{
+			GNS3NodeID:  node.NodeID,
+			ConsolePort: node.Console,
+			ConsoleType: node.ConsoleType,
+		}
+	}
+
+	// Create links between nodes using the interface labels from the
+	// topology template, translated to GNS3 adapter/port numbers per
+	// node type.
+	if err := c.createLinks(ctx, projectID, template, created); err != nil {
+		return nil, err
+	}
+	return nodes, nil
+}
+
+// --- Links ---
+
+// interfaceToPort converts a Cisco-style interface name to GNS3's
+// (adapter_number, port_number) pair for a given node type.
+//
+// The IOU L2 image convention maps Fa0/N → adapter 0, port N.
+// This has been verified against the i86bi-linux-l2-adventerprisek9
+// image (common GNS3 IOU L2 image); if your compute box runs a
+// different image, create one test node + one link to confirm.
+func interfaceToPort(nodeType, iface string) (adapter, port int, err error) {
+	switch nodeType {
+	case "iou":
+		// IOU L2 image: Et0/N → adapter 0, port N (confirmed via test).
+		// Also accept Fa0/N for compatibility with IOS config references
+		// in lab content (IOS accepts both interface names).
+		var n int
+		if _, err := fmt.Sscanf(iface, "Et0/%d", &n); err == nil {
+			return 0, n, nil
+		}
+		if _, err := fmt.Sscanf(iface, "Fa0/%d", &n); err == nil {
+			return 0, n, nil
+		}
+		return 0, 0, fmt.Errorf("unrecognized %s interface %q (expected Et0/N or Fa0/N)", nodeType, iface)
+
+	case "dynamips":
+		// c3725: Fa<N>/M → adapter N (slot number), port M.
+		// Slot0 = GT96100-FE (built-in, Fa0/0-Fa0/1)
+		// Slot1 = NM-16ESW (switch module, Fa1/0-Fa1/15)
+		// Slot2 = NM-1FE-TX (Fa2/0)
+		var slot, portN int
+		if _, err := fmt.Sscanf(iface, "Fa%d/%d", &slot, &portN); err == nil {
+			return slot, portN, nil
+		}
+		// Also accept Gi0/N — maps to the same built-in ports (Fa0/N)
+		// Lab content sometimes reads Gi0/0 and Gi0/1 for c3725 even though
+		// the actual IOS image only supports FastEthernet on these slots.
+		if _, err := fmt.Sscanf(iface, "Gi0/%d", &slot); err == nil {
+			// Gi0/0 → Fa0/0, Gi0/1 → Fa0/1 (same adapter/port)
+			return 0, slot, nil
+		}
+		// NM-16ESW switchports (slot1): IOS calls them GigabitEthernet0/1-16
+		// but in GNS3 they are on adapter 1, port N-1.
+		if _, err := fmt.Sscanf(iface, "Gi1/%d", &portN); err == nil {
+			return 1, portN - 1, nil
+		}
+		return 0, 0, fmt.Errorf("unrecognized dynamips interface %q (expected Fa<N>/<M> or Gi0/N)", iface)
+
+	case "vpcs":
+		// VPCS has a single built-in Ethernet port always at adapter 0, port 0.
+		return 0, 0, nil
+
+	case "ethernet_hub":
+		// Ethernet hub: ports are e0, e1, e2... → adapter 0, port N
+		var port int
+		if _, err := fmt.Sscanf(iface, "e%d", &port); err == nil {
+			return 0, port, nil
+		}
+		return 0, 0, fmt.Errorf("unrecognized hub interface %q (expected e<N>)", iface)
+
+	case "qemu":
+		// QEMU (Kali): eth0 always → adapter 0, port 0.
+		// Multi-NIC templates (e.g. OpenWRT) could use ethN → adapter N, port 0
+		// but that needs per-template verification.
+		if iface == "eth0" {
+			return 0, 0, nil
+		}
+		var n int
+		if _, err := fmt.Sscanf(iface, "eth%d", &n); err == nil {
+			return n, 0, nil
+		}
+		return 0, 0, fmt.Errorf("unrecognized qemu interface %q (expected ethN)", iface)
+
+	default:
+		return 0, 0, fmt.Errorf("no port mapping for node type %q", nodeType)
+	}
+}
+
+func nodeTypeOf(t TopologyTemplate, name string) string {
+	for _, n := range t.Nodes {
+		if n.Name == name {
+			return n.NodeType
+		}
+	}
+	return ""
+}
+
+func (c *HTTPGNS3Client) createLinks(ctx context.Context, projectID string, template TopologyTemplate, created map[string]gns3Node) error {
+	for _, link := range template.Links {
+		nodeA, ok := created[link.NodeA]
+		if !ok {
+			return fmt.Errorf("link references unknown node %q", link.NodeA)
+		}
+		nodeB, ok := created[link.NodeB]
+		if !ok {
+			return fmt.Errorf("link references unknown node %q", link.NodeB)
+		}
+
+		adapterA, portA, err := interfaceToPort(nodeTypeOf(template, link.NodeA), link.IfaceA)
+		if err != nil {
+			return fmt.Errorf("link %s:%s: %w", link.NodeA, link.IfaceA, err)
+		}
+		adapterB, portB, err := interfaceToPort(nodeTypeOf(template, link.NodeB), link.IfaceB)
+		if err != nil {
+			return fmt.Errorf("link %s:%s: %w", link.NodeB, link.IfaceB, err)
+		}
+
+		payload := gns3LinkCreate{Nodes: []gns3LinkNode{
+			{NodeID: nodeA.NodeID, AdapterNumber: adapterA, PortNumber: portA},
+			{NodeID: nodeB.NodeID, AdapterNumber: adapterB, PortNumber: portB},
+		}}
+
+		path := fmt.Sprintf("/v2/projects/%s/links", projectID)
+		if err := c.do(ctx, http.MethodPost, path, payload, nil); err != nil {
+			return fmt.Errorf("create link %s:%s ⇄ %s:%s: %w",
+				link.NodeA, link.IfaceA, link.NodeB, link.IfaceB, err)
+		}
+	}
+	return nil
+}
+
+// --- StartNodes / StopNodes ---
+
+func (c *HTTPGNS3Client) StartNodes(ctx context.Context, projectID string) error {
+	path := fmt.Sprintf("/v2/projects/%s/nodes/start", projectID)
+	return c.do(ctx, http.MethodPost, path, nil, nil)
+}
+
+func (c *HTTPGNS3Client) StopNodes(ctx context.Context, projectID string) error {
+	path := fmt.Sprintf("/v2/projects/%s/nodes/stop", projectID)
+	return c.do(ctx, http.MethodPost, path, nil, nil)
+}
+
+// --- DeleteProject ---
+
+func (c *HTTPGNS3Client) DeleteProject(ctx context.Context, projectID string) error {
+	path := fmt.Sprintf("/v2/projects/%s", projectID)
+	return c.do(ctx, http.MethodDelete, path, nil, nil)
+}
