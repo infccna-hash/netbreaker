@@ -35,7 +35,7 @@ import os, re, sys, glob, subprocess, argparse
 
 # Labs deliberately deferred for GNS3-in-the-loop review (structural issues,
 # port numbers exceeding IOU's 4 ports, phantom nodes). Remove as they're fixed.
-DEFERRED = {20}  # 13,15,17,19 resolved in migration 027
+DEFERRED = set()  # all 45 labs enforced (lab 20 resolved in migration 028)
 # Known-good literal placeholders that are not real interface names.
 ALLOW = {"gi0/X"}
 
