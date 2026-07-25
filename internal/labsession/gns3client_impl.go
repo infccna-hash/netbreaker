@@ -154,6 +154,9 @@ func (c *HTTPGNS3Client) ProvisionTopology(ctx context.Context, projectID string
 		case "qemu":
 			// QEMU nodes boot from their disk image, no startup config.
 			// Properties (disk image, adapters) come from the template.
+		case "docker":
+			// Docker containers: properties (image, start_command, adapters)
+			// come from the template. No startup config.
 		case "vpcs":
 			// Built-in Virtual PC Simulator — no startup config, no properties.
 		case "ethernet_hub":
@@ -248,6 +251,17 @@ func interfaceToPort(nodeType, iface string) (adapter, port int, err error) {
 			return 0, port, nil
 		}
 		return 0, 0, fmt.Errorf("unrecognized hub interface %q (expected e<N>)", iface)
+
+	case "docker":
+		// Docker containers: eth0 → adapter 0, port 0; ethN → adapter N, port 0.
+		if iface == "eth0" {
+			return 0, 0, nil
+		}
+		var n int
+		if _, err := fmt.Sscanf(iface, "eth%d", &n); err == nil {
+			return n, 0, nil
+		}
+		return 0, 0, fmt.Errorf("unrecognized docker interface %q (expected ethN)", iface)
 
 	case "qemu":
 		// QEMU (Kali): eth0 always → adapter 0, port 0.

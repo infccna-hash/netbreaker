@@ -10,13 +10,18 @@ package labsession
 var Lab35Topology = TopologyTemplate{
 	ComputeID: "local",
 	Nodes: []NodeTemplate{
-		{Name:"R1",NodeType:"dynamips",Properties:map[string]any{"platform":"c3725","image":"/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image","ram":256,"slot0":"GT96100-FE"}},
-		{Name:"R2",NodeType:"dynamips",Properties:map[string]any{"platform":"c3725","image":"/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image","ram":256,"slot0":"GT96100-FE"}},
-		{Name:"R3",NodeType:"dynamips",Properties:map[string]any{"platform":"c3725","image":"/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image","ram":256,"slot0":"GT96100-FE"}},
-		{Name:"SW1",NodeType:"iou",Properties:map[string]any{"path":"i86bi-linux-l2-adventerprisek9-15.1a.bin"}},
+		{Name:"R1",NodeType:"dynamips",Properties: map[string]any{"adapters": 2},
+},
+		{Name:"R2",NodeType:"dynamips",Properties: map[string]any{"adapters": 2},
+},
+		{Name:"R3",NodeType:"dynamips",Properties: map[string]any{"adapters": 2},
+},
+		{Name:"SW1",NodeType:"iou",Properties: map[string]any{"adapters": 2},
+},
 		{Name:"PC1",NodeType:"vpcs"},
 		{Name:"PC2",NodeType:"vpcs"},
-		{Name:"KALI",NodeType:"qemu",TemplateID:"6f7a251b-65ec-4de2-9fb7-7bf9b63dd473",Properties:map[string]any{"qemu_path":"/usr/bin/qemu-system-x86_64","ram":1024,"adapters":2,"adapter_type":"e1000","console_type":"telnet","kernel_command_line":"console=ttyS0","hda_disk_image":"kali-linux-2026.1.qcow2","linked_clone":true,"boot_priority":"c","console_auto_start":false}},
+		{Name:"KALI",NodeType:"docker",TemplateID:"efcdd6aa-8a18-4028-ae77-331d9e6d921b",Properties: map[string]any{"adapters": 2},
+},
 	},
 	Links: []LinkTemplate{
 		{NodeA:"R1",IfaceA:"Fa0/0",NodeB:"SW1",IfaceB:"Et0/0"},
