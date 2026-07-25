@@ -177,6 +177,7 @@ func (c *HTTPGNS3Client) ProvisionTopology(ctx context.Context, projectID string
 			GNS3NodeID:  node.NodeID,
 			ConsolePort: node.Console,
 			ConsoleType: node.ConsoleType,
+			NodeType:    nt.NodeType,
 		}
 	}
 

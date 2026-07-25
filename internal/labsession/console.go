@@ -40,6 +40,20 @@ func checkSameOrigin(r *http.Request) bool {
 	return origin == expected
 }
 
+
+// usesVNCConsole reports whether a node's console is VNC (which the telnet-only
+// browser bridge can't render) and should therefore be surfaced to the user as
+// a "connect a VNC client" hint rather than attempted as telnet.
+//
+// It checks node type in addition to console_type on purpose: GNS3 often has
+// not assigned console_type yet at the moment we capture NodeInfo during
+// provisioning, so ConsoleType can be empty for a Kali/QEMU node. NodeType comes
+// straight from the topology template and is always known, so it is the
+// reliable signal. Any QEMU node in this catalog (Kali, OpenWRT) is VNC.
+func usesVNCConsole(n NodeInfo) bool {
+	return n.ConsoleType == "vnc" || n.NodeType == "qemu"
+}
+
 func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 	userID, _ := authFromContext(r.Context())
 
@@ -73,16 +87,23 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// QEMU nodes (Kali, OpenWRT) use VNC console, not telnet.
-	// The console bridge only supports telnet for now.
-	if nodeInfo.ConsoleType == "vnc" {
+	// QEMU nodes (Kali, OpenWRT) expose a VNC console, which the browser
+	// terminal bridge (telnet-only) can't render. Detect these by NODE TYPE as
+	// well as console_type: GNS3 frequently hasn't assigned console_type at the
+	// moment we provision, so keying only off ConsoleType leaves the user
+	// staring at a bare "[disconnected]" with no guidance. NodeType is known
+	// deterministically from the topology template and is populated at provision.
+	if usesVNCConsole(nodeInfo) {
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Printf("console upgrade failed: %v", err)
 			return
 		}
 		defer ws.Close()
-		msg := fmt.Sprintf("\r\n\x1b[33m[VNC console not yet supported via browser. Use a VNC client (e.g. TigerVNC) on port %d]\x1b[0m\r\n", nodeInfo.ConsolePort)
+		msg := fmt.Sprintf(
+			"\r\n\x1b[33m[This node has a VNC console, which the browser terminal can't display.\r\n"+
+				"Connect a VNC client (e.g. TigerVNC) to %s:%d to use it.]\x1b[0m\r\n",
+			h.svc.computeHost, nodeInfo.ConsolePort)
 		ws.WriteMessage(websocket.TextMessage, []byte(msg))
 		return
 	}
