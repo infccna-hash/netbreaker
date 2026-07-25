@@ -14,8 +14,33 @@ import (
 // fakeGNS3 is a controllable GNS3Client. Set stopErr / deleteErr to simulate an
 // unresponsive/starved GNS3 host. Counters record how often each op was called.
 type fakeGNS3 struct {
-	stopErr, deleteErr error
-	stops, deletes     int
+	stopErr, deleteErr    error
+	existsErr, nodesErr   error
+	stops, deletes        int
+	existsCalls, nodeCalls int
+	exists                bool // ProjectExists return (DeleteProject flips to false)
+	stopped               bool // NodesStopped return
+}
+
+func (f *fakeGNS3) ProjectExists(context.Context, string) (bool, error) {
+	f.existsCalls++
+	return f.exists, f.existsErr
+}
+func (f *fakeGNS3) NodesStopped(context.Context, string) (bool, error) {
+	f.nodeCalls++
+	return f.stopped, f.nodesErr
+}
+
+// fakeVerifier lets teardown tests assert reaper behaviour at the invariant
+// level (verified vs not) without simulating individual GNS3 HTTP calls.
+type fakeVerifier struct {
+	err   error
+	calls int
+}
+
+func (v *fakeVerifier) WaitTeardownComplete(context.Context, string) error {
+	v.calls++
+	return v.err
 }
 
 func (f *fakeGNS3) CreateProject(context.Context, string, int, int) (string, error) {
@@ -28,6 +53,9 @@ func (f *fakeGNS3) StartNodes(context.Context, string) error { return nil }
 func (f *fakeGNS3) StopNodes(context.Context, string) error  { f.stops++; return f.stopErr }
 func (f *fakeGNS3) DeleteProject(context.Context, string) error {
 	f.deletes++
+	if f.deleteErr == nil {
+		f.exists = false
+	}
 	return f.deleteErr
 }
 
@@ -137,25 +165,55 @@ func TestSuspend_Escalation(t *testing.T) {
 // Tier 2: a failed DeleteProject must NOT End() the session. Ending would free a
 // capacity slot while the GNS3 project still exists on the host (orphan + cap
 // fiction). The session must remain idle_stopped and be retried.
-func TestTeardown_FailedDelete_KeepsCounted(t *testing.T) {
+// The core invariant: a session is never marked `ended` (freeing its slot)
+// while teardown is unverified — and it converges to `ended` once verification
+// succeeds. Driven at the behavioural level (verifier verdict) so it stays
+// valid regardless of how disappearance is confirmed underneath.
+func TestTeardown_NeverEndsWhileUnverified(t *testing.T) {
 	pool := testPool(t)
 	defer pool.Close()
 	repo := NewRepository(pool)
-	g := &fakeGNS3{deleteErr: errors.New("gns3 timeout")}
-	r := NewReaper(repo, g, time.Minute, time.Hour, 30*time.Second, 5*time.Second)
+	r := NewReaper(repo, &fakeGNS3{}, time.Minute, time.Hour, 30*time.Second, 5*time.Second)
+	fv := &fakeVerifier{err: errors.New("resources still present")}
+	r.verifier = fv
 
 	sid := seedSession(t, pool, "idle_stopped")
 	defer pool.Exec(context.Background(), `DELETE FROM lab_sessions WHERE id=$1`, sid)
 
-	r.sweep(context.Background())
-	if got := statusOf(t, pool, sid); got != "idle_stopped" {
-		t.Fatalf("after failed delete: status=%q, want idle_stopped (slot must stay counted)", got)
+	before, err := repo.ActiveCount(context.Background())
+	if err != nil {
+		t.Fatalf("ActiveCount: %v", err)
 	}
 
-	// Recovery: delete succeeds -> session ends.
-	g.deleteErr = nil
+	// Unverified sweeps: session must NOT end, and the slot stays counted.
+	for i := 0; i < 3; i++ {
+		r.sweep(context.Background())
+		if got := statusOf(t, pool, sid); got != "idle_stopped" {
+			t.Fatalf("unverified sweep %d: status=%q, want idle_stopped", i, got)
+		}
+	}
+	after, err := repo.ActiveCount(context.Background())
+	if err != nil {
+		t.Fatalf("ActiveCount: %v", err)
+	}
+	if after != before {
+		t.Fatalf("slot count changed while unverified: before=%d after=%d", before, after)
+	}
+	if fv.calls != 3 {
+		t.Fatalf("expected 3 verification attempts, got %d", fv.calls)
+	}
+
+	// Convergence: once teardown is verified, the session ends and the slot frees.
+	fv.err = nil
 	r.sweep(context.Background())
 	if got := statusOf(t, pool, sid); got != "ended" {
-		t.Fatalf("after successful delete: status=%q, want ended", got)
+		t.Fatalf("after verified teardown: status=%q, want ended", got)
+	}
+	freed, err := repo.ActiveCount(context.Background())
+	if err != nil {
+		t.Fatalf("ActiveCount: %v", err)
+	}
+	if freed != before-1 {
+		t.Fatalf("slot not freed after verified teardown: was %d, now %d", before, freed)
 	}
 }

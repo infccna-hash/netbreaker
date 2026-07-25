@@ -11,6 +11,11 @@ type GNS3Client interface {
 	StartNodes(ctx context.Context, projectID string) error
 	StopNodes(ctx context.Context, projectID string) error
 	DeleteProject(ctx context.Context, projectID string) error
+
+	// Read-only teardown-verification probes. Both fail closed: any transport
+	// or unexpected-status error must surface, never be read as "gone/stopped".
+	ProjectExists(ctx context.Context, projectID string) (bool, error)
+	NodesStopped(ctx context.Context, projectID string) (bool, error)
 }
 
 // TopologyTemplate describes the full network topology for a single lab —

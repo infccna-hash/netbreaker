@@ -338,14 +338,114 @@ func (c *HTTPGNS3Client) StartNodes(ctx context.Context, projectID string) error
 	return c.do(ctx, http.MethodPost, path, nil, nil)
 }
 
+// doStatus is like do but returns the HTTP status code and does NOT treat a
+// 4xx/5xx response as an error by itself — only transport-level failures
+// (connection refused, timeout, DNS) return a non-nil error. This lets callers
+// make idempotent decisions, e.g. treat 404 on DELETE as "already gone = ok".
+// The response body is only decoded into out on a 2xx status.
+func (c *HTTPGNS3Client) doStatus(ctx context.Context, method, path string, out any) (int, error) {
+	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, nil)
+	if err != nil {
+		return 0, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	if c.username != "" {
+		req.SetBasicAuth(c.username, c.password)
+	}
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode < 400 && out != nil && len(body) > 0 {
+		if err := json.Unmarshal(body, out); err != nil {
+			return resp.StatusCode, fmt.Errorf("gns3 %s %s: decode: %w", method, path, err)
+		}
+	}
+	return resp.StatusCode, nil
+}
+
 func (c *HTTPGNS3Client) StopNodes(ctx context.Context, projectID string) error {
+	// Idempotent: stopping already-stopped nodes is a no-op in GNS3, and a 404
+	// means the project is already gone — nothing to stop — which is success
+	// for our "ensure nothing is running" intent, not an error.
 	path := fmt.Sprintf("/v2/projects/%s/nodes/stop", projectID)
-	return c.do(ctx, http.MethodPost, path, nil, nil)
+	status, err := c.doStatus(ctx, http.MethodPost, path, nil)
+	if err != nil {
+		return err
+	}
+	if status == http.StatusNotFound {
+		return nil
+	}
+	if status >= 400 {
+		return fmt.Errorf("gns3 stop nodes %s: status %d", projectID, status)
+	}
+	return nil
+}
+
+// ProjectExists reports whether the project still exists in GNS3's model.
+// 404 → (false, nil); 2xx → (true, nil); any other status or transport error →
+// (false, err) so callers fail closed (unknown is never treated as "gone").
+func (c *HTTPGNS3Client) ProjectExists(ctx context.Context, projectID string) (bool, error) {
+	path := fmt.Sprintf("/v2/projects/%s", projectID)
+	status, err := c.doStatus(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return false, err
+	}
+	switch {
+	case status == http.StatusNotFound:
+		return false, nil
+	case status >= 200 && status < 300:
+		return true, nil
+	default:
+		return false, fmt.Errorf("gns3 get project %s: status %d", projectID, status)
+	}
+}
+
+// NodesStopped reports whether every node in the project has reached a terminal
+// (stopped) state, or the project/node list is gone. 404 → project no longer
+// exists → nothing running → (true, nil). Any non-stopped node → (false, nil).
+// Transport or unexpected status → (false, err) → fail closed.
+func (c *HTTPGNS3Client) NodesStopped(ctx context.Context, projectID string) (bool, error) {
+	path := fmt.Sprintf("/v2/projects/%s/nodes", projectID)
+	var nodes []struct {
+		Status string `json:"status"`
+	}
+	status, err := c.doStatus(ctx, http.MethodGet, path, &nodes)
+	if err != nil {
+		return false, err
+	}
+	if status == http.StatusNotFound {
+		return true, nil
+	}
+	if status < 200 || status >= 300 {
+		return false, fmt.Errorf("gns3 list nodes %s: status %d", projectID, status)
+	}
+	for _, n := range nodes {
+		if n.Status != "stopped" {
+			return false, nil
+		}
+	}
+	return true, nil
 }
 
 // --- DeleteProject ---
 
 func (c *HTTPGNS3Client) DeleteProject(ctx context.Context, projectID string) error {
+	// Idempotent: a 404 means the project is already deleted, which is exactly
+	// the post-condition we want — treat it as success so a reconciliation loop
+	// can re-issue the delete without turning a benign repeat into a failure.
 	path := fmt.Sprintf("/v2/projects/%s", projectID)
-	return c.do(ctx, http.MethodDelete, path, nil, nil)
+	status, err := c.doStatus(ctx, http.MethodDelete, path, nil)
+	if err != nil {
+		return err
+	}
+	if status == http.StatusNotFound {
+		return nil
+	}
+	if status >= 400 {
+		return fmt.Errorf("gns3 delete project %s: status %d", projectID, status)
+	}
+	return nil
 }

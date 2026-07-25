@@ -38,6 +38,11 @@ type Reaper struct {
 	tickInterval time.Duration
 	opTimeout    time.Duration // per-call deadline for each GNS3 REST op
 
+	// verifier confirms a session's compute resources are actually gone before
+	// the reaper frees its capacity slot. Defaulted from the GNS3 client in
+	// NewReaper; overridable in tests.
+	verifier TeardownVerifier
+
 	// stopAttempts tracks consecutive failed graceful-stop attempts per session.
 	// Single-goroutine access (only touched inside sweep), so no lock needed.
 	stopAttempts map[uuid.UUID]int
@@ -56,6 +61,7 @@ func NewReaper(repo *Repository, gns3 GNS3Client, idleTimeout, sessionTTL, tickI
 		sessionTTL:   sessionTTL,
 		tickInterval: tickInterval,
 		opTimeout:    opTimeout,
+		verifier:     NewGNS3TeardownVerifier(gns3),
 		stopAttempts: make(map[uuid.UUID]int),
 	}
 }
@@ -177,20 +183,25 @@ func (r *Reaper) teardown(ctx context.Context, sess *Session) {
 		return
 	}
 
+	// Gate the slot release on VERIFIED teardown, not on a delete response.
+	// The verifier deletes the project and confirms — via node status + project
+	// 404 + a settle cushion — that GNS3 no longer accounts for this session's
+	// resources. Only positive confirmation frees the slot; any uncertainty
+	// (failed delete, unconfirmed disappearance, GNS3 unreachable, timeout)
+	// returns an error and the session stays idle_stopped (still counted) to be
+	// retried next sweep. This makes teardown a convergence loop: every pass
+	// re-establishes the same fact rather than advancing a fragile state
+	// sequence, so a crash or partial teardown mid-way is harmless — the next
+	// pass simply re-checks and converges.
 	err := r.op(ctx, func(c context.Context) error {
-		return r.gns3.DeleteProject(c, *sess.GNS3ProjectID)
+		return r.verifier.WaitTeardownComplete(c, *sess.GNS3ProjectID)
 	})
 	if err != nil {
-		// Critical: do NOT End() here. Ending would set status=ended and free a
-		// capacity slot while the GNS3 project (and its nodes) still exist on the
-		// host — the exact divergence that lets orphans accumulate and the cap
-		// become fiction. Leave the session idle_stopped (still counted) and
-		// retry on the next sweep.
-		log.Printf("reaper: delete project session=%s FAILED (slot kept counted, will retry): %v",
+		log.Printf("reaper: teardown session=%s NOT confirmed (slot kept counted, will retry): %v",
 			sess.ID, err)
 		return
 	}
 	_ = r.repo.End(ctx, sess.ID)
 	delete(r.stopAttempts, sess.ID)
-	log.Printf("reaper: ended session=%s user=%s lab=%d", sess.ID, sess.UserID, sess.LabID)
+	log.Printf("reaper: ended session=%s user=%s lab=%d (teardown verified)", sess.ID, sess.UserID, sess.LabID)
 }
