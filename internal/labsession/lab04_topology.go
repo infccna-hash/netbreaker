@@ -69,10 +69,10 @@ var Lab04Topology = TopologyTemplate{
 		},
 	},
 	Links: []LinkTemplate{
-		{NodeA: "R1", IfaceA: "Gi0/0", NodeB: "SW1", IfaceB: "Et0/0"},
-		{NodeA: "R2", IfaceA: "Gi0/0", NodeB: "SW1", IfaceB: "Et0/1"},
-		{NodeA: "R2", IfaceA: "Gi0/1", NodeB: "R3", IfaceB: "Gi0/0"},
-		{NodeA: "R3", IfaceA: "Gi0/1", NodeB: "PC1", IfaceB: "eth0"},
+		{NodeA: "R1", IfaceA: "Fa0/0", NodeB: "SW1", IfaceB: "Et0/0"},
+		{NodeA: "R2", IfaceA: "Fa0/0", NodeB: "SW1", IfaceB: "Et0/1"},
+		{NodeA: "R2", IfaceA: "Fa0/1", NodeB: "R3", IfaceB: "Fa0/0"},
+		{NodeA: "R3", IfaceA: "Fa0/1", NodeB: "PC1", IfaceB: "eth0"},
 		{NodeA: "KALI", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/2"},
 	},
 }
