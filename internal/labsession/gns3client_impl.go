@@ -155,8 +155,12 @@ func (c *HTTPGNS3Client) ProvisionTopology(ctx context.Context, projectID string
 			// QEMU nodes boot from their disk image, no startup config.
 			// Properties (disk image, adapters) come from the template.
 		case "docker":
-			// Docker containers: properties (image, start_command, adapters)
-			// come from the template. No startup config.
+			// Docker containers: image and start_command come from the template
+			// properties, but GNS3 requires 'image' in the node creation payload.
+			// Default to the Kali image if not specified.
+			if _, ok := props["image"]; !ok {
+				props["image"] = "gns3/kalilinux:latest"
+			}
 		case "vpcs":
 			// Built-in Virtual PC Simulator — no startup config, no properties.
 		case "ethernet_hub":
