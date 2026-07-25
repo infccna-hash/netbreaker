@@ -152,6 +152,27 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 
 	// websocket → tcp (keystrokes → GNS3 console), with heartbeat-on-keystroke
 	lastTouch := time.Now()
+
+	// Keep-alive ticker: send a heartbeat every 60s while the websocket
+	// remains open. Without this, a user reading a lab phase without
+	// typing for >GNS3_IDLE_TIMEOUT (default 15m) gets reaped — the
+	// session is suspended, all consoles disconnect, and unsaved device
+	// config is lost. The keystroke heartbeat above still fires on
+	// activity for fine-grained last_active_at tracking; this ticker is
+	// the safety net for thinking/reading pauses.
+	keepAlive := time.NewTicker(60 * time.Second)
+	defer keepAlive.Stop()
+	go func() {
+		for {
+			select {
+			case <-keepAlive.C:
+				_ = h.svc.Heartbeat(ctx, sessionID)
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
 	for {
 		_, msg, err := ws.ReadMessage()
 		if err != nil {
