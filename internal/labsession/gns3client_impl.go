@@ -159,7 +159,7 @@ func (c *HTTPGNS3Client) ProvisionTopology(ctx context.Context, projectID string
 			// node creation payload even when using a template that specifies
 			// them. Default to Kali image + telnet.
 			if _, ok := props["image"]; !ok {
-				props["image"] = "gns3/kalilinux:latest"
+				props["image"] = "netbreaker-kali:latest"
 			}
 			if _, ok := props["console_type"]; !ok {
 				props["console_type"] = "telnet"
