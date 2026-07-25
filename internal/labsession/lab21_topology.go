@@ -18,18 +18,36 @@ var Lab21Topology = TopologyTemplate{
 		{
 			Name:     "R1",
 			NodeType: "dynamips",
-			Properties: map[string]any{"adapters": 2},
-},
+			Properties: map[string]any{
+				"platform": "c3725",
+				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
+				"ram":      256,
+				"slot0":    "GT96100-FE",
+				"slot1":    "NM-16ESW",
+			},
+		},
 		{
 			Name:     "R2",
 			NodeType: "dynamips",
-			Properties: map[string]any{"adapters": 2},
-},
+			Properties: map[string]any{
+				"platform": "c3725",
+				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
+				"ram":      256,
+				"slot0":    "GT96100-FE",
+				"slot1":    "NM-16ESW",
+			},
+		},
 		{
 			Name:     "R3",
 			NodeType: "dynamips",
-			Properties: map[string]any{"adapters": 2},
-},
+			Properties: map[string]any{
+				"platform": "c3725",
+				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
+				"ram":      256,
+				"slot0":    "GT96100-FE",
+				"slot1":    "NM-16ESW",
+			},
+		},
 		{
 			Name:     "PC1",
 			NodeType: "vpcs",
@@ -47,7 +65,7 @@ var Lab21Topology = TopologyTemplate{
 			NodeType:   "docker",
 			TemplateID: "efcdd6aa-8a18-4028-ae77-331d9e6d921b",
 			Properties: map[string]any{"adapters": 2},
-},
+		},
 	},
 	Links: []LinkTemplate{
 		// WAN triangle

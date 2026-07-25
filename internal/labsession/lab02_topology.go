@@ -27,20 +27,26 @@ var Lab02Topology = TopologyTemplate{
 		{
 			Name:     "SW1",
 			NodeType: "iou",
-			Properties: map[string]any{"adapters": 2},
-StartupConfig: sw1Startup,
+			Properties: map[string]any{
+				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+			},
+			StartupConfig: sw1Startup,
 		},
 		{
 			Name:     "SW2",
 			NodeType: "iou",
-			Properties: map[string]any{"adapters": 2},
-StartupConfig: sw2Startup,
+			Properties: map[string]any{
+				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+			},
+			StartupConfig: sw2Startup,
 		},
 		{
 			Name:     "SW3",
 			NodeType: "iou",
-			Properties: map[string]any{"adapters": 2},
-StartupConfig: sw3Startup,
+			Properties: map[string]any{
+				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+			},
+			StartupConfig: sw3Startup,
 		},
 		{
 			Name:     "PC1",
@@ -51,7 +57,7 @@ StartupConfig: sw3Startup,
 			NodeType:   "docker",
 			TemplateID: "efcdd6aa-8a18-4028-ae77-331d9e6d921b",
 			Properties: map[string]any{"adapters": 2},
-},
+		},
 	},
 	Links: []LinkTemplate{
 		// Triangle inter-switch links — adapter 0 port 1 (Ethernet0/1)
