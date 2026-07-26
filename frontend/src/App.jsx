@@ -14,11 +14,20 @@ import VerifyCertificate from "./pages/VerifyCertificate.jsx";
 import Account from "./pages/Account.jsx";
 import Team from "./pages/Team.jsx";
 import Admin from "./pages/Admin.jsx";
+import ConsoleWindow from "./pages/ConsoleWindow.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 export default function App() {
   return (
     <Routes>
+      {/* Standalone console tab — deliberately outside <Layout>, so it has
+          no app nav/footer and can fill the whole browser tab. Opened via
+          window.open() from LabDetail's "Open console" button. */}
+      <Route
+        path="console/:sessionId"
+        element={<ProtectedRoute><ConsoleWindow /></ProtectedRoute>}
+      />
+
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />

@@ -3,7 +3,6 @@ import { useParams, Link } from "react-router-dom";
 import { api, ApiError } from "../lib/api.js";
 import { useAuth } from "../lib/auth.jsx";
 import PhaseTrack from "../components/PhaseTrack.jsx";
-import ConsolePanel from "../components/ConsolePanel.jsx";
 import { renderMarkdown } from "../lib/markdown.js";
 
 const PHASE_META = {
@@ -26,8 +25,6 @@ export default function LabDetail() {
   // ── Session (live lab orchestration) ────────────────────────────────
   const [session, setSession] = useState(null);       // current session object or null
   const [sessionLoading, setSessionLoading] = useState(false);
-  const [activeNode, setActiveNode] = useState(null); // which tab is selected
-  const [consoleOpen, setConsoleOpen] = useState(false); // full-screen console modal
   const pollingRef = useRef(null);
 
   const canLaunch = user && (lab?.is_free || isPro);
@@ -44,11 +41,6 @@ export default function LabDetail() {
       try {
         const s = await api.get(`/labsessions/${session.id}`);
         setSession(s);
-        if (s.status === "running" && s.node_map) {
-          const names = Object.keys(s.node_map);
-          setActiveNode((prev) => (names.includes(prev) ? prev : names[0]));
-          setConsoleOpen(true);
-        }
         if (s.status !== "provisioning" && s.status !== "running") {
           clearInterval(pollingRef.current);
           pollingRef.current = null;
@@ -95,17 +87,7 @@ export default function LabDetail() {
       await api.del(`/labsessions/${session.id}`);
     } catch { /* ignore */ }
     setSession(null);
-    setActiveNode(null);
-    setConsoleOpen(false);
   }, [session?.id]);
-
-  // Esc closes the console modal (doesn't touch the session/websockets)
-  useEffect(() => {
-    if (!consoleOpen) return;
-    function onKey(e) { if (e.key === "Escape") setConsoleOpen(false); }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [consoleOpen]);
 
   // ── Standard lab data loading ───────────────────────────────────────
 
@@ -256,8 +238,11 @@ export default function LabDetail() {
               <span className="muted" style={{ fontSize: "0.9rem" }}>
                 Session running — {nodeNames.length} node{nodeNames.length === 1 ? "" : "s"} online.
               </span>
-              <button className="btn btn-primary btn-sm" onClick={() => setConsoleOpen(true)}>
-                🖥 Open console
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => window.open(`/console/${session.id}`, "_blank", "noopener,noreferrer")}
+              >
+                🖥 Open console ↗
               </button>
             </div>
           )}
@@ -329,54 +314,6 @@ export default function LabDetail() {
         </div>
       )}
 
-      {/* ── Full-screen console modal ───────────────────────────────────
-          Always rendered once a session exists with nodes, just hidden
-          via display:none when closed. Every node's ConsolePanel stays
-          mounted the whole time (see console-panel display toggle below)
-          so opening/closing this modal or switching tabs never drops a
-          websocket/telnet session — only "End session" does. */}
-      {session?.status === "running" && nodeNames.length > 0 && (
-        <div
-          className="console-modal-backdrop"
-          style={{ display: consoleOpen ? "flex" : "none" }}
-          onClick={(e) => { if (e.target === e.currentTarget) setConsoleOpen(false); }}
-        >
-          <div className="console-modal">
-            <div className="console-modal-head">
-              <div className="console-modal-tabs">
-                {nodeNames.map((name) => (
-                  <button
-                    key={name}
-                    className={"btn btn-sm " + (activeNode === name ? "btn-primary" : "")}
-                    onClick={() => setActiveNode(name)}
-                    style={{ fontFamily: "var(--mono)" }}
-                  >
-                    {name}
-                  </button>
-                ))}
-              </div>
-              <button className="btn btn-sm" onClick={() => setConsoleOpen(false)}>
-                ✕ Close
-              </button>
-            </div>
-            <div className="console-modal-body">
-              {nodeNames.map((name) => (
-                <div
-                  key={name}
-                  className="console-panel"
-                  style={{ display: activeNode === name ? "block" : "none" }}
-                >
-                  <ConsolePanel
-                    sessionId={session.id}
-                    nodeName={name}
-                    active={activeNode === name && consoleOpen}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
