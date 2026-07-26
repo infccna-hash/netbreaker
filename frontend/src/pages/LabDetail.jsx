@@ -53,15 +53,7 @@ export default function LabDetail() {
     return () => { if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null; } };
   }, [session?.id, session?.status]);
 
-  // End session on unmount
-  useEffect(() => {
-    return () => {
-      if (session?.id && (session.status === "provisioning" || session.status === "running")) {
-        api.del(`/labsessions/${session.id}`).catch(() => {});
-      }
-    };
-  }, [session?.id]);
-
+  // Session persists in the console tab — only ended via explicit End session button.
   const launchSession = useCallback(async () => {
     setSessionLoading(true);
     setError("");
