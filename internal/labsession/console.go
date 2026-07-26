@@ -130,7 +130,7 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 		tcp.SetKeepAlivePeriod(30 * time.Second)
 	}
 
-	ctx, cancel := context.WithCancel(r.Context())
+	ctx, cancel := context.WithCancel(context.Background()) // bg: survive chi Timeout(30s) middleware
 	defer cancel()
 
 	// tcp → websocket (GNS3 console output → browser)

@@ -4,8 +4,9 @@ import { FitAddon } from 'xterm-addon-fit';
 import 'xterm/css/xterm.css';
 import { getToken } from '../lib/api.js';
 
-export default function ConsolePanel({ sessionId, nodeName }) {
+export default function ConsolePanel({ sessionId, nodeName, active }) {
   const containerRef = useRef(null);
+  const fitAddonRef = useRef(null);
 
   useEffect(() => {
     const term = new Terminal({
@@ -15,6 +16,7 @@ export default function ConsolePanel({ sessionId, nodeName }) {
       theme: { background: '#0d1117' },
     });
     const fitAddon = new FitAddon();
+    fitAddonRef.current = fitAddon;
     term.loadAddon(fitAddon);
     term.open(containerRef.current);
     fitAddon.fit();
@@ -45,6 +47,16 @@ export default function ConsolePanel({ sessionId, nodeName }) {
       term.dispose();
     };
   }, [sessionId, nodeName]);
+
+  // The panel may be mounted while hidden (display:none), so its first
+  // fit() can measure a zero-size container. Re-fit whenever it becomes
+  // the visible/active tab.
+  useEffect(() => {
+    if (active && fitAddonRef.current) {
+      const id = requestAnimationFrame(() => fitAddonRef.current.fit());
+      return () => cancelAnimationFrame(id);
+    }
+  }, [active]);
 
   return <div ref={containerRef} style={{ height: '100%', width: '100%' }} />;
 }

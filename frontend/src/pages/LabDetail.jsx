@@ -254,20 +254,29 @@ export default function LabDetail() {
                 ))}
               </div>
 
-              {/* Console terminal panel */}
-              {activeNode && (
+              {/* Console terminal panels — ALL nodes stay mounted so their
+                  websocket/telnet sessions persist across tab switches.
+                  Only the active tab is shown; inactive ones are hidden via
+                  display:none rather than unmounted. */}
+              {nodeNames.map((name) => (
                 <div
+                  key={name}
                   className="console-panel"
                   style={{
+                    display: activeNode === name ? "block" : "none",
                     height: 420,
                     border: "1px solid var(--border)",
                     borderRadius: "var(--radius)",
                     overflow: "hidden",
                   }}
                 >
-                  <ConsolePanel sessionId={session.id} nodeName={activeNode} />
+                  <ConsolePanel
+                    sessionId={session.id}
+                    nodeName={name}
+                    active={activeNode === name}
+                  />
                 </div>
-              )}
+              ))}
             </div>
           )}
 
