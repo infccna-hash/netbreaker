@@ -269,7 +269,7 @@ export default function LabDetail() {
 
           {/* ── Live Lab / Console Section ─────────────────────────── */}
           {user && (lab.is_free || isPro) && (
-            <div className="card card-pad stack-16">
+            <div className="card card-pad stack-16 lab-live-card">
               <div className="row between wrap" style={{ gap: 12 }}>
                 <span className="eyebrow">🖥 Live Lab</span>
                 {session?.status === "running" && (
@@ -305,7 +305,7 @@ export default function LabDetail() {
               )}
 
               {session?.status === "running" && nodeNames.length > 0 && (
-                <div className="stack-8">
+                <div className="stack-8 console-stack">
                   {/* Node tabs */}
                   <div className="row" style={{ gap: 4, flexWrap: "wrap" }}>
                     {nodeNames.map((name) => (
@@ -329,8 +329,8 @@ export default function LabDetail() {
                       key={name}
                       className="console-panel"
                       style={{
-                        display: activeNode === name ? "block" : "none",
-                        height: 420,
+                        display: activeNode === name ? "flex" : "none",
+                        flexDirection: "column",
                         border: "1px solid var(--border)",
                         borderRadius: "var(--radius)",
                         overflow: "hidden",

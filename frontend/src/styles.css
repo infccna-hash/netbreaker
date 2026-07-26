@@ -261,7 +261,7 @@ tbody tr:hover { background: var(--surface-2); }
   display: grid;
   grid-template-columns: minmax(0, 1fr) 400px;
   gap: 24px;
-  align-items: start;
+  align-items: stretch;
 }
 .lab-main { min-width: 0; }
 .lab-side {
@@ -270,9 +270,30 @@ tbody tr:hover { background: var(--surface-2); }
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-height: calc(100vh - 96px);
+  height: calc(100vh - 96px);
   overflow-y: auto;
   padding-bottom: 4px;
+}
+/* The Live Lab card grows to fill whatever height lab-side is given
+   (which now matches the walkthrough column via grid stretch), so the
+   two columns read as the same height instead of the sidebar looking
+   short next to a much taller walkthrough. */
+.lab-live-card {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.lab-live-card .console-stack {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 8px;
+}
+.lab-live-card .console-panel {
+  flex: 1 1 auto;
+  min-height: 320px;
 }
 
 @media (max-width: 900px) {
