@@ -252,6 +252,34 @@ tbody tr:hover { background: var(--surface-2); }
 
 .footer { border-top: 1px solid var(--line); padding: 26px 0; color: var(--muted); font-size: 0.83rem; }
 
+/* ── Lab detail: walkthrough + sticky console side-by-side ────────
+   Left column scrolls normally through the build/attack/harden steps.
+   Right column (topology + Live Lab console) stays pinned in view via
+   position: sticky, offset below the sticky top nav (60px + margin),
+   so the console never has to be scrolled back to mid-walkthrough. */
+.lab-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 24px;
+  align-items: start;
+}
+.lab-main { min-width: 0; }
+.lab-side {
+  position: sticky;
+  top: 76px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  padding-bottom: 4px;
+}
+
+@media (max-width: 900px) {
+  .lab-layout { grid-template-columns: 1fr; }
+  .lab-side { position: static; max-height: none; overflow: visible; }
+}
+
 @media (max-width: 820px) {
   .grid-3 { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }

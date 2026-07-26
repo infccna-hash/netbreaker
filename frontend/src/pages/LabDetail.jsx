@@ -182,170 +182,180 @@ export default function LabDetail() {
 
       {error && <div className="alert alert-error">{error}</div>}
 
-      {topology && (topology.svg_large || topology.svg_small) && (
-        <div className="card card-pad stack-16">
-          <div className="row between">
-            <span className="eyebrow">Topology</span>
-            {isPro && (
-              <button className="btn btn-sm" onClick={downloadConfig}>Download starter config</button>
-            )}
-          </div>
-          <div className="topology" dangerouslySetInnerHTML={{ __html: topology.svg_large || topology.svg_small }} />
-          {Array.isArray(topology.legend) && topology.legend.length > 0 && (
-            <div className="topo-legend">
-              {topology.legend.map((item, i) => (
-                <span key={i} className="topo-legend-item">{item}</span>
-              ))}
+      {/* ── Two-column layout: walkthrough scrolls on the left, topology +
+          Live Lab console stay pinned in view on the right (sticky), so
+          you never have to scroll away from the console to read the next
+          step or back to it to type the next command. ───────────────── */}
+      <div className="lab-layout">
+        <div className="lab-main stack-16">
+          {locked && (
+            <div className="alert alert-info row between wrap" style={{ gap: 12 }}>
+              <span>This is a Pro lab. You can see the brief — unlock the full build, attack, and harden walkthrough with Pro.</span>
+              <Link to="/pricing" className="btn btn-sm btn-primary">See plans</Link>
             </div>
           )}
-        </div>
-      )}
 
-      {/* ── Live Lab / Console Section ─────────────────────────────── */}
-      {user && (lab.is_free || isPro) && (
-        <div className="card card-pad stack-16">
-          <div className="row between wrap" style={{ gap: 12 }}>
-            <span className="eyebrow">🖥 Live Lab</span>
-            {session?.status === "running" && (
-              <button className="btn btn-sm btn-outline-danger" onClick={endSession}>
-                End session
-              </button>
-            )}
+          <div className="stack-16">
+            {phases.map((ph) => {
+              const meta = PHASE_META[ph.phase];
+              const phaseLocked = ph.is_pro_only && !isPro;
+              const done = completed.has(ph.phase);
+              return (
+                <div key={ph.id} className="card card-pad stack-16" style={{ borderLeft: `3px solid ${meta.color}` }}>
+                  <div className="row between wrap">
+                    <div className="row" style={{ gap: 10 }}>
+                      <span className="badge" style={{ background: meta.tint, color: meta.color, borderColor: meta.color }}>
+                        {meta.label}
+                      </span>
+                      <h3>{ph.title}</h3>
+                    </div>
+                    {user && !phaseLocked && (
+                      <button
+                        className={"btn btn-sm " + (done ? "" : "btn-primary")}
+                        onClick={() => togglePhase(ph.phase)}
+                        disabled={busyPhase === ph.phase}
+                      >
+                        {busyPhase === ph.phase ? <span className="spinner" /> : done ? "✓ Completed" : "Mark complete"}
+                      </button>
+                    )}
+                  </div>
+
+                  {phaseLocked ? (
+                    <div className="alert alert-info row between wrap" style={{ gap: 12 }}>
+                      <span>Unlock this phase with Pro.</span>
+                      <Link to="/pricing" className="btn btn-sm">Upgrade</Link>
+                    </div>
+                  ) : (
+                    <div
+                      className="lab-content"
+                      dangerouslySetInnerHTML={{ __html: renderMarkdown(ph.content) }}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          {!session && (
-            <div className="stack-8">
-              <p className="muted" style={{ fontSize: "0.9rem" }}>
-                Launch a live GNS3 session with all devices pre-wired and pre-configured.
-                Your console opens directly in the browser — no external tools needed.
-              </p>
-              <div>
-                <button
-                  className="btn btn-primary"
-                  onClick={launchSession}
-                  disabled={sessionLoading}
-                >
-                  {sessionLoading ? <span className="spinner" /> : "🚀 Launch session"}
-                </button>
+          {!user && (
+            <div className="card card-pad center stack-8">
+              <p className="muted">Log in to track which phases you've completed and work toward your certificate.</p>
+              <div className="btn-row" style={{ justifyContent: "center" }}>
+                <Link to="/register" className="btn btn-primary">Start free</Link>
+                <Link to="/login" className="btn">Log in</Link>
               </div>
             </div>
           )}
+        </div>
 
-          {session?.status === "provisioning" && (
-            <div className="row" style={{ gap: 12, alignItems: "center", padding: "12px 0" }}>
-              <div className="spinner" />
-              <span className="muted">Provisioning your lab environment…</span>
-            </div>
-          )}
-
-          {session?.status === "running" && nodeNames.length > 0 && (
-            <div className="stack-8">
-              {/* Node tabs */}
-              <div className="row" style={{ gap: 4, flexWrap: "wrap" }}>
-                {nodeNames.map((name) => (
-                  <button
-                    key={name}
-                    className={"btn btn-sm " + (activeNode === name ? "btn-primary" : "")}
-                    onClick={() => setActiveNode(name)}
-                    style={{ fontFamily: "var(--mono)" }}
-                  >
-                    {name}
-                  </button>
-                ))}
+        <div className="lab-side">
+          {topology && (topology.svg_large || topology.svg_small) && (
+            <div className="card card-pad stack-16">
+              <div className="row between">
+                <span className="eyebrow">Topology</span>
+                {isPro && (
+                  <button className="btn btn-sm" onClick={downloadConfig}>Download starter config</button>
+                )}
               </div>
-
-              {/* Console terminal panels — ALL nodes stay mounted so their
-                  websocket/telnet sessions persist across tab switches.
-                  Only the active tab is shown; inactive ones are hidden via
-                  display:none rather than unmounted. */}
-              {nodeNames.map((name) => (
-                <div
-                  key={name}
-                  className="console-panel"
-                  style={{
-                    display: activeNode === name ? "block" : "none",
-                    height: 420,
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--radius)",
-                    overflow: "hidden",
-                  }}
-                >
-                  <ConsolePanel
-                    sessionId={session.id}
-                    nodeName={name}
-                    active={activeNode === name}
-                  />
+              <div className="topology" dangerouslySetInnerHTML={{ __html: topology.svg_large || topology.svg_small }} />
+              {Array.isArray(topology.legend) && topology.legend.length > 0 && (
+                <div className="topo-legend">
+                  {topology.legend.map((item, i) => (
+                    <span key={i} className="topo-legend-item">{item}</span>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
 
-          {session && !["provisioning", "running"].includes(session.status) && (
-            <div className="alert alert-warn" style={{ marginTop: 8 }}>
-              Session ended ({session.status}).{" "}
-              <button className="link" onClick={launchSession}>Launch again</button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {locked && (
-        <div className="alert alert-info row between wrap" style={{ gap: 12 }}>
-          <span>This is a Pro lab. You can see the brief — unlock the full build, attack, and harden walkthrough with Pro.</span>
-          <Link to="/pricing" className="btn btn-sm btn-primary">See plans</Link>
-        </div>
-      )}
-
-      <div className="stack-16">
-        {phases.map((ph) => {
-          const meta = PHASE_META[ph.phase];
-          const phaseLocked = ph.is_pro_only && !isPro;
-          const done = completed.has(ph.phase);
-          return (
-            <div key={ph.id} className="card card-pad stack-16" style={{ borderLeft: `3px solid ${meta.color}` }}>
-              <div className="row between wrap">
-                <div className="row" style={{ gap: 10 }}>
-                  <span className="badge" style={{ background: meta.tint, color: meta.color, borderColor: meta.color }}>
-                    {meta.label}
-                  </span>
-                  <h3>{ph.title}</h3>
-                </div>
-                {user && !phaseLocked && (
-                  <button
-                    className={"btn btn-sm " + (done ? "" : "btn-primary")}
-                    onClick={() => togglePhase(ph.phase)}
-                    disabled={busyPhase === ph.phase}
-                  >
-                    {busyPhase === ph.phase ? <span className="spinner" /> : done ? "✓ Completed" : "Mark complete"}
+          {/* ── Live Lab / Console Section ─────────────────────────── */}
+          {user && (lab.is_free || isPro) && (
+            <div className="card card-pad stack-16">
+              <div className="row between wrap" style={{ gap: 12 }}>
+                <span className="eyebrow">🖥 Live Lab</span>
+                {session?.status === "running" && (
+                  <button className="btn btn-sm btn-outline-danger" onClick={endSession}>
+                    End session
                   </button>
                 )}
               </div>
 
-              {phaseLocked ? (
-                <div className="alert alert-info row between wrap" style={{ gap: 12 }}>
-                  <span>Unlock this phase with Pro.</span>
-                  <Link to="/pricing" className="btn btn-sm">Upgrade</Link>
+              {!session && (
+                <div className="stack-8">
+                  <p className="muted" style={{ fontSize: "0.9rem" }}>
+                    Launch a live GNS3 session with all devices pre-wired and pre-configured.
+                    Your console opens directly in the browser — no external tools needed.
+                  </p>
+                  <div>
+                    <button
+                      className="btn btn-primary"
+                      onClick={launchSession}
+                      disabled={sessionLoading}
+                    >
+                      {sessionLoading ? <span className="spinner" /> : "🚀 Launch session"}
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                <div
-                  className="lab-content"
-                  dangerouslySetInnerHTML={{ __html: renderMarkdown(ph.content) }}
-                />
+              )}
+
+              {session?.status === "provisioning" && (
+                <div className="row" style={{ gap: 12, alignItems: "center", padding: "12px 0" }}>
+                  <div className="spinner" />
+                  <span className="muted">Provisioning your lab environment…</span>
+                </div>
+              )}
+
+              {session?.status === "running" && nodeNames.length > 0 && (
+                <div className="stack-8">
+                  {/* Node tabs */}
+                  <div className="row" style={{ gap: 4, flexWrap: "wrap" }}>
+                    {nodeNames.map((name) => (
+                      <button
+                        key={name}
+                        className={"btn btn-sm " + (activeNode === name ? "btn-primary" : "")}
+                        onClick={() => setActiveNode(name)}
+                        style={{ fontFamily: "var(--mono)" }}
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Console terminal panels — ALL nodes stay mounted so their
+                      websocket/telnet sessions persist across tab switches.
+                      Only the active tab is shown; inactive ones are hidden via
+                      display:none rather than unmounted. */}
+                  {nodeNames.map((name) => (
+                    <div
+                      key={name}
+                      className="console-panel"
+                      style={{
+                        display: activeNode === name ? "block" : "none",
+                        height: 420,
+                        border: "1px solid var(--border)",
+                        borderRadius: "var(--radius)",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <ConsolePanel
+                        sessionId={session.id}
+                        nodeName={name}
+                        active={activeNode === name}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {session && !["provisioning", "running"].includes(session.status) && (
+                <div className="alert alert-warn" style={{ marginTop: 8 }}>
+                  Session ended ({session.status}).{" "}
+                  <button className="link" onClick={launchSession}>Launch again</button>
+                </div>
               )}
             </div>
-          );
-        })}
-      </div>
-
-      {!user && (
-        <div className="card card-pad center stack-8">
-          <p className="muted">Log in to track which phases you've completed and work toward your certificate.</p>
-          <div className="btn-row" style={{ justifyContent: "center" }}>
-            <Link to="/register" className="btn btn-primary">Start free</Link>
-            <Link to="/login" className="btn">Log in</Link>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
