@@ -7,6 +7,8 @@ ENV GOFLAGS=-mod=mod
 # if absent, so a fresh checkout builds without a pre-committed go.sum.
 COPY . .
 RUN go mod download && \
+    go vet ./... && \
+    go test ./... && \
     CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /netbreaker ./cmd/server/
 
 # ─── Runtime stage ────────────────────────────────────────────

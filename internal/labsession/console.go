@@ -205,7 +205,7 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 	//
 	// Pong handler extends the read deadline on each pong received
 	// from the browser. A ping ticker sends periodic pings. If the
-	// browser stops responding (60s), ReadMessage returns an error,
+	// browser stops responding (120s), ReadMessage returns an error,
 	// the handler exits, and defer unlock() releases the lock.
 	const (
 		pongWait   = 120 * time.Second
