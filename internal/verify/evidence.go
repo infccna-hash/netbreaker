@@ -57,6 +57,7 @@ type Evidence struct {
 	RunningConfig      string
 	ErrdisableRecovery ErrdisableConfig
 	Reachability       map[string]bool
+	VLANs              map[Port]int
 }
 
 // Collector is the transport-agnostic boundary. An IOS implementation
@@ -69,6 +70,7 @@ type Collector interface {
 	CollectRunningConfig(ctx context.Context) (string, error)
 	CollectErrdisableRecovery(ctx context.Context) (ErrdisableConfig, error)
 	CollectReachability(ctx context.Context, targets ...string) (map[string]bool, error)
+	CollectVLANs(ctx context.Context) (map[Port]int, error)
 }
 
 // EvidenceStore wraps a Collector with per-run caching so that N
@@ -137,6 +139,21 @@ func (s *EvidenceStore) ErrdisableRecovery(ctx context.Context) (ErrdisableConfi
 		s.fetched["errdisable"] = true
 	}
 	return s.evidence.ErrdisableRecovery, nil
+}
+
+func (s *EvidenceStore) VLANFor(ctx context.Context, port Port) (int, bool, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if !s.fetched["vlans"] {
+		vlans, err := s.collector.CollectVLANs(ctx)
+		if err != nil {
+			return 0, false, fmt.Errorf("collect vlans: %w", err)
+		}
+		s.evidence.VLANs = vlans
+		s.fetched["vlans"] = true
+	}
+	v, ok := s.evidence.VLANs[port]
+	return v, ok, nil
 }
 
 func (s *EvidenceStore) Reachable(ctx context.Context, target string) (bool, error) {

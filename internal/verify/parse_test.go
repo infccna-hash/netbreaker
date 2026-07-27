@@ -145,6 +145,41 @@ all                          Disabled
 	}
 }
 
+// TODO(real capture): placeholder `show vlan brief` shape, not yet
+// validated against IOU. Get a real capture with Et0/1 deliberately
+// moved to VLAN 99 (the Fault 2 scenario) before trusting this.
+func TestParseVlanBrief(t *testing.T) {
+	raw := `
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Et0/0, Et0/3
+99   VLAN0099                         active    Et0/1
+`
+	vlans := parseVlanBrief(raw)
+	if vlans["Et0/0"] != 1 {
+		t.Errorf("expected Et0/0 in VLAN 1, got %d", vlans["Et0/0"])
+	}
+	if vlans["Et0/1"] != 99 {
+		t.Errorf("expected Et0/1 in VLAN 99, got %d", vlans["Et0/1"])
+	}
+	if vlans["Et0/3"] != 1 {
+		t.Errorf("expected Et0/3 in VLAN 1, got %d", vlans["Et0/3"])
+	}
+}
+
+func TestParseVlanBrief_ContinuationLine(t *testing.T) {
+	raw := `
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Et0/0, Et0/2, Et0/3,
+                                                 Et1/0
+`
+	vlans := parseVlanBrief(raw)
+	if vlans["Et1/0"] != 1 {
+		t.Errorf("expected wrapped port Et1/0 in VLAN 1, got %d", vlans["Et1/0"])
+	}
+}
+
 func TestParsePingResult(t *testing.T) {
 	cases := []struct {
 		raw  string

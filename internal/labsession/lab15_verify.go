@@ -18,21 +18,23 @@ func Lab15BuildVerifier(sess *verify.LabSession) *verify.Verifier {
 		ExpectMACOnPort("KALI has its own dedicated port", sess.MAC("KALI"), "Et0/2")
 }
 
-// Lab15AttackVerifier checks that all active ports are up and every
-// host is reachable end-to-end after fixing the four deliberate faults.
+// Lab15AttackVerifier checks all four deliberate faults are fixed.
 //
-// IOU L2 note: ExpectInterfaceSpeed / ExpectInterfaceDuplex are NOT
-// included here. IOU L2 Ethernet interfaces don't support the `speed`
-// command (rejected with % Invalid input) and always report
-// `Auto-duplex, Auto-speed` in show interfaces regardless of
-// configuration — there is no PHY to negotiate. These checks are valid
-// on dynamips/IOSvL2 but fundamentally unverifiable on IOU L2.
+// IOU L2 note: speed/duplex checks were removed after real captures
+// confirmed the platform can't surface them (`speed 1000` rejected
+// outright, `duplex full` accepted but never reported as anything
+// but Auto-duplex — see parse.go). Faults 2 and 3 were replaced:
+//   - Fault 2 (was: duplex mismatch)  -> now: wrong VLAN on Et0/1
+//   - Fault 3 (was: speed mismatch)   -> now: port-security violation
+//     err-disabling Et0/2 — caught by ExpectInterfaceUp's existing
+//     ErrDisabled check, no new assertion needed.
 func Lab15AttackVerifier(sess *verify.LabSession) *verify.Verifier {
 	v := verify.New().
 		ExpectInterfaceUp("Et0/0").
 		ExpectInterfaceUp("Et0/1").
 		ExpectInterfaceUp("Et0/2").
-		ExpectInterfaceUp("Et0/3")
+		ExpectInterfaceUp("Et0/3").
+		ExpectPortVLAN("Et0/1", 1) // PC3 back in the default VLAN
 
 	for _, host := range []string{"PC1", "PC2", "PC3", "KALI", "KALI2"} {
 		v.ExpectReachable(host, sess.IP(host))
@@ -48,11 +50,19 @@ func Lab15AttackVerifier(sess *verify.LabSession) *verify.Verifier {
 // running-config). It does NOT verify:
 //   - That `errdisable recovery cause all` was accepted (IOU L2
 //     acceptance unconfirmed as of 2026-07-27 — live-node tests
-//     timed out; the binary does contain errdisable strings, so
-//     rejection isn't guaranteed, but per-cause table flipping to
-//     "Enabled" has not been observed)
+//     timed out). Note: the CCNA curriculum teaches per-cause
+//     recovery (errdisable recovery cause psecure-violation), not
+//     cause all. Switching the lab and verifier to the per-cause
+//     form (a) aligns with the exam, (b) shrinks the open question
+//     from "does cause all work on IOU" to "does one specific
+//     cause keyword work," and (c) makes the per-cause table
+//     (show errdisable recovery) the primary assertion rather
+//     than the 180s timer alone.
 //   - That errdisable recovery actually functions end-to-end
-//     (requires a BPDU guard violation + 180s wait, not yet tested)
+//     (requires a BPDU guard violation + 180s wait, not yet tested).
+//     Intermediate signal: once recovery is enabled for a cause,
+//     an err-disabled port appears under "Interfaces that will be
+//     enabled at the next timeout" — verifiable without waiting.
 //
 // If cause all turns out to be silently rejected or inert on IOU L2,
 // the student can pass all six assertions with a switch that will

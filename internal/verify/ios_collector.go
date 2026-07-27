@@ -10,6 +10,20 @@ import (
 // the existing telnet bridge (console.go), headless. This file only
 // knows CLI syntax and transport — every regex/parse lives in
 // parse.go, tested with zero console dependency.
+//
+// CONCURRENCY: two concurrent verify runs against the same session
+// (double-click, retry racing a slow first attempt) will interleave
+// show commands through the single serialized console channel and
+// each will parse the other's output. The DB unique constraint
+// protects XP but not verdict correctness.
+//
+// REQUIRED before wiring the HTTP handler:
+//  1. Per-session mutex or command queue so only one verify run
+//     executes at a time per (session, device) pair.
+//  2. Hard deadline per verify run (hung console → recorded-as-failed
+//     attempt, not a hung HTTP request).
+//  3. These belong in ConsoleRunner, not here — this file should
+//     remain a thin translation layer.
 type IOSCollector struct {
 	Console  ConsoleRunner
 	NodeID   string
@@ -60,6 +74,14 @@ func (c *IOSCollector) CollectErrdisableRecovery(ctx context.Context) (Errdisabl
 		return ErrdisableConfig{}, err
 	}
 	return parseErrdisableRecovery(out), nil
+}
+
+func (c *IOSCollector) CollectVLANs(ctx context.Context) (map[Port]int, error) {
+	out, err := c.run(ctx, "show vlan brief")
+	if err != nil {
+		return nil, err
+	}
+	return parseVlanBrief(out), nil
 }
 
 func (c *IOSCollector) CollectReachability(ctx context.Context, targets ...string) (map[string]bool, error) {

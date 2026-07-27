@@ -33,6 +33,12 @@ var Lab15Topology = TopologyTemplate{
 			Name:       "FW1",
 			NodeType:   "qemu",
 			TemplateID: "bea8738c-f896-4bd8-9f28-fe4643ad0882",
+			Properties: map[string]any{
+				"hda_disk_image":      "asa-915-k8.qcow2",
+				"hda_disk_interface":  "ide",
+				"ram":                 2048,
+				"qemu_path":           "/usr/bin/qemu-system-x86_64",
+			},
 		},
 		{
 			Name:     "PC1",

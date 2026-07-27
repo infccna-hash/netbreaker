@@ -98,6 +98,64 @@ func parseErrdisableRecovery(out string) ErrdisableConfig {
 
 var pingSuccessRe = regexp.MustCompile(`(?i)Success rate is (\d+) percent`)
 
+// TODO(real capture): parseVlanBrief is written against typical IOS
+// `show vlan brief` formatting, not yet validated against real IOU
+// output the way MAC table / interface / errdisable parsing was.
+// Get a real capture (with at least one port explicitly moved to a
+// non-default VLAN) before trusting this in the Attack verifier.
+//
+// Specific concerns to test when capture comes in:
+//  1. IOU may wrap port lists aggressively — even short lists (2-3
+//     ports) can split across lines, not just long ones.
+//  2. The continuation-line heuristic (currentVLAN >= 0 &&
+//     strings.Contains(trimmed, "Et")) could bleed a wrapped line
+//     from VLAN 1 into VLAN 99's assignment if a new VLAN header
+//     line isn't recognized correctly. The capture MUST include
+//     BOTH VLAN 1 and VLAN 99 in the same output, not just the
+//     faulty port in isolation — that's the case that exercises
+//     whether currentVLAN state correctly resets between blocks.
+//  3. The regex vlanRowRe assumes "VLAN-ID Name Status Ports"
+//     column order. If IOU's column layout differs (extra Status
+//     columns, different spacing), the regex won't match. Confirm
+//     against real output.
+var vlanRowRe = regexp.MustCompile(`^(\d+)\s+\S+\s+\S+\s+(.*)$`)
+
+func parseVlanBrief(out string) map[Port]int {
+	result := map[Port]int{}
+	currentVLAN := -1
+	for _, line := range strings.Split(out, "\n") {
+		trimmed := strings.TrimRight(line, " \r")
+		if trimmed == "" {
+			continue
+		}
+		if m := vlanRowRe.FindStringSubmatch(trimmed); m != nil {
+			vlan, err := strconv.Atoi(m[1])
+			if err != nil {
+				continue
+			}
+			currentVLAN = vlan
+			assignPorts(result, m[2], vlan)
+			continue
+		}
+		// Continuation line: IOS wraps long port lists onto indented
+		// lines with no leading VLAN id — only "Ports" column repeats.
+		if currentVLAN >= 0 && strings.Contains(trimmed, "Et") {
+			assignPorts(result, strings.TrimSpace(trimmed), currentVLAN)
+		}
+	}
+	return result
+}
+
+func assignPorts(result map[Port]int, portsField string, vlan int) {
+	for _, p := range strings.Split(portsField, ",") {
+		p = strings.TrimSpace(p)
+		if p == "" {
+			continue
+		}
+		result[Port(p)] = vlan
+	}
+}
+
 // parsePingResult reads IOS's `ping` summary line and treats anything
 // >= 66% as reachable — tolerates one dropped packet (common on first
 // ping while ARP resolves) without treating real link failure as pass.

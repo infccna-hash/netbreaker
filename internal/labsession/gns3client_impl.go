@@ -193,6 +193,13 @@ func (c *HTTPGNS3Client) ProvisionTopology(ctx context.Context, projectID string
 		case "qemu":
 			// QEMU nodes boot from their disk image, no startup config.
 			// Properties (disk image, adapters) come from the template.
+			// BUT: the template's qemu_path doesn't reliably propagate
+			// into node creation — GNS3 uses a default that doesn't
+			// exist (qemu-system-None). Inject the system path so the
+			// node boots instead of returning 409.
+			if _, ok := props["qemu_path"]; !ok {
+				props["qemu_path"] = "/usr/bin/qemu-system-x86_64"
+			}
 		case "docker":
 			// Docker containers: GNS3 requires image and console_type in the
 			// node creation payload even when using a template that specifies
@@ -314,17 +321,20 @@ func interfaceToPort(nodeType, iface string) (adapter, port int, err error) {
 		return 0, 0, fmt.Errorf("unrecognized docker interface %q (expected ethN)", iface)
 
 	case "qemu":
-		// QEMU (Kali): eth0 always → adapter 0, port 0.
-		// Multi-NIC templates (e.g. OpenWRT) could use ethN → adapter N, port 0
-		// but that needs per-template verification.
-		if iface == "eth0" {
+		// QEMU: eth0 / Ethernet0 → adapter 0, port 0.
+		// Kali/Docker-via-QEMU uses ethN; ASA uses Ethernet{0} (template
+		// port_name_format). Both map the same way: <name><N> → adapter N.
+		if iface == "eth0" || iface == "Ethernet0" {
 			return 0, 0, nil
 		}
 		var n int
 		if _, err := fmt.Sscanf(iface, "eth%d", &n); err == nil {
 			return n, 0, nil
 		}
-		return 0, 0, fmt.Errorf("unrecognized qemu interface %q (expected ethN)", iface)
+		if _, err := fmt.Sscanf(iface, "Ethernet%d", &n); err == nil {
+			return n, 0, nil
+		}
+		return 0, 0, fmt.Errorf("unrecognized qemu interface %q (expected ethN or EthernetN)", iface)
 
 	default:
 		return 0, 0, fmt.Errorf("no port mapping for node type %q", nodeType)

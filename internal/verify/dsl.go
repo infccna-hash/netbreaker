@@ -39,6 +39,19 @@ func (v *Verifier) add(name string, fn func(ctx context.Context, ev *EvidenceSto
 }
 
 // ExpectMACOnPort asserts a MAC is learned on exactly the given port.
+//
+// False-negative safety: dynamic MAC entries only exist if the host
+// recently transmitted (default aging 300s). If a student provisions
+// a session and immediately hits verify without generating traffic,
+// the MAC table is empty and the failure message explicitly tells them
+// to generate traffic and re-verify — same logic as ExpectMACsShareOnePort.
+//
+// TODO(anti-cheat): the parser currently ignores the Type column
+// (DYNAMIC vs STATIC). A student could plant a static entry to pass
+// without correct topology. When MACEntry grows a Type field, assert
+// DYNAMIC here. The method name (ExpectMACOnPort, not ExpectDynamicMACOnPort)
+// deliberately defers that decision until the product decision on anti-cheat
+// scope is made.
 func (v *Verifier) ExpectMACOnPort(name string, mac MAC, port Port) *Verifier {
 	return v.add(name, func(ctx context.Context, ev *EvidenceStore) (bool, string) {
 		table, err := ev.MACTable(ctx)
@@ -47,7 +60,7 @@ func (v *Verifier) ExpectMACOnPort(name string, mac MAC, port Port) *Verifier {
 		}
 		got, ok := table.PortFor(mac)
 		if !ok {
-			return false, fmt.Sprintf("MAC %s not learned on any port", mac)
+			return false, fmt.Sprintf("MAC %s not learned on any port — generate traffic from this host (e.g. ping from it) and re-verify", mac)
 		}
 		if got != port {
 			return false, fmt.Sprintf("expected %s, found on %s", port, got)
@@ -68,7 +81,7 @@ func (v *Verifier) ExpectMACsShareOnePort(name string, macs []MAC, port Port) *V
 		for _, m := range macs {
 			got, ok := table.PortFor(m)
 			if !ok {
-				return false, fmt.Sprintf("MAC %s not learned on any port", m)
+				return false, fmt.Sprintf("MAC %s not learned on any port — generate traffic from this host and re-verify", m)
 			}
 			if got != port {
 				return false, fmt.Sprintf("MAC %s expected on %s, found on %s", m, port, got)
@@ -120,6 +133,26 @@ func (v *Verifier) ExpectInterfaceDuplex(port Port, d Duplex) *Verifier {
 			return false, fmt.Sprintf("expected %s, found %s", d, iface.Duplex)
 		}
 		return true, "duplex matches"
+	})
+}
+
+// ExpectPortVLAN asserts a port's access VLAN. Replaces speed/duplex
+// as the "Fault 2" check — VLAN membership shows up in real `show
+// vlan brief` output on IOU, unlike speed/duplex which the platform
+// silently ignores (see parse.go for the confirmed limitation).
+func (v *Verifier) ExpectPortVLAN(port Port, vlan int) *Verifier {
+	return v.add(fmt.Sprintf("%s in VLAN %d", port, vlan), func(ctx context.Context, ev *EvidenceStore) (bool, string) {
+		got, ok, err := ev.VLANFor(ctx, port)
+		if err != nil {
+			return false, err.Error()
+		}
+		if !ok {
+			return false, fmt.Sprintf("no VLAN assignment found for %s", port)
+		}
+		if got != vlan {
+			return false, fmt.Sprintf("expected VLAN %d, found VLAN %d", vlan, got)
+		}
+		return true, fmt.Sprintf("in VLAN %d", vlan)
 	})
 }
 

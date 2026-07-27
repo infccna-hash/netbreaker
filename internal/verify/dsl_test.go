@@ -16,18 +16,26 @@ type mockCollector struct {
 	interfaces   map[verify.Port]verify.InterfaceStatus
 	errdisable   verify.ErrdisableConfig
 	reachability map[string]bool
+	vlans        map[verify.Port]int
 
 	macTableCalls   int
 	interfaceCalls  map[verify.Port]int
 	errdisableCalls int
+	vlanCalls       int
 }
 
 func newMockCollector() *mockCollector {
 	return &mockCollector{
 		interfaces:     map[verify.Port]verify.InterfaceStatus{},
 		reachability:   map[string]bool{},
+		vlans:          map[verify.Port]int{},
 		interfaceCalls: map[verify.Port]int{},
 	}
+}
+
+func (m *mockCollector) CollectVLANs(ctx context.Context) (map[verify.Port]int, error) {
+	m.vlanCalls++
+	return m.vlans, nil
 }
 
 func (m *mockCollector) CollectMACTable(ctx context.Context) (verify.MACTable, error) {
@@ -213,6 +221,53 @@ func TestExpectErrdisableRecovery(t *testing.T) {
 	fail := verify.New().ExpectErrdisableRecovery(600).Run(context.Background(), m)
 	if fail.Passed {
 		t.Fatal("expected failure on interval mismatch")
+	}
+}
+
+func TestExpectPortVLAN_Pass(t *testing.T) {
+	m := newMockCollector()
+	m.vlans["Et0/1"] = 1
+
+	res := verify.New().ExpectPortVLAN("Et0/1", 1).Run(context.Background(), m)
+	if !res.Passed {
+		t.Fatalf("expected pass, got: %+v", res.Checks)
+	}
+}
+
+func TestExpectPortVLAN_WrongVLAN(t *testing.T) {
+	// Fault 2, replaced: PC3's port accidentally moved to VLAN 99.
+	m := newMockCollector()
+	m.vlans["Et0/1"] = 99
+
+	res := verify.New().ExpectPortVLAN("Et0/1", 1).Run(context.Background(), m)
+	if res.Passed {
+		t.Fatal("expected failure when port is in the wrong VLAN")
+	}
+	if res.Checks[0].Detail != "expected VLAN 1, found VLAN 99" {
+		t.Errorf("unexpected detail: %q", res.Checks[0].Detail)
+	}
+}
+
+func TestExpectPortVLAN_NoAssignmentFound(t *testing.T) {
+	m := newMockCollector()
+	res := verify.New().ExpectPortVLAN("Et0/9", 1).Run(context.Background(), m)
+	if res.Passed {
+		t.Fatal("expected failure when port has no VLAN entry at all")
+	}
+}
+
+func TestEvidenceStore_VLANsFetchedOnce(t *testing.T) {
+	m := newMockCollector()
+	m.vlans["Et0/1"] = 1
+	m.vlans["Et0/2"] = 1
+
+	verify.New().
+		ExpectPortVLAN("Et0/1", 1).
+		ExpectPortVLAN("Et0/2", 1).
+		Run(context.Background(), m)
+
+	if m.vlanCalls != 1 {
+		t.Errorf("expected exactly 1 VLAN collection for 2 port checks, got %d", m.vlanCalls)
 	}
 }
 
