@@ -50,16 +50,16 @@ ORDER BY auto_pass_phases DESC;
 
 \echo ''
 \echo '=== 7. Total phases in catalog (eligibility threshold) ==='
-SELECT COUNT(*) AS total_phases_required
-FROM (
-    SELECT lab_id, phase FROM user_progress GROUP BY lab_id, phase
-) sub;
+-- Uses the lab_phases catalog table (the same source TotalPhases() reads).
+-- Do NOT derive this from user_progress — that only counts (lab, phase)
+-- combos someone has completed, which undercounts the true threshold.
+SELECT COUNT(*) AS total_phases_required FROM lab_phases;
 
--- Alternative: actual count from labs × 3 phases each
 \echo ''
-\echo '=== 8. Lab catalog size (TotalPhases source) ==='
-SELECT COUNT(*) * 3 AS computed_total_phases
-FROM (SELECT DISTINCT lab_id FROM user_progress) sub;
+\echo '=== 8. Verification: lab catalog from lab_phases ==='
+SELECT COUNT(DISTINCT lab_id) AS total_labs,
+       COUNT(*) AS total_phases
+FROM lab_phases;
 
 \echo ''
 \echo '=== END OF REPORT ==='
