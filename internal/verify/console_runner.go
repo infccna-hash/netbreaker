@@ -13,6 +13,20 @@ import (
 // TelnetConsoleRunner executes CLI commands on GNS3 nodes via raw TCP
 // telnet — headless, no WebSocket. It looks up console ports from the
 // session's node_map.
+//
+// THREAD SAFETY: TelnetConsoleRunner opens a dedicated TCP connection per
+// RunCommand call and closes it on return. It is safe for concurrent use
+// across different nodes, but two concurrent calls targeting the same
+// (host, port) will race on the same console channel. The caller (HTTP
+// handler or ConsoleRunner orchestrator) MUST serialize calls per
+// (session, node) pair. See ios_collector.go for the concurrency spec.
+//
+// INTERACTIVE CONSOLE CONFLICT: this runner dials the console port
+// independently of any WebSocket interactive session (console.go). Two
+// simultaneous TCP connections to the same IOU/dynamips console port
+// produce undefined behavior. The handler MUST acquire a per-node lock
+// that is shared between the verify path and the interactive-console
+// path before calling RunCommand.
 type TelnetConsoleRunner struct {
 	host    string              // compute host (Tailscale IP)
 	nodeMap map[string]NodeAddr // node name → (host:port)
@@ -44,25 +58,32 @@ func (r *TelnetConsoleRunner) RunCommand(ctx context.Context, nodeID, cmd string
 	}
 	defer conn.Close()
 
-	// Set a generous read deadline; the caller's context controls cancellation.
-	conn.SetDeadline(time.Now().Add(30 * time.Second))
-
-	// Drain any banner/login output until the prompt appears, then send the
-	// command. We use a simple read-until-prompt strategy.
 	buf := make([]byte, 4096)
 
 	// Step 1: read until the first prompt (banner + login may precede it)
-	if _, err := r.readUntilPrompt(conn, buf, promptRe, 5*time.Second); err != nil {
+	if _, err := r.readUntilPrompt(ctx, conn, buf, promptRe); err != nil {
 		return "", fmt.Errorf("verify: wait for prompt on %s: %w", nodeID, err)
 	}
 
-	// Step 2: send the command
+	// Step 2: disable pagination so long output (show mac address-table,
+	// show running-config) doesn't hang at --More--.
+	// This is fire-and-forget — if the device doesn't support it, the
+	// next readUntilPrompt will still complete (or time out clearly).
+	//
+	// We send it and re-read the prompt to ensure the command was
+	// consumed before proceeding to the actual data-gathering command.
+	fmt.Fprintf(conn, "terminal length 0\r\n")
+	if _, err := r.readUntilPrompt(ctx, conn, buf, promptRe); err != nil {
+		return "", fmt.Errorf("verify: terminal length 0 on %s: %w", nodeID, err)
+	}
+
+	// Step 3: send the actual command
 	if _, err := fmt.Fprintf(conn, "%s\r\n", cmd); err != nil {
 		return "", fmt.Errorf("verify: send command to %s: %w", nodeID, err)
 	}
 
-	// Step 3: read output until next prompt, collecting everything before it
-	output, err := r.readUntilPrompt(conn, buf, promptRe, 15*time.Second)
+	// Step 4: read output until next prompt, collecting everything before it
+	output, err := r.readUntilPrompt(ctx, conn, buf, promptRe)
 	if err != nil {
 		return "", fmt.Errorf("verify: read output from %s: %w", nodeID, err)
 	}
@@ -73,11 +94,35 @@ func (r *TelnetConsoleRunner) RunCommand(ctx context.Context, nodeID, cmd string
 // readUntilPrompt reads from conn into buf until promptRe matches the
 // accumulated output, then returns everything read (minus the prompt
 // line itself). Callers get the raw command output with the prompt stripped.
-func (r *TelnetConsoleRunner) readUntilPrompt(conn net.Conn, buf []byte, promptRe *regexp.Regexp, timeout time.Duration) (string, error) {
-	conn.SetReadDeadline(time.Now().Add(timeout))
+//
+// The ctx's deadline (if any) controls the per-read timeout; a read that
+// produces data resets the timer. This means a hung device with no output
+// is caught quickly (ctx deadline), but a streaming device producing data
+// one byte at a time is allowed to continue until the overall ctx expires.
+func (r *TelnetConsoleRunner) readUntilPrompt(ctx context.Context, conn net.Conn, buf []byte, promptRe *regexp.Regexp) (string, error) {
+	// Default per-read timeout when ctx has no deadline
+	const defaultReadTimeout = 15 * time.Second
 
 	var accumulated strings.Builder
 	for {
+		// Set a per-read deadline derived from the context.
+		// If ctx has a deadline, use the remaining time (capped).
+		// If ctx has no deadline, use a generous default.
+		readTimeout := defaultReadTimeout
+		if deadline, ok := ctx.Deadline(); ok {
+			remaining := time.Until(deadline)
+			if remaining <= 0 {
+				return accumulated.String(), ctx.Err()
+			}
+			// Cap at defaultReadTimeout so a single read doesn't
+			// block for the entire remaining ctx lifetime — we
+			// want to check for prompt matches between reads.
+			if remaining < readTimeout {
+				readTimeout = remaining
+			}
+		}
+		conn.SetReadDeadline(time.Now().Add(readTimeout))
+
 		n, err := conn.Read(buf)
 		if n > 0 {
 			chunk := string(buf[:n])
@@ -94,13 +139,21 @@ func (r *TelnetConsoleRunner) readUntilPrompt(conn net.Conn, buf []byte, promptR
 			}
 		}
 		if err != nil {
-			if err == io.EOF {
-				return accumulated.String(), fmt.Errorf("connection closed (accumulated %d bytes)", accumulated.Len())
-			}
+			// Accumulated data with a read timeout means the device
+			// stopped sending (likely pagination / --More--). Return
+			// what we have with a diagnostic error.
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
 				if accumulated.Len() > 0 {
-					return accumulated.String(), nil
+					return accumulated.String(), fmt.Errorf("read timeout after %d bytes (pagination blocking? terminal length 0 may not have been applied)", accumulated.Len())
 				}
+			}
+			// Context cancellation takes precedence over I/O errors
+			// only when we have no accumulated data to return.
+			if ctx.Err() != nil && accumulated.Len() == 0 {
+				return accumulated.String(), ctx.Err()
+			}
+			if err == io.EOF {
+				return accumulated.String(), fmt.Errorf("connection closed (accumulated %d bytes)", accumulated.Len())
 			}
 			return accumulated.String(), err
 		}
