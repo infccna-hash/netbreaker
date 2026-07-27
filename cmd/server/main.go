@@ -28,6 +28,7 @@ import (
 	"netbreaker.io/api/internal/team"
 	"netbreaker.io/api/internal/users"
 	"netbreaker.io/api/internal/verification"
+	"netbreaker.io/api/internal/verify"
 	"netbreaker.io/api/pkg/config"
 	"netbreaker.io/api/pkg/db"
 	"netbreaker.io/api/pkg/email"
@@ -87,7 +88,6 @@ func main() {
 	labRepo := labs.NewRepository(pool)
 	progressRepo := progress.NewRepository(pool)
 	teamRepo := team.NewRepository(pool)
-	verifyHandler := verification.NewHandler(progressRepo)
 
 	authSvc := auth.NewService(pool, keys, cfg.JWTAccessTTL, cfg.JWTRefreshTTL)
 	labSvc := labs.NewService(labRepo, storageClient)
@@ -120,6 +120,14 @@ func main() {
 	}
 	sessionSvc := labsession.NewService(sessionRepo, gns3Client, cfg.GNS3MaxSessions, "local", computeHost)
 	sessionHandler := labsession.NewHandler(sessionSvc)
+
+	// ── Console-truth verifier registry ──────────────────────────────────
+	verifyReg := verify.NewVerifierRegistry()
+	labsession.RegisterLab1Verifiers(verifyReg)
+	labsession.RegisterLab15Verifiers(verifyReg)
+
+	// ── Verification handler (supports both legacy + console-truth) ─────
+	verifyHandler := verification.NewHandler(progressRepo, sessionRepo, verifyReg, cfg)
 
 	// ── Reaper: reclaim stale GNS3 sessions ───────────────────────────
 	if gns3Client != nil {

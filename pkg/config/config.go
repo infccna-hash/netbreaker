@@ -57,6 +57,17 @@ type Config struct {
 	// source; the GNS3 template pin and the watchdog verify against it too.
 	KaliPinnedTag string
 
+	// VerifyConsoleTruthEnabled gates the new console-truth verification
+	// engine behind the existing suspended-verifier path. When false
+	// (default), all labs continue to use suspendedVerifier / GenericVerifier.
+	// When true, labs with a registered console-truth verifier (Lab 1 Build,
+	// Lab 15) run real device checks; unregistered labs still fall through to
+	// the suspended path (never auto-pass).
+	//
+	// DO NOT enable in production until the shared lock between the verify
+	// handler and the interactive WebSocket console is implemented.
+	VerifyConsoleTruthEnabled bool
+
 	// Reaper sweeps stale lab sessions off the GNS3 compute box.
 	GNS3IdleTimeout  time.Duration // running session idle → suspend
 	GNS3SessionTTL   time.Duration // idle_stopped → full teardown
@@ -97,6 +108,7 @@ func Load() (*Config, error) {
 		GNS3Password:    getEnv("GNS3_PASSWORD", ""),
 		GNS3MaxSessions: getIntEnv("GNS3_MAX_SESSIONS", 3),
 		KaliPinnedTag:   getEnv("KALI_PINNED_TAG", "netbreaker-kali:latest"),
+		VerifyConsoleTruthEnabled: getBoolEnv("VERIFY_CONSOLE_TRUTH_ENABLED", false),
 	}
 
 	var err error

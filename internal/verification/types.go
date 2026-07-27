@@ -22,8 +22,9 @@ type DeviceConfig struct {
 
 // VerifyRequest is what the playground POSTs to /api/v1/labs/{id}/verify.
 type VerifyRequest struct {
-	Phase  string                  `json:"phase"`  // build | attack | harden
-	Config map[string]DeviceConfig `json:"config"` // device_id → config
+	Phase     string                  `json:"phase"`     // build | attack | harden
+	Config    map[string]DeviceConfig `json:"config"`    // device_id → config (legacy client-trust, now only used as reference)
+	SessionID string                  `json:"session_id"` // active lab session (required for console-truth path)
 }
 
 // VerifyResult is what the backend returns.
