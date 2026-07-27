@@ -8,10 +8,16 @@ type LabVerifier interface {
 }
 
 // Registry maps lab IDs to their verifiers.
+//
+// NOTE: All verifiers are currently suspended (return Passed: false)
+// while the platform migrates from client-trust to console-truth
+// verification. Remove the suspendedVerifier wrapper per lab as each
+// one is migrated — do NOT remove the wrapper from the whole registry
+// at once.
 var Registry = map[int]LabVerifier{
-	1:  &Lab1Verifier{},
-	2:  &Lab2Verifier{},
-	3:  &Lab3Verifier{},
+	1:  suspendedVerifier{&Lab1Verifier{}, 1, "VLAN Warfare"},
+	2:  suspendedVerifier{&Lab2Verifier{}, 2, "STP Sabotage"},
+	3:  suspendedVerifier{&Lab3Verifier{}, 3, "Port Security Breach"},
 	4:  &GenericVerifier{LabID: 4, Title: "OSPF Infiltration"},
 	5:  &GenericVerifier{LabID: 5, Title: "HSRP Takeover"},
 	6:  &GenericVerifier{LabID: 6, Title: "ACL Bypass Mission"},
@@ -25,6 +31,25 @@ var Registry = map[int]LabVerifier{
 	14: &GenericVerifier{LabID: 14, Title: "IPv6 Neighbor Spoof"},
 }
 
+// suspendedVerifier wraps a real LabVerifier and always returns
+// Passed: false. Remove this wrapper when the verifier is migrated
+// to console-truth — the inner verifier's logic is preserved intact.
+type suspendedVerifier struct {
+	inner LabVerifier
+	labID int
+	title string
+}
+
+func (s suspendedVerifier) Verify(phase string, cfg map[string]DeviceConfig) VerifyResult {
+	// Run the real verifier so we can still return specific hints
+	// in the Failures/Hints fields — but force Passed: false regardless.
+	res := s.inner.Verify(phase, cfg)
+	res.Passed = false
+	res.Score = 0
+	res.Message = fmt.Sprintf("Lab %d (%s) — %s phase: verification is temporarily suspended while the platform migrates to a new grading engine. Your existing work is preserved but new progress will not be recorded yet.", s.labID, s.title, phase)
+	return res
+}
+
 // Get returns the verifier for a lab, or an error if not found.
 func Get(labID int) (LabVerifier, error) {
 	v, ok := Registry[labID]
@@ -35,8 +60,10 @@ func Get(labID int) (LabVerifier, error) {
 }
 
 // GenericVerifier is a placeholder for labs whose full verification isn't
-// implemented yet. It auto-passes so the API doesn't block progress while
-// content is still being written.
+// implemented yet. It MUST return Passed: false — auto-passing is a
+// credential-issuance vulnerability, not a convenience feature.
+//
+// REGRESSION GUARD: TestGenericVerifierNeverAutoPasses enforces this.
 type GenericVerifier struct {
 	LabID int
 	Title string
@@ -44,9 +71,9 @@ type GenericVerifier struct {
 
 func (g *GenericVerifier) Verify(phase string, _ map[string]DeviceConfig) VerifyResult {
 	return VerifyResult{
-		Passed:  true,
-		Score:   100,
-		Message: fmt.Sprintf("Lab %d (%s) — %s phase accepted. Full verification coming soon.", g.LabID, g.Title, phase),
+		Passed:  false,
+		Score:   0,
+		Message: fmt.Sprintf("Lab %d (%s) — %s phase: verification is temporarily suspended. Your progress will not be recorded. Full verification is being migrated to a new engine — check back soon.", g.LabID, g.Title, phase),
 	}
 }
 
