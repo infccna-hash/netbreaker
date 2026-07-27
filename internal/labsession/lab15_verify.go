@@ -82,13 +82,13 @@ func Lab15HardenVerifier(sess *verify.LabSession) *verify.Verifier {
 
 // RegisterLab15Verifiers wires these into the global registry.
 func RegisterLab15Verifiers(reg *verify.VerifierRegistry) {
-	reg.Register(15, "build", func(sess *verify.LabSession) *verify.Verifier {
+	reg.Register(15, "build", "SW1", func(sess *verify.LabSession) *verify.Verifier {
 		return Lab15BuildVerifier(sess)
 	})
-	reg.Register(15, "attack", func(sess *verify.LabSession) *verify.Verifier {
+	reg.Register(15, "attack", "SW1", func(sess *verify.LabSession) *verify.Verifier {
 		return Lab15AttackVerifier(sess)
 	})
-	reg.Register(15, "harden", func(sess *verify.LabSession) *verify.Verifier {
+	reg.Register(15, "harden", "SW1", func(sess *verify.LabSession) *verify.Verifier {
 		return Lab15HardenVerifier(sess)
 	})
 }

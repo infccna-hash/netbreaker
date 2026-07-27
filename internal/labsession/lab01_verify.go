@@ -27,7 +27,7 @@ func Lab1BuildVerifier(sess *verify.LabSession) *verify.Verifier {
 // be added when the IOSCollector supports running-config and
 // errdisable checks on the Lab 1 topology devices.
 func RegisterLab1Verifiers(reg *verify.VerifierRegistry) {
-	reg.Register(1, "build", func(sess *verify.LabSession) *verify.Verifier {
+	reg.Register(1, "build", "SW1", func(sess *verify.LabSession) *verify.Verifier {
 		return Lab1BuildVerifier(sess)
 	})
 }

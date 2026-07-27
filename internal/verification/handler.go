@@ -130,8 +130,8 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 	}
 
 	// ── Check if a console-truth verifier is registered ──────────────
-	fn := h.verifyReg.Lookup(labID, phase)
-	if fn == nil {
+	entry := h.verifyReg.Lookup(labID, phase)
+	if entry == nil {
 		log.Printf("verify: no console-truth verifier registered for lab %d / %s — falling back to legacy", labID, phase)
 		return h.legacyVerify(labID, phase, nil)
 	}
@@ -139,10 +139,11 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 	// ── Resolve session → verify.LabSession ──────────────────────────
 	vs := labsession.ResolveVerifySession(sess, h.cfg.GNS3ComputeHost)
 
-	// ── Find the IOU switch node (all verify assertions target one switch) ──
-	switchNode := findSwitchNode(sess.NodeMap)
-	if switchNode == "" {
-		return VerifyResult{Passed: false, Score: 0, Message: "no IOU switch found in lab topology"}
+	// ── Target device is set explicitly at registration time ────────
+	// (never discovered via map iteration — random order bug).
+	switchNode := entry.TargetDevice
+	if _, ok := sess.NodeMap[switchNode]; !ok {
+		return VerifyResult{Passed: false, Score: 0, Message: fmt.Sprintf("target device %q not found in session node map", switchNode)}
 	}
 
 	// ── Build collector for the switch ─────────────────────────────────
@@ -161,7 +162,7 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 	verifyCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	result := fn(vs).Run(verifyCtx, collector)
+	result := entry.Factory(vs).Run(verifyCtx, collector)
 	if verifyCtx.Err() != nil {
 		return VerifyResult{
 			Passed:  false,
@@ -183,17 +184,6 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 
 // iosPromptRe matches IOS-like prompts (Router#, Switch#, etc.).
 var iosPromptRe = regexp.MustCompile(`\S+[#>]\s*$`)
-
-// findSwitchNode returns the name of the first IOU switch in the node map,
-// or "" if none exists. The console-truth verifier probes this switch.
-func findSwitchNode(nm labsession.NodeMap) string {
-	for name, info := range nm {
-		if info.NodeType == "iou" {
-			return name
-		}
-	}
-	return ""
-}
 
 // checkFailures extracts failure messages from verify checks.
 func checkFailures(checks []verify.Check) []string {
