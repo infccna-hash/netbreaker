@@ -171,6 +171,14 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
+	// ── Register preempt callback for server-side console closure ──
+	// When verify runs against this node while the console is open,
+	// ForceRelease calls this callback to close the WebSocket cleanly
+	// before the verifier takes over — no frontend coordination needed.
+	h.svc.ConsoleLock.SetPreempt(sessionID, nodeName, func() {
+		ws.Close()
+	})
+
 	// GNS3 console ports are plain telnet on the compute host.
 	telnetAddr := fmt.Sprintf("%s:%d", h.svc.computeHost, nodeInfo.ConsolePort)
 	tcpConn, err := net.DialTimeout("tcp", telnetAddr, 5*time.Second)
@@ -188,6 +196,42 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithCancel(context.Background()) // bg: survive chi Timeout(30s) middleware
 	defer cancel()
+
+	// ── WebSocket liveness (ping/pong) ─────────────────────────────
+	// Without this, a laptop sleep or NAT drop that leaves the TCP
+	// connection half-open holds the ConsoleLock indefinitely — the
+	// student's own verify will be rejected with "console is open"
+	// against a zombie session.
+	//
+	// Pong handler extends the read deadline on each pong received
+	// from the browser. A ping ticker sends periodic pings. If the
+	// browser stops responding (60s), ReadMessage returns an error,
+	// the handler exits, and defer unlock() releases the lock.
+	const (
+		pongWait   = 60 * time.Second
+		pingPeriod = (pongWait * 9) / 10 // 54s — send pings before pongWait expires
+		writeWait  = 10 * time.Second    // deadline for writing a ping/pong frame
+	)
+	ws.SetReadDeadline(time.Now().Add(pongWait))
+	ws.SetPongHandler(func(string) error {
+		ws.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
+	go func() {
+		ticker := time.NewTicker(pingPeriod)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				ws.SetWriteDeadline(time.Now().Add(writeWait))
+				if err := ws.WriteMessage(websocket.PingMessage, nil); err != nil {
+					return
+				}
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
 
 	// tcp → websocket (GNS3 console output → browser)
 	go func() {

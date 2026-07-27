@@ -158,10 +158,21 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 	if !ok {
 		switch heldBy {
 		case labsession.HolderConsole:
-			return VerifyResult{
-				Passed:  false,
-				Score:   0,
-				Message: "Interactive console is open on this device. Please close the console before verifying.",
+			// Server-side preemption: close the student's own
+			// console WebSocket, then retry the lock. The
+			// frontend's normal reconnect logic reattaches
+			// after the verify run completes. This removes
+			// the cross-team dependency on frontend behavior
+			// and avoids confusing "close the console"
+			// rejection during ordinary use.
+			h.sessionSvc.ConsoleLock.ForceRelease(sessionID, switchNode, labsession.HolderConsole)
+			unlock, _, ok = h.sessionSvc.ConsoleLock.TryLock(sessionID, switchNode, labsession.HolderVerify)
+			if !ok {
+				return VerifyResult{
+					Passed:  false,
+					Score:   0,
+					Message: "Could not acquire console lock after closing the interactive console. Another operation may be running — please try again.",
+				}
 			}
 		case labsession.HolderVerify:
 			return VerifyResult{
@@ -188,11 +199,14 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 	}
 
 	// ── Run the verifier with a hard deadline ────────────────────────
-	// Use a background context so chi's Timeout(30s) middleware doesn't
-	// cancel the request before the verify completes. The 30s deadline
-	// on verifyCtx is the one that matters — if the console hangs, we
-	// record a failed attempt instead of returning a hung HTTP request.
-	verifyCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	// Use a background context so chi's Timeout(60s) middleware doesn't
+	// cancel the request before the verify completes. The 25s deadline
+	// here is strictly shorter than chi's 60s — on a hung console the
+	// clean VerifyResult always wins over a middleware 502.
+	// NOTE: context.Background() means verify keeps running (and holds
+	// the console lock) after client disconnect — acceptable at 25s,
+	// but a deliberate trade-off, not a default.
+	verifyCtx, cancel := context.WithTimeout(context.Background(), 25*time.Second)
 	defer cancel()
 
 	result := entry.Factory(vs).Run(verifyCtx, collector)
