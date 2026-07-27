@@ -22,11 +22,13 @@ import (
 	"netbreaker.io/api/internal/auth"
 	"netbreaker.io/api/internal/certificate"
 	"netbreaker.io/api/internal/labs"
+	"netbreaker.io/api/internal/labsession"
 	"netbreaker.io/api/internal/progress"
 	"netbreaker.io/api/internal/subscription"
 	"netbreaker.io/api/internal/team"
 	"netbreaker.io/api/internal/users"
 	"netbreaker.io/api/internal/verification"
+	"netbreaker.io/api/internal/verify"
 	"netbreaker.io/api/pkg/config"
 	"netbreaker.io/api/pkg/db"
 	"netbreaker.io/api/pkg/email"
@@ -86,8 +88,6 @@ func main() {
 	labRepo := labs.NewRepository(pool)
 	progressRepo := progress.NewRepository(pool)
 	teamRepo := team.NewRepository(pool)
-	verifyHandler := verification.NewHandler(progressRepo)
-t"netbreaker.io/api/internal/labsession"
 
 	authSvc := auth.NewService(pool, keys, cfg.JWTAccessTTL, cfg.JWTRefreshTTL)
 	labSvc := labs.NewService(labRepo, storageClient)
@@ -103,9 +103,38 @@ t"netbreaker.io/api/internal/labsession"
 	certHandler := certificate.NewHandler(certSvc, userRepo)
 	teamHandler := team.NewHandler(teamRepo, userRepo, emailClient)
 	adminHandler := admin.NewHandler(pool, userRepo)
-tsessionRepo := labsession.NewRepository(pool)
-	sessionSvc := labsession.NewService(sessionRepo, nil, 8, "compute-1")
+
+	// ── Lab Sessions (live GNS3 orchestration) ────────────────────────────
+	sessionRepo := labsession.NewRepository(pool)
+	var gns3Client labsession.GNS3Client
+	if cfg.GNS3ServerURL != "" {
+		gns3Client = labsession.NewHTTPGNS3Client(cfg.GNS3ServerURL, cfg.GNS3Username, cfg.GNS3Password, cfg.KaliPinnedTag)
+	} else {
+		gns3Client = nil
+	}
+	// Derive telnet host from config; fall back to localhost since
+	// GNS3 runs on the same machine in development.
+	computeHost := cfg.GNS3ComputeHost
+	if computeHost == "" {
+		computeHost = "localhost"
+	}
+	sessionSvc := labsession.NewService(sessionRepo, gns3Client, cfg.GNS3MaxSessions, "local", computeHost)
 	sessionHandler := labsession.NewHandler(sessionSvc)
+
+	// ── Console-truth verifier registry ──────────────────────────────────
+	verifyReg := verify.NewVerifierRegistry()
+	labsession.RegisterLab1Verifiers(verifyReg)
+	labsession.RegisterLab15Verifiers(verifyReg)
+
+	// ── Verification handler (supports both legacy + console-truth) ─────
+	verifyHandler := verification.NewHandler(progressRepo, sessionRepo, verifyReg, cfg)
+
+	// ── Reaper: reclaim stale GNS3 sessions ───────────────────────────
+	if gns3Client != nil {
+		reaper := labsession.NewReaper(sessionRepo, gns3Client,
+			cfg.GNS3IdleTimeout, cfg.GNS3SessionTTL, cfg.GNS3ReaperTick, cfg.GNS3OpTimeout)
+		reaper.Start(context.Background())
+	}
 
 	// ── Router ────────────────────────────────────────────────────────────
 	r := chi.NewRouter()
@@ -158,11 +187,13 @@ tsessionRepo := labsession.NewRepository(pool)
 			r.Get("/subscription", subHandler.Get)
 			r.Post("/subscription/checkout", subHandler.Checkout)
 
+			// Lab Sessions — requires pro or bootcamp
 			r.Group(func(r chi.Router) {
 				r.Use(auth.RequirePlan("pro", "bootcamp"))
 				r.Get("/labs/{id}/config", labHandler.GetConfig)
 				r.Get("/certificate", certHandler.Get)
 				r.Post("/subscription/portal", subHandler.Portal)
+				sessionHandler.Routes(r)
 			})
 
 			r.Group(func(r chi.Router) {
@@ -176,17 +207,8 @@ tsessionRepo := labsession.NewRepository(pool)
 			r.Group(func(r chi.Router) {
 				r.Use(auth.RequireAdmin())
 				r.Get("/admin/stats", adminHandler.Stats)
-tsessionRepo := labsession.NewRepository(pool)
-	sessionSvc := labsession.NewService(sessionRepo, nil, 8, "compute-1")
-	sessionHandler := labsession.NewHandler(sessionSvc)
 				r.Get("/admin/users", adminHandler.Users)
-tsessionRepo := labsession.NewRepository(pool)
-	sessionSvc := labsession.NewService(sessionRepo, nil, 8, "compute-1")
-	sessionHandler := labsession.NewHandler(sessionSvc)
 				r.Patch("/admin/users/{id}/plan", adminHandler.SetPlan)
-tsessionRepo := labsession.NewRepository(pool)
-	sessionSvc := labsession.NewService(sessionRepo, nil, 8, "compute-1")
-	sessionHandler := labsession.NewHandler(sessionSvc)
 			})
 		})
 	})

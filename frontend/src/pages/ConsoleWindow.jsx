@@ -46,7 +46,14 @@ export default function ConsoleWindow() {
     document.title = session?.lab_title ? `Console · ${session.lab_title}` : "Console · NetBreaker";
   }, [session]);
 
-  const nodeNames = session?.node_map ? Object.keys(session.node_map).sort() : [];
+  // Filter to nodes that actually have a console — ethernet_hub and
+  // other console-less nodes have console_port: 0 and shouldn't get a tab.
+  const nodeNames = session?.node_map
+    ? Object.keys(session.node_map)
+        .filter((name) => (session.node_map[name]?.console_port ?? 0) > 0)
+        .sort()
+    : [];
+  const allNodeNames = session?.node_map ? Object.keys(session.node_map).sort() : [];
 
   if (error) {
     return (
@@ -64,7 +71,7 @@ export default function ConsoleWindow() {
     );
   }
 
-  if (session.status !== "running" || nodeNames.length === 0) {
+  if (session.status !== "running") {
     return (
       <div className="console-window-page console-window-center">
         <p className="muted">
@@ -72,6 +79,24 @@ export default function ConsoleWindow() {
             ? "Still provisioning — this tab will connect automatically once the session is up."
             : `Session is ${session.status}. You can close this tab.`}
         </p>
+      </div>
+    );
+  }
+
+  if (nodeNames.length === 0 && allNodeNames.length > 0) {
+    return (
+      <div className="console-window-page console-window-center">
+        <p className="muted">
+          This topology has no interactive consoles (all nodes are passive — hubs, etc.).
+        </p>
+      </div>
+    );
+  }
+
+  if (nodeNames.length === 0) {
+    return (
+      <div className="console-window-page console-window-center">
+        <p className="muted">No nodes available. You can close this tab.</p>
       </div>
     );
   }
