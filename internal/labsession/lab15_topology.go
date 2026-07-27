@@ -3,7 +3,7 @@ package labsession
 // Lab 15 — Network Devices & Anatomy (Vol 1 · Ch 2)
 // Path A design: KALI2 permanently wired on the hub segment alongside PC1+PC2.
 // Side-by-side comparison — no rewiring needed.
-// 9 nodes: H1 (ethernet_hub), SW1 (IOU L2), R1 (c3745), FW1 (ASAv QEMU),
+// 9 nodes: H1 (ethernet_hub), SW1 (IOU L2), R1 (IOU L3), FW1 (ASAv QEMU),
 //          PC1/PC2/PC3 (VPCS), KALI (Docker, switch-side), KALI2 (Docker, hub-side)
 var Lab15Topology = TopologyTemplate{
 	ComputeID: "local",
@@ -16,17 +16,17 @@ var Lab15Topology = TopologyTemplate{
 			Name:     "SW1",
 			NodeType: "iou",
 			Properties: map[string]any{
-				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+				"path":              "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+				"ethernet_adapters": 4,
 			},
 		},
 		{
 			Name:     "R1",
-			NodeType: "dynamips",
+			NodeType: "iou",
 			Properties: map[string]any{
-				"platform": "c3745",
-				"image":    "/home/kobayashi/GNS3/images/IOS/c3745-adventerprisek9-mz.124-25d.image",
-				"ram":      256,
-				"slot0":    "GT96100-FE",
+				"path":              "/home/kobayashi/GNS3/images/IOU/i86bi-linux-l3-jk9s-15.0.1.bin",
+				"ethernet_adapters": 6,
+				"ram":               256,
 			},
 		},
 		{
@@ -34,10 +34,10 @@ var Lab15Topology = TopologyTemplate{
 			NodeType:   "qemu",
 			TemplateID: "bea8738c-f896-4bd8-9f28-fe4643ad0882",
 			Properties: map[string]any{
-				"hda_disk_image":      "asa-915-k8.qcow2",
-				"hda_disk_interface":  "ide",
-				"ram":                 2048,
-				"qemu_path":           "/usr/bin/qemu-system-x86_64",
+				"hda_disk_image":     "asa-915-k8.qcow2",
+				"hda_disk_interface": "ide",
+				"ram":                2048,
+				"qemu_path":          "/usr/bin/qemu-system-x86_64",
 			},
 		},
 		{
@@ -72,7 +72,7 @@ var Lab15Topology = TopologyTemplate{
 		{NodeA: "H1", IfaceA: "e2", NodeB: "SW1", IfaceB: "Et0/0"},
 		{NodeA: "PC3", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/1"},
 		{NodeA: "KALI", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/2"},
-		{NodeA: "SW1", IfaceA: "Et0/3", NodeB: "R1", IfaceB: "Fa0/0"},
-		{NodeA: "R1", IfaceA: "Fa0/1", NodeB: "FW1", IfaceB: "Ethernet0"},
+		{NodeA: "SW1", IfaceA: "Et0/3", NodeB: "R1", IfaceB: "Et0/0"},
+		{NodeA: "R1", IfaceA: "Et0/1", NodeB: "FW1", IfaceB: "Ethernet0"},
 	},
 }
