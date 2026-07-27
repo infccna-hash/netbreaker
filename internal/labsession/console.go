@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -21,8 +22,12 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin: checkSameOrigin,
 }
 
-// checkSameOrigin returns true when the Origin header matches this server's
-// own origin — same rule Caddy enforces at the proxy layer.
+// checkSameOrigin returns true when the Origin header belongs to the same
+// site as this API server. Behind Caddy the Host header is e.g.
+// "api.netbreaker.io" while the frontend sends "https://netbreaker.io".
+// Those are the same site — the check extracts hostnames (ignoring scheme
+// and port) and compares them after stripping a leading "api." subdomain
+// from the Host side, so the API subdomain doesn't block frontend origins.
 func checkSameOrigin(r *http.Request) bool {
 	origin := r.Header.Get("Origin")
 	if origin == "" {
@@ -30,14 +35,49 @@ func checkSameOrigin(r *http.Request) bool {
 		// Allow CLI/testing clients through.
 		return true
 	}
-	// Compare against the Host header; in production behind Caddy this
-	// is the actual domain, not an IP.
-	scheme := "http"
-	if r.TLS != nil {
-		scheme = "https"
+
+	// Extract hostname from Origin (strip scheme and port).
+	originHost := origin
+	if after, ok := strings.CutPrefix(originHost, "https://"); ok {
+		originHost = after
+	} else if after, ok := strings.CutPrefix(originHost, "http://"); ok {
+		originHost = after
 	}
-	expected := fmt.Sprintf("%s://%s", scheme, r.Host)
-	return origin == expected
+	if idx := strings.IndexByte(originHost, ':'); idx >= 0 {
+		originHost = originHost[:idx]
+	}
+
+	// Host as seen by the API (e.g. "api.netbreaker.io").
+	host := r.Host
+	if idx := strings.IndexByte(host, ':'); idx >= 0 {
+		host = host[:idx]
+	}
+
+	// Exact match (same hostname).
+	if strings.EqualFold(originHost, host) {
+		return true
+	}
+
+	// Subdomain match: strip known service prefixes (api., app.) from
+	// both hostnames, then compare the remaining root domain.
+	// "https://netbreaker.io" ↔ "api.netbreaker.io" → strip api. → netbreaker.io = netbreaker.io ✅
+	// "https://app.netbreaker.io" ↔ "api.netbreaker.io" → strip both → netbreaker.io = netbreaker.io ✅
+	knownPrefixes := []string{"api.", "app."}
+	hostBase := host
+	originBase := originHost
+	for _, p := range knownPrefixes {
+		if s, ok := strings.CutPrefix(hostBase, p); ok {
+			hostBase = s
+			break
+		}
+	}
+	for _, p := range knownPrefixes {
+		if s, ok := strings.CutPrefix(originBase, p); ok {
+			originBase = s
+			break
+		}
+	}
+	return strings.EqualFold(originBase, hostBase)
 }
 
 
