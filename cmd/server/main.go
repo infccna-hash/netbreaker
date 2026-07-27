@@ -127,7 +127,7 @@ func main() {
 	labsession.RegisterLab15Verifiers(verifyReg)
 
 	// ── Verification handler (supports both legacy + console-truth) ─────
-	verifyHandler := verification.NewHandler(progressRepo, sessionRepo, verifyReg, cfg)
+	verifyHandler := verification.NewHandler(progressRepo, sessionRepo, sessionSvc, verifyReg, cfg)
 
 	// ── Reaper: reclaim stale GNS3 sessions ───────────────────────────
 	if gns3Client != nil {

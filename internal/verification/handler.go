@@ -24,14 +24,16 @@ import (
 type Handler struct {
 	progressRepo *progress.Repository
 	sessionRepo  *labsession.Repository
+	sessionSvc   *labsession.Service
 	verifyReg    *verify.VerifierRegistry
 	cfg          *config.Config
 }
 
-func NewHandler(progressRepo *progress.Repository, sessionRepo *labsession.Repository, verifyReg *verify.VerifierRegistry, cfg *config.Config) *Handler {
+func NewHandler(progressRepo *progress.Repository, sessionRepo *labsession.Repository, sessionSvc *labsession.Service, verifyReg *verify.VerifierRegistry, cfg *config.Config) *Handler {
 	return &Handler{
 		progressRepo: progressRepo,
 		sessionRepo:  sessionRepo,
+		sessionSvc:   sessionSvc,
 		verifyReg:    verifyReg,
 		cfg:          cfg,
 	}
@@ -145,6 +147,21 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 	if _, ok := sess.NodeMap[switchNode]; !ok {
 		return VerifyResult{Passed: false, Score: 0, Message: fmt.Sprintf("target device %q not found in session node map", switchNode)}
 	}
+
+	// ── Acquire console lock for the verification run ───────────────
+	// Prevents a student with the interactive console open from having
+	// their keystrokes interleaved with show commands. TryLock is
+	// non-blocking — if the console is open, the user gets a clear
+	// message to close it instead of a 30s timeout.
+	unlock, ok := h.sessionSvc.ConsoleLock.TryLock(sessionID, switchNode)
+	if !ok {
+		return VerifyResult{
+			Passed:  false,
+			Score:   0,
+			Message: "Interactive console is open on this device. Please close the console before verifying.",
+		}
+	}
+	defer unlock()
 
 	// ── Build collector for the switch ─────────────────────────────────
 	runner := verify.NewTelnetConsoleRunner(h.cfg.GNS3ComputeHost, vs.ConsoleNodes)

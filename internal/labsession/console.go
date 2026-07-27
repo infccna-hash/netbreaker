@@ -148,6 +148,18 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// ── Acquire console lock before opening the TCP connection ──────
+	// Prevents verify from sending show commands while a student has
+	// the interactive console open on the same node.
+	unlock, ok := h.svc.ConsoleLock.TryLock(sessionID, nodeName)
+	if !ok {
+		http.Error(w, "verification is currently running on this node — please wait a moment and try again", http.StatusConflict)
+		return
+	}
+	// Release the lock when the WebSocket session ends. unlock is
+	// idempotent — safe to call even if we exit early via error.
+	defer unlock()
+
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("console upgrade failed: %v", err)

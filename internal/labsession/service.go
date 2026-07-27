@@ -20,10 +20,11 @@ type Service struct {
 	maxSessions int
 	computeID   string // which compute box new sessions land on; single-compute for now
 	computeHost string // hostname/IP for raw telnet console (may differ from GNS3 API host)
+	ConsoleLock *ConsoleLock
 }
 
 func NewService(repo *Repository, gns3 GNS3Client, maxSessions int, computeID, computeHost string) *Service {
-	return &Service{repo: repo, gns3: gns3, maxSessions: maxSessions, computeID: computeID, computeHost: computeHost}
+	return &Service{repo: repo, gns3: gns3, maxSessions: maxSessions, computeID: computeID, computeHost: computeHost, ConsoleLock: NewConsoleLock()}
 }
 
 // Launch implements the resume-or-create path described in the spec.
