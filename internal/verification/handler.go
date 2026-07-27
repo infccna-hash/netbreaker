@@ -151,14 +151,30 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 	// ── Acquire console lock for the verification run ───────────────
 	// Prevents a student with the interactive console open from having
 	// their keystrokes interleaved with show commands. TryLock is
-	// non-blocking — if the console is open, the user gets a clear
-	// message to close it instead of a 30s timeout.
-	unlock, ok := h.sessionSvc.ConsoleLock.TryLock(sessionID, switchNode)
+	// non-blocking — if the lock is held, the user gets a message
+	// that reflects who actually holds it (another verify run vs
+	// the interactive console).
+	unlock, heldBy, ok := h.sessionSvc.ConsoleLock.TryLock(sessionID, switchNode, labsession.HolderVerify)
 	if !ok {
-		return VerifyResult{
-			Passed:  false,
-			Score:   0,
-			Message: "Interactive console is open on this device. Please close the console before verifying.",
+		switch heldBy {
+		case labsession.HolderConsole:
+			return VerifyResult{
+				Passed:  false,
+				Score:   0,
+				Message: "Interactive console is open on this device. Please close the console before verifying.",
+			}
+		case labsession.HolderVerify:
+			return VerifyResult{
+				Passed:  false,
+				Score:   0,
+				Message: "Another verification is already running on this device — please wait a moment and try again.",
+			}
+		default:
+			return VerifyResult{
+				Passed:  false,
+				Score:   0,
+				Message: fmt.Sprintf("This device is locked by another operation (%s). Please try again.", heldBy),
+			}
 		}
 	}
 	defer unlock()

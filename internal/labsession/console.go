@@ -151,9 +151,13 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 	// ── Acquire console lock before opening the TCP connection ──────
 	// Prevents verify from sending show commands while a student has
 	// the interactive console open on the same node.
-	unlock, ok := h.svc.ConsoleLock.TryLock(sessionID, nodeName)
+	unlock, heldBy, ok := h.svc.ConsoleLock.TryLock(sessionID, nodeName, HolderConsole)
 	if !ok {
-		http.Error(w, "verification is currently running on this node — please wait a moment and try again", http.StatusConflict)
+		if heldBy == HolderVerify {
+			http.Error(w, "verification is currently running on this node — please wait a moment and try again", http.StatusConflict)
+		} else {
+			http.Error(w, "console is already open for this node in another window", http.StatusConflict)
+		}
 		return
 	}
 	// Release the lock when the WebSocket session ends. unlock is
