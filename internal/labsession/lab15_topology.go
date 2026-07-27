@@ -27,6 +27,7 @@ var Lab15Topology = TopologyTemplate{
 				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
 				"ram":      256,
 				"slot0":    "GT96100-FE",
+				"slot1":    "NM-1FE-TX",
 			},
 		},
 		{
