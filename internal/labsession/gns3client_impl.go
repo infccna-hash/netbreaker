@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -507,30 +508,34 @@ func (c *HTTPGNS3Client) DeleteProject(ctx context.Context, projectID string) er
 // It fetches each node's properties from the GNS3 API and dispatches to
 // the type-appropriate resolution strategy.
 //
+// Every node is processed regardless of other nodes' failures — a VPCS
+// resolution error won't prevent docker/qemu nodes from getting their
+// MACs. All errors are collected and returned as a joined error.
+//
 // Nodes that don't need MACs (switches, routers, hubs) are silently
-// skipped. Nodes whose MAC can't be resolved (VPCS without console
-// support, API missing mac_address) get an error — the caller decides
-// whether to fail the session or proceed without.
+// skipped.
 func (c *HTTPGNS3Client) PopulateNodeMACs(ctx context.Context, projectID string, nodes NodeMap) error {
+	var errs []error
 	for name, info := range nodes {
 		props, err := c.getNodeProperties(ctx, projectID, info.GNS3NodeID)
 		if err != nil {
-			return fmt.Errorf("gns3 populate MAC for %s: %w", name, err)
+			errs = append(errs, fmt.Errorf("%s: %w", name, err))
+			continue
 		}
 
 		mac, err := ResolveMAC(ctx, props)
 		if err != nil {
-			return fmt.Errorf("gns3 populate MAC for %s (type=%s): %w", name, info.NodeType, err)
+			errs = append(errs, fmt.Errorf("%s (type=%s): %w", name, info.NodeType, err))
+			continue
 		}
 
 		// ResolveMAC returns ("", nil) for node types that don't need MACs.
-		// Only update when we have a real MAC.
 		if mac != "" {
 			info.MAC = mac
 			nodes[name] = info
 		}
 	}
-	return nil
+	return errors.Join(errs...)
 }
 
 // getNodeProperties fetches a single node's data from the GNS3 REST API
