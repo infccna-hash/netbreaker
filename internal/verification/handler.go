@@ -23,10 +23,18 @@ import (
 
 type Handler struct {
 	progressRepo *progress.Repository
-	sessionRepo  *labsession.Repository
+	sessionRepo  sessionGetter
 	sessionSvc   *labsession.Service
 	verifyReg    *verify.VerifierRegistry
 	cfg          *config.Config
+}
+
+// sessionGetter is the subset of labsession.Repository that the verify
+// handler needs — just enough to look up a session by ID and check
+// ownership. Extracted as an interface so cross-user authorization
+// can be tested without a live database.
+type sessionGetter interface {
+	GetByID(ctx context.Context, id uuid.UUID) (*labsession.Session, error)
 }
 
 func NewHandler(progressRepo *progress.Repository, sessionRepo *labsession.Repository, sessionSvc *labsession.Service, verifyReg *verify.VerifierRegistry, cfg *config.Config) *Handler {
@@ -158,21 +166,21 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 	if !ok {
 		switch heldBy {
 		case labsession.HolderConsole:
-			// Server-side preemption: close the student's own
-			// console WebSocket, then retry the lock. The
-			// frontend's normal reconnect logic reattaches
-			// after the verify run completes. This removes
-			// the cross-team dependency on frontend behavior
-			// and avoids confusing "close the console"
-			// rejection during ordinary use.
-			h.sessionSvc.ConsoleLock.ForceRelease(sessionID, switchNode, labsession.HolderConsole)
-			unlock, _, ok = h.sessionSvc.ConsoleLock.TryLock(sessionID, switchNode, labsession.HolderVerify)
-			if !ok {
-				return VerifyResult{
-					Passed:  false,
-					Score:   0,
-					Message: "Could not acquire console lock after closing the interactive console. Another operation may be running — please try again.",
-				}
+			// TODO(preemption): When the frontend implements WebSocket
+			// auto-reconnect (onclose → reconnect after delay), switch
+			// from this user-facing message to server-side preemption:
+			//
+			//   h.sessionSvc.ConsoleLock.ForceRelease(sessionID, switchNode, labsession.HolderConsole)
+			//   unlock, _, ok = h.sessionSvc.ConsoleLock.TryLock(sessionID, switchNode, labsession.HolderVerify)
+			//
+			// ForceRelease + SetPreempt infrastructure is already built
+			// and tested in ConsoleLock. Until the frontend reconnects
+			// automatically, server-side close just shows a confusing
+			// "[disconnected]" to the student with no way back.
+			return VerifyResult{
+				Passed:  false,
+				Score:   0,
+				Message: "Interactive console is open on this device. Please close the console before verifying.",
 			}
 		case labsession.HolderVerify:
 			return VerifyResult{
@@ -199,9 +207,9 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 	}
 
 	// ── Run the verifier with a hard deadline ────────────────────────
-	// Use a background context so chi's Timeout(60s) middleware doesn't
+	// Use a background context so chi's Timeout(30s) middleware doesn't
 	// cancel the request before the verify completes. The 25s deadline
-	// here is strictly shorter than chi's 60s — on a hung console the
+	// here is strictly shorter than chi's 30s — on a hung console the
 	// clean VerifyResult always wins over a middleware 502.
 	// NOTE: context.Background() means verify keeps running (and holds
 	// the console lock) after client disconnect — acceptable at 25s,

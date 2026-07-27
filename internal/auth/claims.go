@@ -19,3 +19,11 @@ func ClaimsFromCtx(ctx context.Context) *jwtutil.Claims {
 	}
 	return v.(*jwtutil.Claims)
 }
+
+// CtxWithClaims returns a child context with the given claims embedded.
+// Exported for test helpers only — tests that call handlers directly
+// (bypassing HTTP middleware) can inject claims into the context so
+// handler code that calls ClaimsFromCtx still works.
+func CtxWithClaims(parent context.Context, claims *jwtutil.Claims) context.Context {
+	return context.WithValue(parent, claimsKey, claims)
+}
