@@ -154,7 +154,11 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 	}
 
 	// ── Run the verifier with a hard deadline ────────────────────────
-	verifyCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	// Use a background context so chi's Timeout(30s) middleware doesn't
+	// cancel the request before the verify completes. The 30s deadline
+	// on verifyCtx is the one that matters — if the console hangs, we
+	// record a failed attempt instead of returning a hung HTTP request.
+	verifyCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	result := fn(vs).Run(verifyCtx, collector)
