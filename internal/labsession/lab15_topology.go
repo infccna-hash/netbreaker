@@ -3,7 +3,7 @@ package labsession
 // Lab 15 — Network Devices & Anatomy (Vol 1 · Ch 2)
 // Path A design: KALI2 permanently wired on the hub segment alongside PC1+PC2.
 // Side-by-side comparison — no rewiring needed.
-// 9 nodes: H1 (ethernet_hub), SW1 (IOU L2), R1 (c3725), FW1 (ASAv QEMU),
+// 9 nodes: H1 (ethernet_hub), SW1 (IOU L2), R1 (c3745), FW1 (ASAv QEMU),
 //          PC1/PC2/PC3 (VPCS), KALI (Docker, switch-side), KALI2 (Docker, hub-side)
 var Lab15Topology = TopologyTemplate{
 	ComputeID: "local",
@@ -23,11 +23,10 @@ var Lab15Topology = TopologyTemplate{
 			Name:     "R1",
 			NodeType: "dynamips",
 			Properties: map[string]any{
-				"platform": "c3725",
-				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
+				"platform": "c3745",
+				"image":    "/home/kobayashi/GNS3/images/IOS/c3745-adventerprisek9-mz.124-25d.image",
 				"ram":      256,
 				"slot0":    "GT96100-FE",
-				"slot1":    "NM-1FE-TX",
 			},
 		},
 		{
