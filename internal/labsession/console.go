@@ -278,6 +278,10 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
+		// Extend the read deadline on every message received —
+		// keystrokes prove the browser is alive, so the connection
+		// should stay open even if the ping goroutine stalls.
+		ws.SetReadDeadline(time.Now().Add(pongWait))
 		if _, err := tcpConn.Write(msg); err != nil {
 			break
 		}
