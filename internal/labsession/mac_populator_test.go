@@ -73,13 +73,28 @@ func TestResolveMAC_DynamipsNoMAC(t *testing.T) {
 	}
 }
 
-func TestResolveMAC_VPCSNotYetImplemented(t *testing.T) {
-	_, err := ResolveMAC(context.Background(), gns3NodeProperties{NodeType: "vpcs"})
+func TestResolveMAC_VPCSNoConsole(t *testing.T) {
+	// VPCS with no console allocated fails early — no TCP dial attempted.
+	_, err := ResolveMAC(context.Background(), gns3NodeProperties{NodeType: "vpcs", Console: 0})
 	if err == nil {
-		t.Fatal("expected 'not yet implemented' error for VPCS")
+		t.Fatal("expected error for VPCS with no console port")
 	}
-	if !strings.Contains(err.Error(), "not yet implemented") {
-		t.Errorf("error should mention not implemented: %v", err)
+	if !strings.Contains(err.Error(), "no console port") {
+		t.Errorf("error should mention missing console port: %v", err)
+	}
+}
+
+func TestResolveMAC_VPCSNoConsoleHost(t *testing.T) {
+	_, err := ResolveMAC(context.Background(), gns3NodeProperties{
+		NodeType:    "vpcs",
+		Console:     5000,
+		ConsoleHost: "",
+	})
+	if err == nil {
+		t.Fatal("expected error for VPCS with empty console host")
+	}
+	if !strings.Contains(err.Error(), "no console host") {
+		t.Errorf("error should mention missing console host: %v", err)
 	}
 }
 
@@ -115,7 +130,7 @@ func TestVpcsMACRegex(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		matches := vpcsMACRe.FindStringSubmatch(tt.line)
+		matches := vpcsMACVerboseRe.FindStringSubmatch(tt.line)
 		var got string
 		if len(matches) > 1 {
 			got = matches[1]

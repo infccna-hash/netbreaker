@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -540,12 +541,18 @@ func (c *HTTPGNS3Client) PopulateNodeMACs(ctx context.Context, projectID string,
 
 // getNodeProperties fetches a single node's data from the GNS3 REST API
 // and returns the subset the MAC resolution strategies need.
+//
+// ConsoleHost is normalized: GNS3 may return "0.0.0.0" (bind-any). This
+// method replaces that with the actual compute host derived from baseURL,
+// so console-dependent strategies (VPCS) can dial the real address.
 func (c *HTTPGNS3Client) getNodeProperties(ctx context.Context, projectID, nodeID string) (gns3NodeProperties, error) {
 	path := fmt.Sprintf("/v2/projects/%s/nodes/%s", projectID, nodeID)
 
 	var raw struct {
-		NodeType   string `json:"node_type"`
-		Properties struct {
+		NodeType    string `json:"node_type"`
+		Console     int    `json:"console"`
+		ConsoleHost string `json:"console_host"`
+		Properties  struct {
 			MACAddress string `json:"mac_address"`
 			MACAddr    string `json:"mac_addr"`
 		} `json:"properties"`
@@ -555,9 +562,33 @@ func (c *HTTPGNS3Client) getNodeProperties(ctx context.Context, projectID, nodeI
 		return gns3NodeProperties{}, fmt.Errorf("get node %s: %w", nodeID, err)
 	}
 
+	consoleHost := raw.ConsoleHost
+	if consoleHost == "" || consoleHost == "0.0.0.0" || consoleHost == "::" {
+		consoleHost = c.computeHost()
+	}
+
 	return gns3NodeProperties{
-		NodeType:   raw.NodeType,
-		MACAddress: raw.Properties.MACAddress,
-		MACAddr:    raw.Properties.MACAddr,
+		NodeType:    raw.NodeType,
+		MACAddress:  raw.Properties.MACAddress,
+		MACAddr:     raw.Properties.MACAddr,
+		Console:     raw.Console,
+		ConsoleHost: consoleHost,
 	}, nil
+}
+
+// computeHost extracts the host portion of the GNS3 controller base URL.
+// baseURL is e.g. "http://100.124.157.39:3080" — this returns "100.124.157.39".
+func (c *HTTPGNS3Client) computeHost() string {
+	s := c.baseURL
+	// Strip scheme
+	if after, ok := strings.CutPrefix(s, "http://"); ok {
+		s = after
+	} else if after, ok := strings.CutPrefix(s, "https://"); ok {
+		s = after
+	}
+	// Strip port and path
+	if idx := strings.IndexAny(s, ":/"); idx >= 0 {
+		s = s[:idx]
+	}
+	return s
 }

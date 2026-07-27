@@ -7,9 +7,10 @@ import (
 )
 
 // TestPopulateNodeMACs_ContinuesOnVPCSFailure proves the fix for the
-// early-return bug: when a VPCS node fails resolution (not yet
-// implemented), docker/qemu nodes that come LATER in the iteration
-// must still get their MACs resolved.
+// early-return bug: when a VPCS node fails resolution (no console
+// allocated — the typical case when Console=0 in test data), docker/qemu
+// nodes that come LATER in the iteration must still get their MACs
+// resolved.
 //
 // Before the fix, Go's random map iteration order meant a VPCS node
 // encountered first would cause an immediate return, leaving all
@@ -64,8 +65,8 @@ func TestPopulateNodeMACs_ContinuesOnVPCSFailure(t *testing.T) {
 	if len(errs) == 0 {
 		t.Fatal("expected at least one error from VPCS")
 	}
-	if !strings.Contains(errs[0].Error(), "not yet implemented") {
-		t.Errorf("VPCS error should mention 'not yet implemented': %v", errs[0])
+	if !strings.Contains(errs[0].Error(), "no console port") {
+		t.Errorf("VPCS error should mention 'no console port': %v", errs[0])
 	}
 }
 
