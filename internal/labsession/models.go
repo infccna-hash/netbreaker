@@ -20,7 +20,8 @@ type NodeInfo struct {
 	GNS3NodeID  string `json:"gns3_node_id"`
 	ConsolePort int    `json:"console_port"`
 	ConsoleType string `json:"console_type,omitempty"` // "telnet", "vnc", "none"
-	NodeType    string `json:"node_type,omitempty"`    // "iou", "dynamips", "qemu" — from the topology template
+	NodeType    string `json:"node_type,omitempty"`    // "iou", "dynamips", "qemu", "docker", "vpcs"
+	MAC         string `json:"mac,omitempty"`          // host MAC resolved at provision time; empty for switches/routers
 }
 
 // NodeMap keys are the same node names used in the lab's topology template,

@@ -502,3 +502,57 @@ func (c *HTTPGNS3Client) DeleteProject(ctx context.Context, projectID string) er
 	}
 	return nil
 }
+
+// PopulateNodeMACs resolves MAC addresses for every node that needs one.
+// It fetches each node's properties from the GNS3 API and dispatches to
+// the type-appropriate resolution strategy.
+//
+// Nodes that don't need MACs (switches, routers, hubs) are silently
+// skipped. Nodes whose MAC can't be resolved (VPCS without console
+// support, API missing mac_address) get an error — the caller decides
+// whether to fail the session or proceed without.
+func (c *HTTPGNS3Client) PopulateNodeMACs(ctx context.Context, projectID string, nodes NodeMap) error {
+	for name, info := range nodes {
+		props, err := c.getNodeProperties(ctx, projectID, info.GNS3NodeID)
+		if err != nil {
+			return fmt.Errorf("gns3 populate MAC for %s: %w", name, err)
+		}
+
+		mac, err := ResolveMAC(ctx, props)
+		if err != nil {
+			return fmt.Errorf("gns3 populate MAC for %s (type=%s): %w", name, info.NodeType, err)
+		}
+
+		// ResolveMAC returns ("", nil) for node types that don't need MACs.
+		// Only update when we have a real MAC.
+		if mac != "" {
+			info.MAC = mac
+			nodes[name] = info
+		}
+	}
+	return nil
+}
+
+// getNodeProperties fetches a single node's data from the GNS3 REST API
+// and returns the subset the MAC resolution strategies need.
+func (c *HTTPGNS3Client) getNodeProperties(ctx context.Context, projectID, nodeID string) (gns3NodeProperties, error) {
+	path := fmt.Sprintf("/v2/projects/%s/nodes/%s", projectID, nodeID)
+
+	var raw struct {
+		NodeType   string `json:"node_type"`
+		Properties struct {
+			MACAddress string `json:"mac_address"`
+			MACAddr    string `json:"mac_addr"`
+		} `json:"properties"`
+	}
+
+	if err := c.do(ctx, http.MethodGet, path, nil, &raw); err != nil {
+		return gns3NodeProperties{}, fmt.Errorf("get node %s: %w", nodeID, err)
+	}
+
+	return gns3NodeProperties{
+		NodeType:   raw.NodeType,
+		MACAddress: raw.Properties.MACAddress,
+		MACAddr:    raw.Properties.MACAddr,
+	}, nil
+}

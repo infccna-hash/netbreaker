@@ -17,9 +17,11 @@ type GNS3Client interface {
 	// build.sh" message if missing.
 	EnsureKaliImage(ctx context.Context, computeID string) error
 
-	// Read-only teardown-verification probes. Both fail closed: any
-	// transport or unexpected-status error must surface, never be read
-	// as "gone/stopped".
+	// PopulateNodeMACs resolves MAC addresses for every node in the
+	// NodeMap that needs one (docker, qemu, vpcs) by querying the
+	// GNS3 API or node consoles. NodeMap is mutated in-place — the
+	// caller is responsible for persisting the updated map.
+	PopulateNodeMACs(ctx context.Context, projectID string, nodes NodeMap) error
 	ProjectExists(ctx context.Context, projectID string) (bool, error)
 	NodesStopped(ctx context.Context, projectID string) (bool, error)
 }

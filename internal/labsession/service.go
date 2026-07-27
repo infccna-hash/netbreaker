@@ -109,6 +109,16 @@ func (s *Service) provision(sessionID uuid.UUID, labID int) {
 		return
 	}
 
+	// Resolve host MACs (docker, qemu → GNS3 API; vpcs → console).
+	// Must happen BEFORE StartNodes so we capture MACs while devices
+	// are pre-boot (console is accessible but device isn't running yet
+	// for docker/qemu; for vpcs console is already active).
+	//
+	// VPCS resolution is not yet implemented — log and continue.
+	if err := s.gns3.PopulateNodeMACs(ctx, projectID, nodes); err != nil {
+		log.Printf("labsession: populate MACs (non-fatal): %v", err)
+	}
+
 	if err := s.gns3.StartNodes(ctx, projectID); err != nil {
 		log.Printf("labsession: start nodes: %v", err)
 		_ = s.repo.SetStatus(ctx, sessionID, StatusFailed)

@@ -9,9 +9,9 @@ import (
 func TestResolveVerifySession(t *testing.T) {
 	sess := &Session{
 		NodeMap: NodeMap{
-			"SW1": {ConsolePort: 5000, NodeType: "iou", GNS3NodeID: "abc123"},
-			"R1":  {ConsolePort: 5001, NodeType: "dynamips", GNS3NodeID: "def456"},
-			"KALI": {ConsolePort: 5002, NodeType: "docker", ConsoleType: "telnet"},
+			"SW1":  {ConsolePort: 5000, NodeType: "iou", GNS3NodeID: "abc123"},
+			"R1":   {ConsolePort: 5001, NodeType: "dynamips", GNS3NodeID: "def456"},
+			"KALI": {ConsolePort: 5002, NodeType: "docker", ConsoleType: "telnet", MAC: "02:42:ac:11:00:02"},
 		},
 	}
 
@@ -47,15 +47,24 @@ func TestResolveVerifySession(t *testing.T) {
 		t.Errorf("R1 port = %d, want 5001", r1.Port)
 	}
 
-	// MACs and IPs should be empty (not nil)
-	if vs.MACs == nil {
-		t.Error("MACs map is nil, should be empty")
+	// KALI MAC should be populated from NodeInfo.MAC
+	kaliMac := vs.MACs["KALI"]
+	if kaliMac != "02:42:ac:11:00:02" {
+		t.Errorf("KALI MAC = %q, want 02:42:ac:11:00:02", kaliMac)
 	}
+
+	// SW1 has no MAC (switch) — sess.MAC("SW1") should return sentinel
+	sw1Mac := vs.MAC("SW1")
+	if sw1Mac != "<unresolved:SW1>" {
+		t.Errorf("SW1 MAC = %q, want sentinel '<unresolved:SW1>'", sw1Mac)
+	}
+
+	// IPs should be empty (not nil)
 	if vs.IPs == nil {
 		t.Error("IPs map is nil, should be empty")
 	}
-	if len(vs.MACs) != 0 || len(vs.IPs) != 0 {
-		t.Error("MACs and IPs should be empty")
+	if len(vs.IPs) != 0 {
+		t.Error("IPs should be empty")
 	}
 
 	// Empty session
