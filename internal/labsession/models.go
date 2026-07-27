@@ -21,7 +21,14 @@ type NodeInfo struct {
 	ConsolePort int    `json:"console_port"`
 	ConsoleType string `json:"console_type,omitempty"` // "telnet", "vnc", "none"
 	NodeType    string `json:"node_type,omitempty"`    // "iou", "dynamips", "qemu", "docker", "vpcs"
-	MAC         string `json:"mac,omitempty"`          // host MAC resolved at provision time; empty for switches/routers
+	MAC         string `json:"mac,omitempty"`          // host MAC resolved once at provisioning via PopulateNodeMACs; empty for switches/routers.
+	// IMPORTANT: MACs are captured exactly once (provision → PopulateNodeMACs → node_map JSONB)
+	// and are valid for the session's entire lifetime because NO code path recreates
+	// containers or nodes within an existing session (see service.go Launch/resume,
+	// reaper.go suspend/teardown/DeleteProject — restart reuses, delete destroys).
+	// If a node-recreate path is ever added (e.g. per-node restart, error-recovery
+	// that re-provisions), MACs MUST be re-resolved before the verify engine reads
+	// them, or verify results will be silently stale.
 }
 
 // NodeMap keys are the same node names used in the lab's topology template,

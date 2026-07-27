@@ -173,10 +173,17 @@ func (h *Handler) consoleTruthVerify(ctx context.Context, sessionID uuid.UUID, l
 			//   h.sessionSvc.ConsoleLock.ForceRelease(sessionID, switchNode, labsession.HolderConsole)
 			//   unlock, _, ok = h.sessionSvc.ConsoleLock.TryLock(sessionID, switchNode, labsession.HolderVerify)
 			//
-			// ForceRelease + SetPreempt infrastructure is already built
-			// and tested in ConsoleLock. Until the frontend reconnects
+			// ForceRelease + SetPreempt infrastructure is already built,
+			// tested (including stale-unlock guard via generation counter),
+			// and waiting in ConsoleLock. Until the frontend reconnects
 			// automatically, server-side close just shows a confusing
 			// "[disconnected]" to the student with no way back.
+			//
+			// UX note: with the current flag-OFF message ("close the console
+			// first"), the normal workflow (console open → Verify) hits this
+			// rejection every time — it's the common path, not a race. This
+			// is an acceptable papercut for initial launch; the preemption
+			// TODO resolves it permanently without frontend coordination.
 			return VerifyResult{
 				Passed:  false,
 				Score:   0,

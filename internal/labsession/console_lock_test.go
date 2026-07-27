@@ -206,3 +206,83 @@ func TestErrNodeLocked_Error(t *testing.T) {
 		t.Fatal("ErrNodeLocked.Error() should not be empty")
 	}
 }
+
+// TestStaleUnlockAfterPreemption verifies the stale-release guard: when
+// ForceRelease preempts the console's lock and a verify re-acquires it,
+// the killed console's deferred unlock() must NOT release the verify's
+// lock. Without the generation counter, the stale defer would free the
+// lock mid-verification and let a third party (console reopen, second
+// verify) in — a guaranteed defect after any preemption.
+func TestStaleUnlockAfterPreemption(t *testing.T) {
+	lock := NewConsoleLock()
+	sessID := uuid.New()
+	node := "SW1"
+
+	// Console acquires lock (token = 1).
+	consoleUnlock, _, ok := lock.TryLock(sessID, node, HolderConsole)
+	if !ok {
+		t.Fatal("console TryLock should succeed")
+	}
+	lock.SetPreempt(sessID, node, func() {}) // no-op preempt (no real WebSocket)
+
+	// ForceRelease preempts the console. Token 1 is invalidated.
+	if !lock.ForceRelease(sessID, node, HolderConsole) {
+		t.Fatal("ForceRelease should succeed")
+	}
+
+	// Verify acquires (token = 2).
+	verifyUnlock, _, ok := lock.TryLock(sessID, node, HolderVerify)
+	if !ok {
+		t.Fatal("verify TryLock should succeed after preemption")
+	}
+
+	// The console's deferred unlock fires — must be a no-op.
+	// Token 1 ≠ token 2, so it must NOT delete the verify's lock.
+	consoleUnlock()
+
+	// After stale unlock, the verify should STILL hold the lock.
+	_, heldBy, ok := lock.TryLock(sessID, node, HolderConsole)
+	if ok {
+		t.Fatal("stale console unlock must not release verify lock — third party acquired")
+	}
+	if heldBy != HolderVerify {
+		t.Fatalf("lock should still be held by verify after stale unlock, got %q", heldBy)
+	}
+
+	// Verify releases normally.
+	verifyUnlock()
+
+	// Now the lock is actually free.
+	thirdUnlock, _, ok := lock.TryLock(sessID, node, HolderConsole)
+	if !ok {
+		t.Fatal("lock should be free after verify releases")
+	}
+	thirdUnlock()
+}
+
+// TestDoubleUnlockAfterForceRelease verifies that a double-unlock from
+// the original holder after ForceRelease does not corrupt state — both
+// calls should be no-ops.
+func TestDoubleUnlockAfterForceRelease(t *testing.T) {
+	lock := NewConsoleLock()
+	sessID := uuid.New()
+	node := "SW1"
+
+	unlock, _, ok := lock.TryLock(sessID, node, HolderConsole)
+	if !ok {
+		t.Fatal("TryLock should succeed")
+	}
+	lock.SetPreempt(sessID, node, func() {})
+
+	lock.ForceRelease(sessID, node, HolderConsole)
+
+	// Two stale unlocks — neither should panic or affect state.
+	unlock()
+	unlock()
+
+	// Lock should still be free.
+	_, _, ok = lock.TryLock(sessID, node, HolderVerify)
+	if !ok {
+		t.Fatal("lock should be free after stale double-unlock")
+	}
+}

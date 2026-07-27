@@ -3,6 +3,7 @@ package labsession
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 
 	"github.com/google/uuid"
 )
@@ -53,10 +54,16 @@ import (
 //
 // The console path calls SetPreempt to register a callback that closes
 // its WebSocket. ForceRelease calls that callback, then releases the
-// lock atomically.
+// lock. A generation counter prevents the killed console's deferred
+// unlock from releasing a lock it no longer owns (stale-release guard).
+//
+// Preemption is NOT yet activated in the verify handler because the
+// frontend has no WebSocket auto-reconnect. See the TODO(preemption)
+// in internal/verification/handler.go for the one-line activation.
 type ConsoleLock struct {
-	mu       sync.Mutex
-	locks    map[consoleLockKey]*lockEntry
+	mu        sync.Mutex
+	locks     map[consoleLockKey]*lockEntry
+	nextToken uint64 // monotonically increasing; zero is invalid
 }
 
 type consoleLockKey struct {
@@ -65,8 +72,9 @@ type consoleLockKey struct {
 }
 
 type lockEntry struct {
-	holder   string   // "console" or "verify"
-	preempt  func()   // called by ForceRelease to close the console WebSocket
+	holder  string // "console" or "verify"
+	token   uint64 // generation counter; only a matching unlock() may release
+	preempt func() // called by ForceRelease to close the console WebSocket
 }
 
 // Holder constants for readability at call sites.
@@ -86,7 +94,9 @@ func NewConsoleLock() *ConsoleLock {
 // behalf of holder. Returns:
 //
 //   - unlock func + "" + true on success. unlock is safe to call
-//     multiple times; only the first call releases the lock.
+//     multiple times; only the first call that matches the current
+//     generation releases the lock. Stale unlocks (from a goroutine
+//     whose lock was preempted by ForceRelease) are no-ops.
 //   - nil + heldBy + false if already held. heldBy is the holder
 //     string ("console" or "verify") so the caller can tailor the
 //     error message to the actual conflict.
@@ -98,16 +108,15 @@ func (l *ConsoleLock) TryLock(sessionID uuid.UUID, nodeName, holder string) (unl
 	if entry, held := l.locks[key]; held {
 		return nil, entry.holder, false
 	}
-	entry := &lockEntry{holder: holder}
+	token := atomic.AddUint64(&l.nextToken, 1)
+	entry := &lockEntry{holder: holder, token: token}
 	l.locks[key] = entry
 
-	released := false
 	unlock = func() {
 		l.mu.Lock()
 		defer l.mu.Unlock()
-		if !released {
+		if e, exists := l.locks[key]; exists && e.token == token {
 			delete(l.locks, key)
-			released = true
 		}
 	}
 	return unlock, "", true
@@ -133,6 +142,12 @@ func (l *ConsoleLock) SetPreempt(sessionID uuid.UUID, nodeName string, fn func()
 // registered (by the console path), it is called first to close the
 // WebSocket. Returns true if the lock was released.
 //
+// After ForceRelease, the original holder's deferred unlock becomes
+// a no-op (generation counter mismatch) — the stale-release guard
+// prevents a killed console goroutine from releasing a lock it no
+// longer owns, even if the verify path has already re-acquired and
+// released it.
+//
 // This enables the server-side preemption flow: when verify
 // encounters a console-vs-own-console contention, it calls
 // ForceRelease to close the console, then acquires the lock for
@@ -145,6 +160,9 @@ func (l *ConsoleLock) ForceRelease(sessionID uuid.UUID, nodeName, expectedHolder
 		l.mu.Unlock()
 		return false
 	}
+	// Invalidate the token so the original holder's deferred unlock
+	// is a no-op even if it fires after verify re-acquires the lock.
+	entry.token = 0 // zero is never a valid token (nextToken starts at 1)
 	preempt := entry.preempt
 	delete(l.locks, key)
 	l.mu.Unlock()
