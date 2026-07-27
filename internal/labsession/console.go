@@ -208,8 +208,8 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 	// browser stops responding (60s), ReadMessage returns an error,
 	// the handler exits, and defer unlock() releases the lock.
 	const (
-		pongWait   = 60 * time.Second
-		pingPeriod = (pongWait * 9) / 10 // 54s — send pings before pongWait expires
+		pongWait   = 120 * time.Second
+		pingPeriod = (pongWait * 9) / 10 // 108s — send pings before pongWait expires
 		writeWait  = 10 * time.Second    // deadline for writing a ping/pong frame
 	)
 	ws.SetReadDeadline(time.Now().Add(pongWait))
