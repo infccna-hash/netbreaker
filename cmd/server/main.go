@@ -108,7 +108,7 @@ func main() {
 	sessionRepo := labsession.NewRepository(pool)
 	var gns3Client labsession.GNS3Client
 	if cfg.GNS3ServerURL != "" {
-		gns3Client = labsession.NewHTTPGNS3Client(cfg.GNS3ServerURL, cfg.GNS3Username, cfg.GNS3Password)
+		gns3Client = labsession.NewHTTPGNS3Client(cfg.GNS3ServerURL, cfg.GNS3Username, cfg.GNS3Password, cfg.KaliPinnedTag)
 	} else {
 		gns3Client = nil
 	}

@@ -83,7 +83,7 @@ func TestDeleteProject_Idempotent404(t *testing.T) {
 		}
 	}))
 	defer srv.Close()
-	c := NewHTTPGNS3Client(srv.URL, "", "")
+	c := NewHTTPGNS3Client(srv.URL, "", "", "netbreaker-kali:test")
 	if err := c.DeleteProject(context.Background(), "p"); err != nil {
 		t.Fatalf("404 on delete must be success (idempotent), got %v", err)
 	}
@@ -94,7 +94,7 @@ func TestDeleteProject_ErrorOn500(t *testing.T) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}))
 	defer srv.Close()
-	c := NewHTTPGNS3Client(srv.URL, "", "")
+	c := NewHTTPGNS3Client(srv.URL, "", "", "netbreaker-kali:test")
 	if err := c.DeleteProject(context.Background(), "p"); err == nil {
 		t.Fatal("500 on delete must return an error (fail closed)")
 	}
@@ -106,7 +106,7 @@ func TestProjectExists_404False_200True(t *testing.T) {
 		w.WriteHeader(code)
 	}))
 	defer srv.Close()
-	c := NewHTTPGNS3Client(srv.URL, "", "")
+	c := NewHTTPGNS3Client(srv.URL, "", "", "netbreaker-kali:test")
 
 	code = http.StatusNotFound
 	if ok, err := c.ProjectExists(context.Background(), "p"); err != nil || ok {

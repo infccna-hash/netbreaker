@@ -48,6 +48,11 @@ func (s *Service) Launch(ctx context.Context, userID uuid.UUID, labID int, isPro
 			if err := s.repo.SetStatus(ctx, existing.ID, StatusRunning); err != nil {
 				return nil, err
 			}
+			// Touch last_active_at so the reaper doesn't immediately suspend
+			// a just-resumed session whose last_active_at is still hours old.
+			if err := s.repo.Touch(ctx, existing.ID); err != nil {
+				log.Printf("labsession: touch after resume: %v", err)
+			}
 			existing.Status = StatusRunning
 		}
 		return existing, nil
@@ -79,6 +84,15 @@ func (s *Service) Launch(ctx context.Context, userID uuid.UUID, labID int, isPro
 
 func (s *Service) provision(sessionID uuid.UUID, labID int) {
 	ctx := context.Background()
+
+	// Pre-flight: confirm the pinned Kali image exists on the compute
+	// node *before* creating any GNS3 resources. Fails closed with an
+	// actionable message rather than a generic "image not found" mid-flow.
+	if err := s.gns3.EnsureKaliImage(ctx, s.computeID); err != nil {
+		log.Printf("labsession: kali image pre-flight failed: %v", err)
+		_ = s.repo.SetStatus(ctx, sessionID, StatusFailed)
+		return
+	}
 
 	projectID, err := s.gns3.CreateProject(ctx, s.computeID, 0, labID)
 	if err != nil {
@@ -213,6 +227,8 @@ func lookupTopologyTemplate(labID int) TopologyTemplate {
 		return Lab44Topology
 	case 45:
 		return Lab45Topology
+	case 46:
+		return Lab46Topology
 	default:
 		return TopologyTemplate{LabID: labID, Nodes: []NodeTemplate{}}
 	}

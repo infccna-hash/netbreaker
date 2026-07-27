@@ -7,13 +7,19 @@ import "context"
 // before gns3client.go has a single line of HTTP/telnet code in it.
 type GNS3Client interface {
 	CreateProject(ctx context.Context, computeID string, userID, labID int) (projectID string, err error)
+	DeleteProject(ctx context.Context, projectID string) error
 	ProvisionTopology(ctx context.Context, projectID string, template TopologyTemplate) (NodeMap, error)
 	StartNodes(ctx context.Context, projectID string) error
 	StopNodes(ctx context.Context, projectID string) error
-	DeleteProject(ctx context.Context, projectID string) error
 
-	// Read-only teardown-verification probes. Both fail closed: any transport
-	// or unexpected-status error must surface, never be read as "gone/stopped".
+	// EnsureKaliImage verifies the pinned Kali image exists on the
+	// compute node. Returns nil if present, an error with a "run
+	// build.sh" message if missing.
+	EnsureKaliImage(ctx context.Context, computeID string) error
+
+	// Read-only teardown-verification probes. Both fail closed: any
+	// transport or unexpected-status error must surface, never be read
+	// as "gone/stopped".
 	ProjectExists(ctx context.Context, projectID string) (bool, error)
 	NodesStopped(ctx context.Context, projectID string) (bool, error)
 }

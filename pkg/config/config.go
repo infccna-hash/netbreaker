@@ -50,6 +50,13 @@ type Config struct {
 	GNS3Password    string
 	GNS3MaxSessions int
 
+	// KaliPinnedTag is the pinned immutable Docker tag for the Kali attacker
+	// image (e.g. "netbreaker-kali:2026-07-26-8690fc6bd659"). Set from the
+	// provenance file that Falcon's build.sh writes atomically. The Go
+	// default path (when a topology template omits image) reads this single
+	// source; the GNS3 template pin and the watchdog verify against it too.
+	KaliPinnedTag string
+
 	// Reaper sweeps stale lab sessions off the GNS3 compute box.
 	GNS3IdleTimeout  time.Duration // running session idle → suspend
 	GNS3SessionTTL   time.Duration // idle_stopped → full teardown
@@ -89,6 +96,7 @@ func Load() (*Config, error) {
 		GNS3Username:     getEnv("GNS3_USERNAME", ""),
 		GNS3Password:    getEnv("GNS3_PASSWORD", ""),
 		GNS3MaxSessions: getIntEnv("GNS3_MAX_SESSIONS", 3),
+		KaliPinnedTag:   getEnv("KALI_PINNED_TAG", "netbreaker-kali:latest"),
 	}
 
 	var err error

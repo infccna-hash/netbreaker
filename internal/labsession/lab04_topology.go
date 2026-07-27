@@ -1,5 +1,9 @@
 package labsession
 
+// Lab 04 — OSPF Infiltration
+// Topology: R1+R2 (Dynamips c3725) + SW1 (IOU L2) + KALI (Docker)
+// Transit segment 10.0.99.0/24 on SW1; R1 fronts 10.0.20.0/24, R2 fronts 10.0.10.0/24.
+// Kali joins the transit, forms an unauthenticated OSPF adjacency, and injects a route.
 var Lab04Topology = TopologyTemplate{
 	ComputeID: "local",
 	Nodes: []NodeTemplate{
@@ -18,7 +22,6 @@ var Lab04Topology = TopologyTemplate{
 				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
 				"ram":      256,
 				"slot0":    "GT96100-FE",
-				"slot1":    "NM-16ESW",
 				"slot2":    "NM-1FE-TX",
 			},
 		},
@@ -30,25 +33,8 @@ var Lab04Topology = TopologyTemplate{
 				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
 				"ram":      256,
 				"slot0":    "GT96100-FE",
-				"slot1":    "NM-16ESW",
 				"slot2":    "NM-1FE-TX",
 			},
-		},
-		{
-			Name:     "R3",
-			NodeType: "dynamips",
-			Properties: map[string]any{
-				"platform": "c3725",
-				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
-				"ram":      256,
-				"slot0":    "GT96100-FE",
-				"slot1":    "NM-16ESW",
-				"slot2":    "NM-1FE-TX",
-			},
-		},
-		{
-			Name:     "PC1",
-			NodeType: "vpcs",
 		},
 		{
 			Name:       "KALI",
@@ -60,8 +46,6 @@ var Lab04Topology = TopologyTemplate{
 	Links: []LinkTemplate{
 		{NodeA: "R1", IfaceA: "Fa0/0", NodeB: "SW1", IfaceB: "Et0/0"},
 		{NodeA: "R2", IfaceA: "Fa0/0", NodeB: "SW1", IfaceB: "Et0/1"},
-		{NodeA: "R2", IfaceA: "Fa0/1", NodeB: "R3", IfaceB: "Fa0/0"},
-		{NodeA: "R3", IfaceA: "Fa0/1", NodeB: "PC1", IfaceB: "eth0"},
 		{NodeA: "KALI", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/2"},
 	},
 }

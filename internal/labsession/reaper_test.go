@@ -51,6 +51,7 @@ func (f *fakeGNS3) ProvisionTopology(context.Context, string, TopologyTemplate) 
 }
 func (f *fakeGNS3) StartNodes(context.Context, string) error { return nil }
 func (f *fakeGNS3) StopNodes(context.Context, string) error  { f.stops++; return f.stopErr }
+func (f *fakeGNS3) EnsureKaliImage(context.Context, string) error { return nil } // always passes in tests
 func (f *fakeGNS3) DeleteProject(context.Context, string) error {
 	f.deletes++
 	if f.deleteErr == nil {

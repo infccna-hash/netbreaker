@@ -12,18 +12,20 @@ import (
 
 // HTTPGNS3Client implements GNS3Client against a GNS3 v2 controller.
 type HTTPGNS3Client struct {
-	baseURL  string // e.g. "http://10.0.0.5:3080"
-	username string
-	password string
-	http     *http.Client
+	baseURL       string // e.g. "http://10.0.0.5:3080"
+	username      string
+	password      string
+	http          *http.Client
+	kaliPinnedTag string // immutable tag from KALI_PINNED_TAG env var
 }
 
-func NewHTTPGNS3Client(baseURL, username, password string) *HTTPGNS3Client {
+func NewHTTPGNS3Client(baseURL, username, password, kaliPinnedTag string) *HTTPGNS3Client {
 	return &HTTPGNS3Client{
-		baseURL:  baseURL,
-		username: username,
-		password: password,
-		http:     &http.Client{Timeout: 30 * time.Second},
+		baseURL:       baseURL,
+		username:      username,
+		password:      password,
+		http:          &http.Client{Timeout: 30 * time.Second},
+		kaliPinnedTag: kaliPinnedTag,
 	}
 }
 
@@ -63,6 +65,35 @@ func (c *HTTPGNS3Client) do(ctx context.Context, method, path string, body any, 
 		}
 	}
 	return nil
+}
+
+// --- EnsureKaliImage ---
+
+type gns3DockerImage struct {
+	Image string `json:"image"`
+}
+
+// EnsureKaliImage queries the GNS3 compute node's Docker image list and
+// confirms the pinned Kali tag is present. Fails closed — any transport
+// error, unexpected response, or missing image surfaces with an actionable
+// message ("run build.sh") rather than letting GNS3 produce a generic
+// "image not found" at node-creation time.
+func (c *HTTPGNS3Client) EnsureKaliImage(ctx context.Context, computeID string) error {
+	var images []gns3DockerImage
+	path := fmt.Sprintf("/v2/computes/%s/docker/images", computeID)
+	if err := c.do(ctx, http.MethodGet, path, nil, &images); err != nil {
+		return fmt.Errorf("cannot list docker images on compute %q: %w; is GNS3 reachable?", computeID, err)
+	}
+
+	pinned := c.kaliPinnedTag
+	for _, img := range images {
+		if img.Image == pinned {
+			return nil // found — safe to provision
+		}
+	}
+
+	return fmt.Errorf("kali image %q not found on Falcon compute %q; "+
+		"run ~/netbreaker/docker/kali/build.sh on Falcon to rebuild", pinned, computeID)
 }
 
 // --- CreateProject ---
@@ -142,14 +173,22 @@ func (c *HTTPGNS3Client) ProvisionTopology(ctx context.Context, projectID string
 
 		switch nt.NodeType {
 		case "iou":
+			// Always disable console/vty timeouts so lab sessions don't disconnect
+			// after 10 minutes of idle (default IOS exec-timeout).
+			base := "line con 0\nexec-timeout 0 0\nline vty 0 4\nexec-timeout 0 0\n"
 			if nt.StartupConfig != "" {
-				props["startup_config_content"] = nt.StartupConfig
+				props["startup_config_content"] = base + nt.StartupConfig
+			} else {
+				props["startup_config_content"] = base
 			}
 		case "dynamips":
 			// Properties from the topology template must include
 			// platform, image, ram etc. — no defaults to guess.
+			base := "line con 0\nexec-timeout 0 0\nline vty 0 4\nexec-timeout 0 0\n"
 			if nt.StartupConfig != "" {
-				props["startup_config_content"] = nt.StartupConfig
+				props["startup_config_content"] = base + nt.StartupConfig
+			} else {
+				props["startup_config_content"] = base
 			}
 		case "qemu":
 			// QEMU nodes boot from their disk image, no startup config.
@@ -157,9 +196,13 @@ func (c *HTTPGNS3Client) ProvisionTopology(ctx context.Context, projectID string
 		case "docker":
 			// Docker containers: GNS3 requires image and console_type in the
 			// node creation payload even when using a template that specifies
-			// them. Default to Kali image + telnet.
+			// them.
 			if _, ok := props["image"]; !ok {
-				props["image"] = "netbreaker-kali:latest"
+				// The topology template didn't supply an image — this is
+				// the normal path (no template sets image; we always pin
+				// it here). Read the single source of truth so a rebuild
+				// propagates everywhere without multi-place manual edits.
+				props["image"] = c.kaliPinnedTag
 			}
 			if _, ok := props["console_type"]; !ok {
 				props["console_type"] = "telnet"

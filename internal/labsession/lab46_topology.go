@@ -1,21 +1,11 @@
 package labsession
 
-// Lab 10 — DNS Poisoning
-// Topology: R1 (gateway+DNS) + SW1 (IOU L2) + PC-A (client) + PC-B (victim) + KALI (dnschef)
-// Kali intercepts DNS via ARP poison or rogue DHCP, then dnschef returns fake IPs.
-var Lab10Topology = TopologyTemplate{
+// Lab 46 — CAM Overflow
+// Topology: SW1 (IOU L2) + PC-A (VPCS) + PC-B (VPCS) + KALI (Docker) — star.
+// Same topology as Lab 03 (MAC Flood Chaos) — simple one-switch L2 segment.
+var Lab46Topology = TopologyTemplate{
 	ComputeID: "local",
 	Nodes: []NodeTemplate{
-		{
-			Name:     "R1",
-			NodeType: "dynamips",
-			Properties: map[string]any{
-				"platform": "c3725",
-				"image":    "/home/kobayashi/GNS3/images/IOS/c3725-adventerprisek9-mz.124-15.T14.image",
-				"ram":      256,
-				"slot0":    "GT96100-FE",
-			},
-		},
 		{
 			Name:     "SW1",
 			NodeType: "iou",
@@ -39,7 +29,6 @@ var Lab10Topology = TopologyTemplate{
 		},
 	},
 	Links: []LinkTemplate{
-		{NodeA: "R1", IfaceA: "Fa0/0", NodeB: "SW1", IfaceB: "Et0/0"},
 		{NodeA: "PC-A", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/1"},
 		{NodeA: "PC-B", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/2"},
 		{NodeA: "KALI", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/3"},
