@@ -7,9 +7,24 @@ import "netbreaker.io/api/internal/verify"
 // session reaches StatusRunning (nodes are started, console ports are
 // assigned).
 //
-// MACs are NOT populated here — they're resolved at verification time
-// by the IOSCollector via show commands. IPs are also left empty; each
-// lab's verifier factory knows its own addressing plan.
+// BLOCKER — MAC resolution: MACs are NOT populated here (left empty).
+// This means any verifier using ExpectMACOnPort or ExpectMACsShareOnePort
+// (e.g. Lab 15 Build) will fail 100% of the time because sess.MAC("PC3")
+// returns "<unresolved:PC3>".
+//
+// The fix requires a provisioning-time MAC populator that queries each
+// host individually:
+//   - VPCS nodes: telnet → "show" command → parse MAC
+//   - Docker nodes: "docker exec <id> cat /sys/class/net/eth0/address"
+//   - IOU/dynamips: these are switches/routers; their own MACs aren't needed
+//
+// This must run at session launch time (between StatusProvisioning and
+// StatusRunning) and write results into Session.NodeMap or a new
+// session_macs table.
+//
+// Verifiers using only port-based assertions (ExpectPortVLAN, ExpectInterfaceUp)
+// are NOT blocked — Lab 1 Build works today. Lab 15 Build is blocked until
+// MAC resolution ships.
 func ResolveVerifySession(sess *Session, computeHost string) *verify.LabSession {
 	nodes := make(map[string]verify.NodeAddr, len(sess.NodeMap))
 	for name, info := range sess.NodeMap {

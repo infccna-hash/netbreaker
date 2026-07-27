@@ -51,18 +51,18 @@ func devicePromptRe(suffix string) *regexp.Regexp {
 	return regexp.MustCompile(regexp.QuoteMeta(suffix))
 }
 
-// deviceRespond: send prompt, read client command, write output + prompt.
-func deviceRespond(conn net.Conn, prompt, output string) {
-	buf := make([]byte, 4096)
-	conn.Write([]byte("\r\n" + prompt))
-	conn.Read(buf)
-	conn.Write([]byte("\r\n" + output + "\r\n" + prompt))
-}
-
 func TestRunCommand_BasicExecution(t *testing.T) {
 	handler := func(conn net.Conn) {
-		deviceRespond(conn, "Router#", "terminal length 0")
-		deviceRespond(conn, "Router#", "show version\r\nCisco IOS Software, Version 15.1")
+		buf := make([]byte, 4096)
+
+		// Terminal length 0 handshake
+		conn.Write([]byte("\r\nRouter#"))
+		conn.Read(buf)
+		conn.Write([]byte("\r\nterminal length 0\r\nRouter#"))
+
+		// Read command, send output with prompt
+		conn.Read(buf)
+		conn.Write([]byte("\r\nshow version\r\nCisco IOS Software, Version 15.1\r\nRouter#"))
 	}
 
 	addr, cleanup := fakeConsole(t, handler)
@@ -86,9 +86,20 @@ func TestRunCommand_BasicExecution(t *testing.T) {
 }
 
 func TestRunCommand_PromptStripping(t *testing.T) {
+	// Manual handshake (not deviceRespond) to avoid the localhost
+	// race where the next command's prompt arrives before the
+	// client finishes consuming the current response.
 	handler := func(conn net.Conn) {
-		deviceRespond(conn, "Switch#", "terminal length 0")
-		deviceRespond(conn, "Switch#", "show vlan\r\nVLAN0010 active\r\nVLAN0020 active")
+		buf := make([]byte, 4096)
+
+		// Terminal length 0 handshake
+		conn.Write([]byte("\r\nSwitch#"))
+		conn.Read(buf)
+		conn.Write([]byte("\r\nterminal length 0\r\nSwitch#"))
+
+		// Read command, send output with prompt
+		conn.Read(buf)
+		conn.Write([]byte("\r\nshow vlan\r\nVLAN0010 active\r\nVLAN0020 active\r\nSwitch#"))
 	}
 
 	addr, cleanup := fakeConsole(t, handler)
@@ -209,11 +220,20 @@ func TestRunCommand_ConcurrentDifferentNodes(t *testing.T) {
 
 	makeHandler := func(nodeName string) func(net.Conn) {
 		return func(conn net.Conn) {
-			deviceRespond(conn, nodeName+"#", "terminal length 0")
+			buf := make([]byte, 4096)
+
+			// Terminal length 0 handshake
+			conn.Write([]byte("\r\n" + nodeName + "#"))
+			conn.Read(buf)
+			conn.Write([]byte("\r\nterminal length 0\r\n" + nodeName + "#"))
+
 			mu.Lock()
 			commands[nodeName] = append(commands[nodeName], "received")
 			mu.Unlock()
-			deviceRespond(conn, nodeName+"#", fmt.Sprintf("show version\r\noutput from %s", nodeName))
+
+			// Read command, send output with prompt
+			conn.Read(buf)
+			conn.Write([]byte(fmt.Sprintf("\r\nshow version\r\noutput from %s\r\n%s#", nodeName, nodeName)))
 		}
 	}
 

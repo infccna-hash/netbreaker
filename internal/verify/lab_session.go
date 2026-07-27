@@ -19,7 +19,13 @@ type LabSession struct {
 }
 
 // MAC returns the MAC address for a named node.
-func (s *LabSession) MAC(name string) MAC { return MAC(s.MACs[name]) }
+func (s *LabSession) MAC(name string) MAC {
+	m := s.MACs[name]
+	if m == "" {
+		return MAC("<unresolved:" + name + ">")
+	}
+	return MAC(m)
+}
 
 // IP returns the expected IP address for a named node.
 func (s *LabSession) IP(name string) string { return s.IPs[name] }
