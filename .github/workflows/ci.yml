@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Unit tests (no external services) ──────────────────────────
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test -race (unit)
+        run: go test -race -count=1 ./internal/... -timeout 120s
+
+  # ── Integration tests (needs Postgres) ─────────────────────────
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: netbreaker
+          POSTGRES_USER: netbreaker
+          POSTGRES_PASSWORD: testpass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U netbreaker"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      TEST_DATABASE_URL: postgres://netbreaker:testpass@localhost:5432/netbreaker?sslmode=disable
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: go test -race (integration)
+        run: go test -race -count=1 ./internal/... -timeout 120s
