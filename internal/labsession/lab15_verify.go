@@ -11,7 +11,7 @@ func Lab15BuildVerifier(sess *verify.LabSession) *verify.Verifier {
 	return verify.New().
 		ExpectMACsShareOnePort(
 			"hub segment collapses to one port",
-			[]verify.MAC{sess.MAC("PC1"), sess.MAC("PC2"), sess.MAC("KALI2")},
+			[]verify.MAC{sess.MAC("PC1"), sess.MAC("PC2")},
 			"Et0/0",
 		).
 		ExpectMACOnPort("PC3 has its own dedicated port", sess.MAC("PC3"), "Et0/1").
@@ -40,13 +40,12 @@ func Lab15AttackVerifier(sess *verify.LabSession) *verify.Verifier {
 	// addressing" as declared in the ResolveVerifySession design doc.
 	// sess.IP() is not populated; IP resolution is future work.
 	ips := map[string]string{
-		"PC1":   "192.168.1.10",
-		"PC2":   "192.168.1.20",
-		"PC3":   "192.168.1.30",
-		"KALI":  "192.168.1.100",
-		"KALI2": "192.168.1.101",
+		"PC1":  "192.168.1.10",
+		"PC2":  "192.168.1.20",
+		"PC3":  "192.168.1.30",
+		"KALI": "192.168.1.100",
 	}
-	for _, host := range []string{"PC1", "PC2", "PC3", "KALI", "KALI2"} {
+	for _, host := range []string{"PC1", "PC2", "PC3", "KALI"} {
 		v.ExpectReachable(host, ips[host])
 	}
 	return v

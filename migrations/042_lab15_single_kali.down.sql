@@ -1,0 +1,1 @@
+-- Rollback: restore original KALI2 build content (no-op — revert via git)
