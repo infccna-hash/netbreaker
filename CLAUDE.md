@@ -6,6 +6,22 @@ NetBreaker is a CCNA learning platform where students build network topologies i
 ## Your Job
 Read every file before touching it. Follow TODO.md **in order**, one task at a time. Mark each task done as you complete it. Do not skip ahead.
 
+## Review Rules — Never Skip These (2026-07-28 incident)
+Three silent regressions were caught today by reviewing the **actual diff**,
+not the commit message. Each would have shipped clean through a review that
+only read messages and trusted green CI. Institutionalize this:
+1. **Every fix claiming to prevent a specific failure needs a negative control**
+   — reintroduce the failure and confirm the fix/test catches it.
+2. **Every commit that deletes or modifies existing files needs a full diff
+   review** — not just the commit message. `git diff HEAD~1 --stat` first,
+   then read every changed file. Three times today a commit message said one
+   thing while the diff silently reverted unrelated code (00f9d5c, 06a854e).
+3. **`go vet && go test -race` must pass** — the Dockerfile gate enforces this,
+   but verify locally before pushing. If a PR claims "tests pass," actually run them.
+4. **Any PR touching existing test files must confirm test count didn't drop.**
+   run `find . -name '*_test.go' | wc -l` before and after, and flag any
+   decrease regardless of commit message claims.
+
 ---
 
 ## Tech Stack
