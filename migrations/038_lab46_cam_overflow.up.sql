@@ -2,6 +2,14 @@
 -- Lab 46 (id=46) — CAM Overflow : full content (Vol 1 · Ch 5)
 -- ═══════════════════════════════════════════════════════
 
+-- Lab 46 was added ad-hoc post-curriculum-expansion (migration 008 creates
+-- 15-45 only). The INSERT is here so the migration is self-contained on a
+-- fresh DB — the old VPS had it inserted manually.
+INSERT INTO labs (id, slug, title, topic, difficulty, is_free, sort_order, short_desc, book_ref)
+VALUES (46, 'cam-overflow', 'CAM Overflow', 'switching', 'easy', true, 46,
+        'Turn a switch into a hub by flooding the CAM table.', 'Vol 1 · Ch 5')
+ON CONFLICT (id) DO NOTHING;
+
 UPDATE labs
 SET short_desc = 'Turn a switch into a hub. Flood the CAM table with macof, capture traffic that should be private, then lock it down with port-security.',
     topic = 'switching',
