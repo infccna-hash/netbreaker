@@ -400,6 +400,8 @@ tbody tr:hover { background: var(--surface-2); }
 .lab-content .callout.danger::before { content: "🚫"; }
 .lab-content .callout.info   { background: var(--build-tint); border-color: #cfddfb; color: #1f47b0; }
 .lab-content .callout.info::before   { content: "ℹ️"; }
+.lab-content .callout.aha    { background: #f4effe; border-color: #ddc7f7; color: #6425c9; }
+.lab-content .callout.aha::before    { content: "✨"; }
 .lab-content .callout strong { color: inherit; }
 
 /* ── Achievement unlocked ── */
