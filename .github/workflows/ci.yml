@@ -11,9 +11,9 @@ jobs:
   unit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.22"
 
@@ -45,11 +45,19 @@ jobs:
       TEST_DATABASE_URL: postgres://netbreaker:testpass@localhost:5432/netbreaker?sslmode=disable
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.22"
+
+      - name: install golang-migrate
+        run: |
+          curl -sSL https://github.com/golang-migrate/migrate/releases/download/v4.17.1/migrate.linux-amd64.tar.gz | tar xz
+          sudo mv migrate /usr/local/bin/
+
+      - name: apply migrations
+        run: migrate -path migrations -database "$TEST_DATABASE_URL" up
 
       - name: go test -race (integration)
         run: go test -race -count=1 ./internal/... -timeout 120s
