@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -212,6 +213,20 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 		pingPeriod = (pongWait * 9) / 10 // 108s — send pings before pongWait expires
 		writeWait  = 10 * time.Second    // deadline for writing a ping/pong frame
 	)
+	// ── Serialize all writes to the WebSocket connection ──────────
+	// gorilla/websocket requires at most one concurrent writer.
+	// The ping goroutine, the tcp→ws relay, and the error-path
+	// writes all target the same *websocket.Conn. This mutex
+	// prevents the data race that would otherwise produce torn
+	// frames and corrupt the connection — the likely trigger for
+	// the silent, no-close-event console freeze under typing load.
+	var writeMu sync.Mutex
+	safeWrite := func(mt int, data []byte) error {
+		writeMu.Lock()
+		defer writeMu.Unlock()
+		ws.SetWriteDeadline(time.Now().Add(writeWait))
+		return ws.WriteMessage(mt, data)
+	}
 	ws.SetReadDeadline(time.Now().Add(pongWait))
 	ws.SetPongHandler(func(string) error {
 		ws.SetReadDeadline(time.Now().Add(pongWait))
@@ -223,8 +238,7 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 		for {
 			select {
 			case <-ticker.C:
-				ws.SetWriteDeadline(time.Now().Add(writeWait))
-				if err := ws.WriteMessage(websocket.PingMessage, nil); err != nil {
+				if err := safeWrite(websocket.PingMessage, nil); err != nil {
 					return
 				}
 			case <-ctx.Done():
@@ -240,7 +254,7 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 		for {
 			n, err := tcpConn.Read(buf)
 			if n > 0 {
-				if werr := ws.WriteMessage(websocket.BinaryMessage, buf[:n]); werr != nil {
+				if werr := safeWrite(websocket.BinaryMessage, buf[:n]); werr != nil {
 					return
 				}
 			}

@@ -1,14 +1,14 @@
 # ─── Build stage ──────────────────────────────────────────────
 FROM golang:1.22-alpine AS builder
 WORKDIR /app
-RUN apk add --no-cache git
+RUN apk add --no-cache git gcc musl-dev
 ENV GOFLAGS=-mod=mod
 # Copy everything and let the build resolve modules. go.sum is generated here
 # if absent, so a fresh checkout builds without a pre-committed go.sum.
 COPY . .
 RUN go mod download && \
     go vet ./... && \
-    go test ./... && \
+    CGO_ENABLED=1 go test -race ./... && \
     CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /netbreaker ./cmd/server/
 
 # ─── Runtime stage ────────────────────────────────────────────
