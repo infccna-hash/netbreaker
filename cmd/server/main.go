@@ -124,6 +124,7 @@ func main() {
 	// ── Console-truth verifier registry ──────────────────────────────────
 	verifyReg := verify.NewVerifierRegistry()
 	labsession.RegisterLab1Verifiers(verifyReg)
+	labsession.RegisterLab8Verifiers(verifyReg)
 	labsession.RegisterLab15Verifiers(verifyReg)
 
 	// ── Verification handler (supports both legacy + console-truth) ─────

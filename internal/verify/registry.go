@@ -1,6 +1,9 @@
 package verify
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
 // VerifierFactory is called with a LabSession to produce a Verifier for
 // a specific lab+phase combination. Each lab registers one factory per
@@ -54,12 +57,24 @@ func (r *VerifierRegistry) Lookup(labID int, phase string) *RegistryEntry {
 }
 
 // Run executes the registered verifier for (labID, phase) against the
-// given session and collector, returning the result. If no verifier is
-// registered, all checks pass vacuously (no assertions = no failures).
+// given session and collector, returning the result.
+//
+// FAIL-CLOSED: If no verifier is registered, the result is Passed: false
+// with an explicit message — never auto-passes. An unregistered lab
+// should fall back to the handler's legacy (suspended) path, not
+// succeed vacuously. This is the same credential-integrity shape as
+// the GenericVerifier incident (2026-07-27).
 func (r *VerifierRegistry) Run(ctx context.Context, labID int, phase string, sess *LabSession, c Collector) VerifyResult {
 	e := r.Lookup(labID, phase)
 	if e == nil {
-		return VerifyResult{Passed: true}
+		return VerifyResult{
+			Passed: false,
+			Checks: []Check{{
+				Name:    "verifier_registered",
+				Passed:  false,
+				Detail:  fmt.Sprintf("no console-truth verifier registered for lab %d / %s", labID, phase),
+			}},
+		}
 	}
 	return e.Factory(sess).Run(ctx, c)
 }
