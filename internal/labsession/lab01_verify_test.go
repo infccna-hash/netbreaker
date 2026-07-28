@@ -11,6 +11,7 @@ import (
 type mockCollector struct {
 	vlans      map[verify.Port]int
 	interfaces map[verify.Port]verify.InterfaceStatus
+	errdisable verify.ErrdisableConfig
 }
 
 func (m *mockCollector) CollectVLANs(_ context.Context) (map[verify.Port]int, error) {
@@ -36,7 +37,7 @@ func (m *mockCollector) CollectRunningConfig(_ context.Context) (string, error) 
 }
 
 func (m *mockCollector) CollectErrdisableRecovery(_ context.Context) (verify.ErrdisableConfig, error) {
-	return verify.ErrdisableConfig{}, nil
+	return m.errdisable, nil
 }
 
 func (m *mockCollector) CollectReachability(_ context.Context, targets ...string) (map[string]bool, error) {

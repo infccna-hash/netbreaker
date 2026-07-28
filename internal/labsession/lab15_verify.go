@@ -3,8 +3,8 @@ package labsession
 import "netbreaker.io/api/internal/verify"
 
 // Lab15BuildVerifier checks the exact lesson Step 3 teaches: hosts
-// behind the hub (PC1, PC2, KALI2) all resolve to one switch port,
-// while PC3 and KALI — each on their own dedicated port — resolve
+// behind the hub (PC1, PC2) both resolve to one switch port, while
+// PC3 and KALI — each on their own dedicated port — resolve
 // separately. This is the entire "collision domain" concept made
 // machine-checkable.
 func Lab15BuildVerifier(sess *verify.LabSession) *verify.Verifier {
@@ -54,8 +54,18 @@ func Lab15AttackVerifier(sess *verify.LabSession) *verify.Verifier {
 // Lab15HardenVerifier checks all five ports are documented and
 // errdisable auto-recovery interval is configured.
 //
+// FIXED (2026-07-28): Et0/0's expected description previously said
+// "LINK-TO-HUB-PC1-PC2-KALI2" — a leftover from before the lab moved
+// to a single-Kali topology (commit 351618a). The harden content was
+// already correct ("LINK-TO-HUB-PC1-PC2"); this verifier was the
+// stale side. Same issue with the errdisable interval: content
+// teaches 300s, this verifier checked for 180. Content is the
+// deliberately-authored value in both cases — verifier corrected to
+// match it, not the other way around. This mismatch meant the
+// Harden phase could never be passed by any student.
+//
 // SCOPE: This verifier confirms the student typed `errdisable
-// recovery interval 180` (a non-default value that persists in
+// recovery interval 300` (a non-default value that persists in
 // running-config). It does NOT verify:
 //   - That `errdisable recovery cause all` was accepted (IOU L2
 //     acceptance unconfirmed as of 2026-07-27 — live-node tests
@@ -81,12 +91,12 @@ func Lab15AttackVerifier(sess *verify.LabSession) *verify.Verifier {
 // the more honest signal to key on than the timer alone.
 func Lab15HardenVerifier(sess *verify.LabSession) *verify.Verifier {
 	return verify.New().
-		ExpectDescription("Et0/0", "LINK-TO-HUB-PC1-PC2-KALI2").
+		ExpectDescription("Et0/0", "LINK-TO-HUB-PC1-PC2").
 		ExpectDescription("Et0/1", "LINK-TO-PC3").
 		ExpectDescription("Et0/2", "LINK-TO-KALI").
 		ExpectDescription("Et0/3", "UPLINK-TO-R1").
 		ExpectDescription("Et0/4", "SPARE-UNUSED").
-		ExpectErrdisableRecovery(180)
+		ExpectErrdisableRecovery(300)
 }
 
 // RegisterLab15Verifiers wires these into the global registry.
