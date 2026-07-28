@@ -43,17 +43,20 @@ func (s *Service) GetOrCreate(ctx context.Context, userID uuid.UUID, userName, u
 		return nil, err
 	}
 
-	// Check eligibility against the current size of the catalog — grows over time.
-	count, err := s.progressRepo.CountCompleted(ctx, userID)
+	// Check eligibility: the user's completed (lab_id, phase) set must be a
+	// superset of the catalog's (lab_id, phase) set.  Set membership, not just
+	// count equality, so a user who completed 5 build phases across different
+	// labs cannot earn a certificate for a catalog that requires attack/harden.
+	// Replaces the COUNT-vs-COUNT check that was the "eligibility by
+	// coincidence" bug (2026-07-28).
+	ok, err := s.progressRepo.AllPhasesCompleted(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	totalPhasesRequired, err := s.progressRepo.TotalPhases(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if count < totalPhasesRequired {
-		return nil, fmt.Errorf("%w: %d/%d phases completed", ErrNotEligible, count, totalPhasesRequired)
+	if !ok {
+		count, _ := s.progressRepo.CountCompleted(ctx, userID)
+		total, _ := s.progressRepo.TotalPhases(ctx)
+		return nil, fmt.Errorf("%w: %d/%d phases completed", ErrNotEligible, count, total)
 	}
 
 	// Issue certificate
