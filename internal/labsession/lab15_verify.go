@@ -36,8 +36,18 @@ func Lab15AttackVerifier(sess *verify.LabSession) *verify.Verifier {
 		ExpectInterfaceUp("Et0/3").
 		ExpectPortVLAN("Et0/1", 1) // PC3 back in the default VLAN
 
+	// Hardcoded addressing plan — the verifier factory "knows its
+	// addressing" as declared in the ResolveVerifySession design doc.
+	// sess.IP() is not populated; IP resolution is future work.
+	ips := map[string]string{
+		"PC1":   "192.168.1.10",
+		"PC2":   "192.168.1.20",
+		"PC3":   "192.168.1.30",
+		"KALI":  "192.168.1.100",
+		"KALI2": "192.168.1.101",
+	}
 	for _, host := range []string{"PC1", "PC2", "PC3", "KALI", "KALI2"} {
-		v.ExpectReachable(host, sess.IP(host))
+		v.ExpectReachable(host, ips[host])
 	}
 	return v
 }

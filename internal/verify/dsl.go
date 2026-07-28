@@ -187,14 +187,17 @@ func (v *Verifier) ExpectErrdisableRecovery(intervalSec int) *Verifier {
 
 func (v *Verifier) ExpectReachable(name, target string) *Verifier {
 	return v.add(fmt.Sprintf("%s reachable", name), func(ctx context.Context, ev *EvidenceStore) (bool, string) {
+		if target == "" {
+			return false, fmt.Sprintf("IP not configured for host %s", name)
+		}
 		ok, err := ev.Reachable(ctx, target)
 		if err != nil {
 			return false, err.Error()
 		}
 		if !ok {
-			return false, fmt.Sprintf("%s did not respond", target)
+			return false, fmt.Sprintf("%s (%s) did not respond", target, name)
 		}
-		return true, "responded"
+		return true, fmt.Sprintf("%s responded", target)
 	})
 }
 

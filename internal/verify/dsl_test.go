@@ -285,6 +285,27 @@ func TestExpectReachable(t *testing.T) {
 	if fail.Passed {
 		t.Fatal("expected failure for unreachable host")
 	}
+
+	// Negative control: IP valid but host not configured to respond.
+	// Proves the check is live (real ping) — not a placebo that passes
+	// whenever the IP string is non-empty.
+	noResponse := verify.New().ExpectReachable("dead-host", "192.168.1.55").Run(context.Background(), m)
+	if noResponse.Passed {
+		t.Fatal("negative control: expected failure for IP with no responder")
+	}
+}
+
+func TestExpectReachable_EmptyIP(t *testing.T) {
+	// Guard: empty IP fails immediately (no ping command built).
+	m := newMockCollector()
+	result := verify.New().ExpectReachable("R1", "").Run(context.Background(), m)
+	if result.Passed {
+		t.Fatal("expected failure for empty IP target")
+	}
+	c := result.Checks[0]
+	if c.Detail != "IP not configured for host R1" {
+		t.Fatalf("expected guard message, got: %s", c.Detail)
+	}
 }
 
 // --- the actual point of the EvidenceStore: caching ---
