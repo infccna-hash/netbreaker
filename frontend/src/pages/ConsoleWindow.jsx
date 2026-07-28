@@ -46,14 +46,15 @@ export default function ConsoleWindow() {
     document.title = session?.lab_title ? `Console · ${session.lab_title}` : "Console · NetBreaker";
   }, [session]);
 
-  // Filter to nodes that actually have a console — ethernet_hub and
-  // other console-less nodes have console_port: 0 and shouldn't get a tab.
+  // All nodes get a tab — interactive ones (console_port > 0) open a
+  // live terminal; passive ones (hubs, etc.) show a placeholder.
   const nodeNames = session?.node_map
-    ? Object.keys(session.node_map)
-        .filter((name) => (session.node_map[name]?.console_port ?? 0) > 0)
-        .sort()
+    ? Object.keys(session.node_map).sort()
     : [];
-  const allNodeNames = session?.node_map ? Object.keys(session.node_map).sort() : [];
+  const consoleNodes = new Set(
+    Object.keys(session?.node_map || {})
+      .filter((name) => (session.node_map[name]?.console_port ?? 0) > 0)
+  );
 
   if (error) {
     return (
@@ -83,16 +84,6 @@ export default function ConsoleWindow() {
     );
   }
 
-  if (nodeNames.length === 0 && allNodeNames.length > 0) {
-    return (
-      <div className="console-window-page console-window-center">
-        <p className="muted">
-          This topology has no interactive consoles (all nodes are passive — hubs, etc.).
-        </p>
-      </div>
-    );
-  }
-
   if (nodeNames.length === 0) {
     return (
       <div className="console-window-page console-window-center">
@@ -105,16 +96,27 @@ export default function ConsoleWindow() {
     <div className="console-window-page">
       <div className="console-window-head">
         <div className="console-modal-tabs">
-          {nodeNames.map((name) => (
-            <button
-              key={name}
-              className={"btn btn-sm " + (activeNode === name ? "btn-primary" : "")}
-              onClick={() => setActiveNode(name)}
-              style={{ fontFamily: "var(--mono)" }}
-            >
-              {name}
-            </button>
-          ))}
+          {nodeNames.map((name) => {
+            const isPassive = !consoleNodes.has(name);
+            return (
+              <button
+                key={name}
+                className={
+                  "btn btn-sm " +
+                  (activeNode === name ? "btn-primary" : "") +
+                  (isPassive ? " btn-ghost" : "")
+                }
+                onClick={() => setActiveNode(name)}
+                style={{ fontFamily: "var(--mono)" }}
+                title={isPassive ? "Passive device — no interactive console" : ""}
+              >
+                {name}
+                {isPassive && (
+                  <span style={{ fontSize: "0.65rem", opacity: 0.5, marginLeft: 3 }}>⬤</span>
+                )}
+              </button>
+            );
+          })}
         </div>
         <span className="muted mono" style={{ fontSize: "0.78rem" }}>
           {session.lab_title || "Live Lab"}
@@ -122,15 +124,30 @@ export default function ConsoleWindow() {
       </div>
 
       <div className="console-window-body">
-        {nodeNames.map((name) => (
-          <div
-            key={name}
-            className="console-panel"
-            style={{ display: activeNode === name ? "block" : "none" }}
-          >
-            <ConsolePanel sessionId={session.id} nodeName={name} active={activeNode === name} />
-          </div>
-        ))}
+        {nodeNames.map((name) => {
+          const isPassive = !consoleNodes.has(name);
+          return (
+            <div
+              key={name}
+              className="console-panel"
+              style={{ display: activeNode === name ? "block" : "none" }}
+            >
+              {isPassive ? (
+                <div className="console-window-center" style={{ height: "100%" }}>
+                  <p className="muted">
+                    Passive device — no interactive console.
+                    <br />
+                    <span style={{ fontSize: "0.85rem" }}>
+                      Hubs, unmanaged switches, and patch panels don't run an OS.
+                    </span>
+                  </p>
+                </div>
+              ) : (
+                <ConsolePanel sessionId={session.id} nodeName={name} active={activeNode === name} />
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
