@@ -17,12 +17,18 @@ import (
 // the Go race detector when the ping goroutine and the tcp→ws relay
 // goroutine write to the WebSocket connection concurrently.
 //
-// This is the regression test for the bug where unsynchronized
-// ws.WriteMessage / ws.SetWriteDeadline calls from two goroutines
-// produced torn frames and silent console freezes. It is designed to
-// trigger the exact interleaving that would fire under -race if the
-// sync.Mutex in safeWrite() were ever removed or bypassed.
+// Single-run race detection under -race is inherently probabilistic —
+// whether a particular run observes the interleaving that trips the
+// detector depends on goroutine scheduling. To make the test reliable
+// we wrap the scenario in 5 independent shots so the compound catch
+// probability approaches 100 %.
 func TestConsoleBridge_NoWriteRace(t *testing.T) {
+	for shot := 0; shot < 5; shot++ {
+		runNoWriteRaceShot(t)
+	}
+}
+
+func runNoWriteRaceShot(t *testing.T) {
 	// ── Fake telnet endpoint (stands in for the GNS3 console) ────
 	// Blasts output continuously — max concurrency stress on the
 	// tcp→ws relay goroutine.
@@ -108,24 +114,27 @@ func TestConsoleBridge_NoWriteRace(t *testing.T) {
 		client.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
 		_, _, err := client.ReadMessage()
 		if err != nil {
-			// Timeout or close is expected — the relay may have
-			// exited because the test is short. We just need the
-			// concurrent goroutines to run long enough for -race to
-			// observe any unsynchronized write.
-			if !isTimeoutOrClose(err) {
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				// Read timeout is expected — the relay may pause
+				// briefly. Continue reading until the deadline.
+				continue
+			}
+			// Genuine close or protocol error — the relay has
+			// exited. We've run long enough for -race to observe
+			// any unsynchronized write.
+			if !isClose(err) {
 				t.Logf("client read: %v", err)
 			}
-			break
+			return
 		}
 	}
 }
 
-func isTimeoutOrClose(err error) bool {
+func isClose(err error) bool {
 	if err == nil {
 		return false
 	}
 	s := err.Error()
-	return strings.Contains(s, "i/o timeout") ||
-		strings.Contains(s, "close 1006") ||
+	return strings.Contains(s, "close 1006") ||
 		strings.Contains(s, "closed")
 }
