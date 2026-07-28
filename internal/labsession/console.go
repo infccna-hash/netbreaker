@@ -95,6 +95,129 @@ func usesVNCConsole(n NodeInfo) bool {
 	return n.ConsoleType == "vnc" || n.NodeType == "qemu"
 }
 
+// consoleBridgeConfig holds timing knobs for the WebSocket↔telnet bridge.
+// Exported so tests can inject fast timers without reaching into the handler.
+type ConsoleBridgeConfig struct {
+	PongWait   time.Duration
+	PingPeriod time.Duration
+	WriteWait  time.Duration
+}
+
+// defaultBridgeConfig is the production timer profile. Tests replace it
+// with a profile that shrinks ping/pong periods to single-digit milliseconds
+// so concurrent-write races trigger within a few hundred ms instead of
+// minutes.
+var DefaultBridgeConfig = ConsoleBridgeConfig{
+	PongWait:   120 * time.Second,
+	PingPeriod: 108 * time.Second, // (pongWait * 9) / 10
+	WriteWait:  10 * time.Second,
+}
+
+// bridgeConsole runs the bidirectional WebSocket↔telnet relay inside the
+// caller's goroutine (it does not return until the WebSocket closes or a
+// fatal error occurs). It is split out from the handler so tests can
+// exercise the concurrent ping/relay/read paths under -race without
+// needing the full session/auth/DB stack.
+func bridgeConsole(ctx context.Context, cancel context.CancelFunc, ws *websocket.Conn, tcpConn net.Conn, cfg ConsoleBridgeConfig, onActivity func()) {
+	// ── Serialize all writes to the WebSocket connection ──────────
+	// gorilla/websocket requires at most one concurrent writer.
+	// The ping goroutine, the tcp→ws relay, and the error-path
+	// writes all target the same *websocket.Conn. This mutex
+	// prevents the data race that would otherwise produce torn
+	// frames and corrupt the connection — the likely trigger for
+	// the silent, no-close-event console freeze under typing load.
+	var writeMu sync.Mutex
+	safeWrite := func(mt int, data []byte) error {
+		writeMu.Lock()
+		defer writeMu.Unlock()
+		ws.SetWriteDeadline(time.Now().Add(cfg.WriteWait))
+		return ws.WriteMessage(mt, data)
+	}
+
+	ws.SetReadDeadline(time.Now().Add(cfg.PongWait))
+	ws.SetPongHandler(func(string) error {
+		ws.SetReadDeadline(time.Now().Add(cfg.PongWait))
+		return nil
+	})
+	go func() {
+		ticker := time.NewTicker(cfg.PingPeriod)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				if err := safeWrite(websocket.PingMessage, nil); err != nil {
+					return
+				}
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	// tcp → websocket (GNS3 console output → browser)
+	go func() {
+		defer cancel()
+		buf := make([]byte, 4096)
+		for {
+			n, err := tcpConn.Read(buf)
+			if n > 0 {
+				if werr := safeWrite(websocket.BinaryMessage, buf[:n]); werr != nil {
+					return
+				}
+			}
+			if err != nil {
+				return
+			}
+		}
+	}()
+
+	// websocket → tcp (keystrokes → GNS3 console), with heartbeat-on-keystroke
+	lastTouch := time.Now()
+
+	// Keep-alive ticker: send a heartbeat every 60s while the websocket
+	// remains open. Without this, a user reading a lab phase without
+	// typing for >GNS3_IDLE_TIMEOUT (default 15m) gets reaped — the
+	// session is suspended, all consoles disconnect, and unsaved device
+	// config is lost. The keystroke heartbeat above still fires on
+	// activity for fine-grained last_active_at tracking; this ticker is
+	// the safety net for thinking/reading pauses.
+	keepAlive := time.NewTicker(60 * time.Second)
+	defer keepAlive.Stop()
+	go func() {
+		for {
+			select {
+			case <-keepAlive.C:
+				if onActivity != nil {
+					onActivity()
+				}
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	for {
+		_, msg, err := ws.ReadMessage()
+		if err != nil {
+			break
+		}
+		// Extend the read deadline on every message received —
+		// keystrokes prove the browser is alive, so the connection
+		// should stay open even if the ping goroutine stalls.
+		ws.SetReadDeadline(time.Now().Add(cfg.PongWait))
+		if _, err := tcpConn.Write(msg); err != nil {
+			break
+		}
+		// Throttle: touch at most once per ~20s of activity
+		if time.Since(lastTouch) > 20*time.Second {
+			if onActivity != nil {
+				onActivity()
+			}
+			lastTouch = time.Now()
+		}
+	}
+}
+
 func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 	userID, _ := authFromContext(r.Context())
 
@@ -198,111 +321,7 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithCancel(context.Background()) // bg: survive chi Timeout(30s) middleware
 	defer cancel()
 
-	// ── WebSocket liveness (ping/pong) ─────────────────────────────
-	// Without this, a laptop sleep or NAT drop that leaves the TCP
-	// connection half-open holds the ConsoleLock indefinitely — the
-	// student's own verify will be rejected with "console is open"
-	// against a zombie session.
-	//
-	// Pong handler extends the read deadline on each pong received
-	// from the browser. A ping ticker sends periodic pings. If the
-	// browser stops responding (120s), ReadMessage returns an error,
-	// the handler exits, and defer unlock() releases the lock.
-	const (
-		pongWait   = 120 * time.Second
-		pingPeriod = (pongWait * 9) / 10 // 108s — send pings before pongWait expires
-		writeWait  = 10 * time.Second    // deadline for writing a ping/pong frame
-	)
-	// ── Serialize all writes to the WebSocket connection ──────────
-	// gorilla/websocket requires at most one concurrent writer.
-	// The ping goroutine, the tcp→ws relay, and the error-path
-	// writes all target the same *websocket.Conn. This mutex
-	// prevents the data race that would otherwise produce torn
-	// frames and corrupt the connection — the likely trigger for
-	// the silent, no-close-event console freeze under typing load.
-	var writeMu sync.Mutex
-	safeWrite := func(mt int, data []byte) error {
-		writeMu.Lock()
-		defer writeMu.Unlock()
-		ws.SetWriteDeadline(time.Now().Add(writeWait))
-		return ws.WriteMessage(mt, data)
-	}
-	ws.SetReadDeadline(time.Now().Add(pongWait))
-	ws.SetPongHandler(func(string) error {
-		ws.SetReadDeadline(time.Now().Add(pongWait))
-		return nil
+	bridgeConsole(ctx, cancel, ws, tcpConn, DefaultBridgeConfig, func() {
+		_ = h.svc.Heartbeat(ctx, sessionID)
 	})
-	go func() {
-		ticker := time.NewTicker(pingPeriod)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-ticker.C:
-				if err := safeWrite(websocket.PingMessage, nil); err != nil {
-					return
-				}
-			case <-ctx.Done():
-				return
-			}
-		}
-	}()
-
-	// tcp → websocket (GNS3 console output → browser)
-	go func() {
-		defer cancel()
-		buf := make([]byte, 4096)
-		for {
-			n, err := tcpConn.Read(buf)
-			if n > 0 {
-				if werr := safeWrite(websocket.BinaryMessage, buf[:n]); werr != nil {
-					return
-				}
-			}
-			if err != nil {
-				return
-			}
-		}
-	}()
-
-	// websocket → tcp (keystrokes → GNS3 console), with heartbeat-on-keystroke
-	lastTouch := time.Now()
-
-	// Keep-alive ticker: send a heartbeat every 60s while the websocket
-	// remains open. Without this, a user reading a lab phase without
-	// typing for >GNS3_IDLE_TIMEOUT (default 15m) gets reaped — the
-	// session is suspended, all consoles disconnect, and unsaved device
-	// config is lost. The keystroke heartbeat above still fires on
-	// activity for fine-grained last_active_at tracking; this ticker is
-	// the safety net for thinking/reading pauses.
-	keepAlive := time.NewTicker(60 * time.Second)
-	defer keepAlive.Stop()
-	go func() {
-		for {
-			select {
-			case <-keepAlive.C:
-				_ = h.svc.Heartbeat(ctx, sessionID)
-			case <-ctx.Done():
-				return
-			}
-		}
-	}()
-
-	for {
-		_, msg, err := ws.ReadMessage()
-		if err != nil {
-			break
-		}
-		// Extend the read deadline on every message received —
-		// keystrokes prove the browser is alive, so the connection
-		// should stay open even if the ping goroutine stalls.
-		ws.SetReadDeadline(time.Now().Add(pongWait))
-		if _, err := tcpConn.Write(msg); err != nil {
-			break
-		}
-		// Throttle: touch at most once per ~20s of activity
-		if time.Since(lastTouch) > 20*time.Second {
-			_ = h.svc.Heartbeat(ctx, sessionID)
-			lastTouch = time.Now()
-		}
-	}
 }
