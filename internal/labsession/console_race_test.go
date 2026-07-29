@@ -101,42 +101,27 @@ func runNoWriteRaceShot(t *testing.T) {
 	}
 	defer client.Close()
 
-	// Read incoming frames (the relayed blast) for ~500 ms so that
-	// the ping goroutine fires many times while the relay is
-	// simultaneously writing.
-	deadline := time.After(500 * time.Millisecond)
+	// Read incoming frames for up to 500 ms — a single deadline for
+	// the entire shot, no retries. The ping goroutine fires every 3 ms
+	// (~166 pings in 500 ms) while the relay simultaneously blasts data
+	// through safeWrite, giving the race detector maximum exposure.
+	//
+	// We MUST NOT call ReadMessage again after ANY error, including
+	// timeout: gorilla/websocket poisons the connection (sets readErr)
+	// and panics with "repeated read on failed websocket connection"
+	// on the next call. A single 500 ms deadline avoids the per-
+	// iteration retry that triggered this panic on CI runners where
+	// TCP RST beats the close frame.
+	client.SetReadDeadline(time.Now().Add(500 * time.Millisecond))
 	for {
-		select {
-		case <-deadline:
-			return // success — no race detected
-		default:
-		}
-		client.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
 		_, _, err := client.ReadMessage()
 		if err != nil {
-			// Never retry ReadMessage after ANY error, including
-			// timeout. If the underlying TCP connection has already
-			// failed (e.g. the relay goroutine exited), gorilla/
-			// websocket sets readErr and the NEXT ReadMessage call
-			// panics with "repeated read on failed websocket
-			// connection". A timeout that masks a dead connection
-			// triggers exactly this panic — reproducible on CI
-			// runners where TCP RST beats the close frame to the
-			// browser-side read.
-			if !isClose(err) && !isTimeout(err) {
+			if !isClose(err) {
 				t.Logf("client read: %v", err)
 			}
 			return
 		}
 	}
-}
-
-func isTimeout(err error) bool {
-	if err == nil {
-		return false
-	}
-	netErr, ok := err.(net.Error)
-	return ok && netErr.Timeout()
 }
 
 func isClose(err error) bool {
