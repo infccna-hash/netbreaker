@@ -3,15 +3,15 @@ package labsession
 import "netbreaker.io/api/internal/verify"
 
 // Lab15BuildVerifier checks the exact lesson Step 3 teaches: hosts
-// behind the hub (PC1, PC2) both resolve to one switch port, while
-// PC3 and KALI — each on their own dedicated port — resolve
+// behind the hub (PC1, PC2, KALI2) all resolve to one switch port,
+// while PC3 and KALI — each on their own dedicated port — resolve
 // separately. This is the entire "collision domain" concept made
 // machine-checkable.
 func Lab15BuildVerifier(sess *verify.LabSession) *verify.Verifier {
 	return verify.New().
 		ExpectMACsShareOnePort(
 			"hub segment collapses to one port",
-			[]verify.MAC{sess.MAC("PC1"), sess.MAC("PC2")},
+			[]verify.MAC{sess.MAC("PC1"), sess.MAC("PC2"), sess.MAC("KALI2")},
 			"Et0/0",
 		).
 		ExpectMACOnPort("PC3 has its own dedicated port", sess.MAC("PC3"), "Et0/1").

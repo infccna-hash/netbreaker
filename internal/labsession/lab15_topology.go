@@ -1,11 +1,14 @@
 package labsession
 
 // Lab 15 — Network Devices & Anatomy (Vol 1 · Ch 2)
-// Single-Kali design: KALI on switch port Et0/2 as observer/sniffer.
-// Hub segment (PC1+PC2→H1→SW1 Et0/0) vs switch segment (PC3→SW1 Et0/1, KALI→SW1 Et0/2)
-// shows collision-domain boundaries without rewiring.
-// 8 nodes: H1 (ethernet_hub), SW1 (IOU L2, 5 ports), R1 (IOU L3), FW1 (ASAv QEMU),
-//          PC1/PC2/PC3 (VPCS), KALI (Docker)
+// Two-observer design: KALI on switch port Et0/2 (sees broadcasts
+// only — the switch forwards known unicasts elsewhere), KALI2 on the
+// hub segment alongside PC1/PC2 (sees everything — a hub floods
+// every frame to every port, no exceptions). Same PC1<->PC2 traffic,
+// two vantage points, two different outcomes — the entire hub-vs-
+// switch lesson made directly comparable in one capture each.
+// 9 nodes: H1 (ethernet_hub), SW1 (IOU L2, 5 ports), R1 (IOU L3), FW1 (ASAv QEMU),
+//          PC1/PC2/PC3 (VPCS), KALI/KALI2 (Docker)
 var Lab15Topology = TopologyTemplate{
 	ComputeID: "local",
 	Nodes: []NodeTemplate{
@@ -59,10 +62,17 @@ var Lab15Topology = TopologyTemplate{
 			TemplateID: "efcdd6aa-8a18-4028-ae77-331d9e6d921b",
 			Properties: map[string]any{"adapters": 1},
 		},
+		{
+			Name:       "KALI2",
+			NodeType:   "docker",
+			TemplateID: "efcdd6aa-8a18-4028-ae77-331d9e6d921b",
+			Properties: map[string]any{"adapters": 1},
+		},
 	},
 	Links: []LinkTemplate{
 		{NodeA: "PC1", IfaceA: "eth0", NodeB: "H1", IfaceB: "e0"},
 		{NodeA: "PC2", IfaceA: "eth0", NodeB: "H1", IfaceB: "e1"},
+		{NodeA: "KALI2", IfaceA: "eth0", NodeB: "H1", IfaceB: "e3"},
 		{NodeA: "H1", IfaceA: "e2", NodeB: "SW1", IfaceB: "Et0/0"},
 		{NodeA: "PC3", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/1"},
 		{NodeA: "KALI", IfaceA: "eth0", NodeB: "SW1", IfaceB: "Et0/2"},
