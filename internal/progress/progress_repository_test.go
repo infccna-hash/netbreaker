@@ -85,6 +85,73 @@ func TestAllPhasesCompleted_NoProgress_Fails(t *testing.T) {
 	}
 }
 
+// TestPhaseExists_Lab15AndBeyond_True is the regression guard for the
+// "labID must be 1-14" bug (found 2026-07-28): a hardcoded range check in
+// the Mark handler rejected every lab added after #14, silently breaking
+// progress-marking for labs 15 through the current catalog max. This
+// confirms the live PhaseExists check (which replaced it) correctly
+// recognizes labs beyond 14.
+func TestPhaseExists_Lab15AndBeyond_True(t *testing.T) {
+	pool := testPool(t)
+	defer pool.Close()
+	repo := NewRepository(pool)
+
+	for _, labID := range []int{15, 30, 45} {
+		ok, err := repo.PhaseExists(context.Background(), labID, "build")
+		if err != nil {
+			t.Fatalf("PhaseExists(%d, build): %v", labID, err)
+		}
+		if !ok {
+			t.Errorf("lab %d build phase should exist in the catalog — if this fails, "+
+				"either the catalog doesn't go up to 46 anymore, or PhaseExists itself is broken", labID)
+		}
+	}
+}
+
+// TestPhaseExists_NonexistentLab_False confirms a truly bogus lab ID is
+// still correctly rejected — the fix removes the hardcoded upper bound,
+// not validation entirely.
+func TestPhaseExists_NonexistentLab_False(t *testing.T) {
+	pool := testPool(t)
+	defer pool.Close()
+	repo := NewRepository(pool)
+
+	ok, err := repo.PhaseExists(context.Background(), 99999, "build")
+	if err != nil {
+		t.Fatalf("PhaseExists(99999, build): %v", err)
+	}
+	if ok {
+		t.Error("lab 99999 does not exist — PhaseExists should return false")
+	}
+}
+
+// TestPhaseExists_Lab46_CurrentlyHasNoContent documents a real, separate
+// gap found alongside this fix (2026-07-28): migration 038 inserted Lab
+// 46's `labs` row ("CAM Overflow") but never inserted its `lab_phases`
+// rows — the lab exists in the catalog listing but has zero actual
+// content. PhaseExists correctly returns false here today, which is the
+// right behavior for a lab with no phases yet. This test is written to
+// FAIL, not silently pass, once someone adds Lab 46's content — that's
+// deliberate: the point is to force a visible decision (update this test
+// to expect true) rather than let the catalog change unnoticed. Do not
+// "fix" this by changing the assertion without first confirming
+// migration 038 (or a follow-up) actually adds Lab 46's lab_phases rows.
+func TestPhaseExists_Lab46_CurrentlyHasNoContent(t *testing.T) {
+	pool := testPool(t)
+	defer pool.Close()
+	repo := NewRepository(pool)
+
+	ok, err := repo.PhaseExists(context.Background(), 46, "build")
+	if err != nil {
+		t.Fatalf("PhaseExists(46, build): %v", err)
+	}
+	if ok {
+		t.Error("Lab 46 has no lab_phases content as of 2026-07-28 — if this now passes, " +
+			"migration 038 (or a follow-up) was updated to add it; update this test to assert " +
+			"true and remove this comment rather than deleting the test")
+	}
+}
+
 // ── helpers ──────────────────────────────────────────────────────────
 
 // seedAllPhases inserts a user_progress row for every (lab_id, phase)

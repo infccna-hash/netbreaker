@@ -59,6 +59,21 @@ func (h *Handler) Mark(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Confirm this (labID, phase) is real before writing — checked live
+	// against lab_phases, not a hardcoded lab-count constant. This replaces
+	// a "labID must be 1-14" check that silently rejected every lab added
+	// after #14 (found 2026-07-28: labs 15-46 could never be marked
+	// complete through this endpoint at all).
+	exists, err := h.repo.PhaseExists(r.Context(), labID, phase)
+	if err != nil {
+		response.InternalError(w)
+		return
+	}
+	if !exists {
+		response.Error(w, http.StatusBadRequest, "no such lab or phase")
+		return
+	}
+
 	if err := h.repo.Mark(r.Context(), userID, labID, phase); err != nil {
 		response.InternalError(w)
 		return
@@ -67,6 +82,18 @@ func (h *Handler) Mark(w http.ResponseWriter, r *http.Request) {
 }
 
 // DELETE /api/v1/progress/:labID/:phase
+//
+// Deliberately does NOT call PhaseExists (unlike Mark). DELETE is
+// idempotent: unmarking a (labID, phase) that was never real is a no-op
+// either way, since there's nothing to delete — it returns 204 the same
+// as unmarking a real-but-not-completed phase. This is intentional
+// asymmetry with Mark, not an oversight: Mark needs the check because it
+// WRITES a row for whatever's requested (that's how labID>14 silently
+// broke — bogus IDs succeeded at insert time), Unmark doesn't create
+// anything so there's nothing bogus to prevent. Concretely:
+// DELETE /progress/99999/build returns 204, not 400. If a future change
+// wants Unmark to 400 on a nonexistent lab too, that's a real behavior
+// change to decide on deliberately — not a bug to silently fix.
 func (h *Handler) Unmark(w http.ResponseWriter, r *http.Request) {
 	userID := mustUserID(r)
 	labID, phase, ok := parseParams(w, r)
@@ -81,10 +108,14 @@ func (h *Handler) Unmark(w http.ResponseWriter, r *http.Request) {
 	response.NoContent(w)
 }
 
+// parseParams does shape-only validation (positive integer, known phase
+// name). It deliberately does NOT check the lab count — see Mark's live
+// PhaseExists check for that. Unmark doesn't need the live check: deleting
+// a row that was never a valid (labID, phase) is a harmless no-op.
 func parseParams(w http.ResponseWriter, r *http.Request) (int, string, bool) {
 	labID, err := strconv.Atoi(chi.URLParam(r, "labID"))
-	if err != nil || labID < 1 || labID > 14 {
-		response.Error(w, http.StatusBadRequest, "invalid lab id (must be 1-14)")
+	if err != nil || labID < 1 {
+		response.Error(w, http.StatusBadRequest, "invalid lab id")
 		return 0, "", false
 	}
 	phase := chi.URLParam(r, "phase")

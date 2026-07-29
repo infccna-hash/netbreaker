@@ -21,6 +21,8 @@ export default function LabDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busyPhase, setBusyPhase] = useState(null);
+  const [verifyingPhase, setVerifyingPhase] = useState(null);
+  const [verifyResults, setVerifyResults] = useState({}); // phase -> VerifyResult
 
   // ── Session (live lab orchestration) ────────────────────────────────
   const [session, setSession] = useState(null);       // current session object or null
@@ -127,6 +129,34 @@ export default function LabDetail() {
       setError(err.message);
     } finally {
       setBusyPhase(null);
+    }
+  }
+
+  // Calls the real console-truth verification endpoint against the live
+  // session. The backend marks progress automatically when a check passes
+  // (maybeMarkProgress) — this just mirrors that into local state so the
+  // UI updates without a full reload. Falls back gracefully: if this lab
+  // has no console-truth verifier registered yet, the backend says so
+  // explicitly ("verification not available for this lab yet") rather
+  // than silently failing — "Mark complete" stays available below as the
+  // manual path for every lab that doesn't have automated checks yet.
+  async function verifyPhase(phase) {
+    if (!user || !session || session.status !== "running") return;
+    setVerifyingPhase(phase);
+    setError("");
+    try {
+      const result = await api.post(`/labs/${id}/verify`, {
+        phase,
+        session_id: session.id,
+      });
+      setVerifyResults((prev) => ({ ...prev, [phase]: result }));
+      if (result.passed) {
+        setCompleted((prev) => new Set(prev).add(phase));
+      }
+    } catch (err) {
+      setError(err.message || "Verification failed");
+    } finally {
+      setVerifyingPhase(null);
     }
   }
 
@@ -241,8 +271,18 @@ export default function LabDetail() {
 
           {session && !["provisioning", "running"].includes(session.status) && (
             <div className="alert alert-warn" style={{ marginTop: 8 }}>
-              Session ended ({session.status}).{" "}
-              <button className="link" onClick={launchSession}>Launch again</button>
+              {session.status === "idle_stopped" ? (
+                <>
+                  Session paused after inactivity — your nodes and config are still there.{" "}
+                  <button className="link" onClick={launchSession}>Resume session</button>
+                  {" "}(fast — just restarts the existing nodes, not a rebuild).
+                </>
+              ) : (
+                <>
+                  Session ended ({session.status}).{" "}
+                  <button className="link" onClick={launchSession}>Launch again</button>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -260,6 +300,9 @@ export default function LabDetail() {
           const meta = PHASE_META[ph.phase];
           const phaseLocked = ph.is_pro_only && !isPro;
           const done = completed.has(ph.phase);
+          const vr = verifyResults[ph.phase];
+          const sessionRunning = session?.status === "running";
+          const verifierUnavailable = vr && !vr.passed && vr.message === "verification not available for this lab yet";
           return (
             <div key={ph.id} className="card card-pad stack-16" style={{ borderLeft: `3px solid ${meta.color}` }}>
               <div className="row between wrap">
@@ -270,15 +313,55 @@ export default function LabDetail() {
                   <h3>{ph.title}</h3>
                 </div>
                 {user && !phaseLocked && (
-                  <button
-                    className={"btn btn-sm " + (done ? "" : "btn-primary")}
-                    onClick={() => togglePhase(ph.phase)}
-                    disabled={busyPhase === ph.phase}
-                  >
-                    {busyPhase === ph.phase ? <span className="spinner" /> : done ? "✓ Completed" : "Mark complete"}
-                  </button>
+                  <div className="row" style={{ gap: 8 }}>
+                    {!done && (
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => verifyPhase(ph.phase)}
+                        disabled={verifyingPhase === ph.phase || !sessionRunning}
+                        title={sessionRunning ? "Check your work against the live session" : "Launch a session to verify"}
+                      >
+                        {verifyingPhase === ph.phase ? <span className="spinner" /> : "✓ Verify"}
+                      </button>
+                    )}
+                    <button
+                      className={"btn btn-sm " + (done ? "" : "")}
+                      onClick={() => togglePhase(ph.phase)}
+                      disabled={busyPhase === ph.phase}
+                    >
+                      {busyPhase === ph.phase ? <span className="spinner" /> : done ? "✓ Completed" : "Mark complete manually"}
+                    </button>
+                  </div>
                 )}
               </div>
+
+              {!done && vr && (
+                <div className={"alert " + (vr.passed ? "alert-ok" : verifierUnavailable ? "alert-info" : "alert-warn")}>
+                  {verifierUnavailable ? (
+                    <span>Automated verification isn't available for this lab yet — use "Mark complete manually" once you've done the work.</span>
+                  ) : (
+                    <div className="stack-8">
+                      <span>{vr.message}{typeof vr.score === "number" && !vr.passed ? ` (${vr.score}%)` : ""}</span>
+                      {Array.isArray(vr.failures) && vr.failures.length > 0 && (
+                        <ul style={{ margin: 0, paddingLeft: 20 }}>
+                          {vr.failures.map((f, i) => (
+                            <li key={i}>
+                              <strong>{f}</strong>
+                              {vr.hints?.[i] && <span className="muted"> — {vr.hints[i]}</span>}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {!sessionRunning && !done && (
+                <p className="muted" style={{ fontSize: "0.82rem", margin: 0 }}>
+                  Launch a live session above to check your work automatically — or mark this phase complete manually.
+                </p>
+              )}
 
               {phaseLocked ? (
                 <div className="alert alert-info row between wrap" style={{ gap: 12 }}>

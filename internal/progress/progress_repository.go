@@ -54,6 +54,20 @@ func (r *Repository) Unmark(ctx context.Context, userID uuid.UUID, labID int, ph
 	return err
 }
 
+// PhaseExists reports whether (labID, phase) is a real entry in the current
+// lab_phases catalog. Used to validate Mark/Unmark requests against live
+// state instead of a hardcoded lab-count constant that goes stale as the
+// catalog grows (see the 2026-07-28 fix: a previous "labID must be 1-14"
+// check silently broke progress-marking for every lab added after #14).
+func (r *Repository) PhaseExists(ctx context.Context, labID int, phase string) (bool, error) {
+	var exists bool
+	err := r.pool.QueryRow(ctx,
+		`SELECT EXISTS(SELECT 1 FROM lab_phases WHERE lab_id = $1 AND phase = $2)`,
+		labID, phase,
+	).Scan(&exists)
+	return exists, err
+}
+
 // CountCompleted returns how many phases across all labs the user has completed.
 // Prefer AllPhasesCompleted for certificate eligibility; this count-only check
 // was the source of the "eligibility by coincidence" bug (2026-07-28).
