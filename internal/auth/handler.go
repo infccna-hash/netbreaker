@@ -63,7 +63,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		go func() { _ = h.email.SendWelcome(user.Email, user.Name) }()
 	}
 
-	h.setRefreshCookie(w, tokens.RefreshToken)
+	h.setRefreshCookie(w, r, tokens.RefreshToken)
 	response.JSON(w, http.StatusCreated, map[string]any{
 		"access_token": tokens.AccessToken,
 		"user":         user,
@@ -92,7 +92,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.setRefreshCookie(w, tokens.RefreshToken)
+	h.setRefreshCookie(w, r, tokens.RefreshToken)
 	response.JSON(w, http.StatusOK, map[string]any{
 		"access_token": tokens.AccessToken,
 		"user":         user,
@@ -108,12 +108,12 @@ func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
 
 	accessToken, newRefresh, err := h.svc.Refresh(r.Context(), cookie.Value)
 	if err != nil {
-		h.clearRefreshCookie(w)
+		h.clearRefreshCookie(w, r)
 		response.Unauthorized(w)
 		return
 	}
 
-	h.setRefreshCookie(w, newRefresh)
+	h.setRefreshCookie(w, r, newRefresh)
 	response.JSON(w, http.StatusOK, map[string]string{"access_token": accessToken})
 }
 
@@ -122,30 +122,42 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		_ = h.svc.Logout(r.Context(), cookie.Value)
 	}
-	h.clearRefreshCookie(w)
+	h.clearRefreshCookie(w, r)
 	response.NoContent(w)
 }
 
-func (h *Handler) setRefreshCookie(w http.ResponseWriter, token string) {
+// isSecure reports whether the request arrived over a TLS-terminated
+// connection.  When Caddy sits in front (reaching us over plain HTTP),
+// we trust the X-Forwarded-Proto header; when Caddy itself is on plain
+// HTTP the header is absent and Secure stays false so the browser will
+// actually store the cookie.
+func (h *Handler) isSecure(r *http.Request) bool {
+	if r.TLS != nil {
+		return true
+	}
+	return r.Header.Get("X-Forwarded-Proto") == "https"
+}
+
+func (h *Handler) setRefreshCookie(w http.ResponseWriter, r *http.Request, token string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     refreshCookieName,
 		Value:    token,
 		Path:     refreshCookiePath,
 		Expires:  time.Now().Add(h.refreshTTL),
 		HttpOnly: true,
-		Secure:   h.isProd,
+		Secure:   h.isSecure(r),
 		SameSite: http.SameSiteStrictMode,
 	})
 }
 
-func (h *Handler) clearRefreshCookie(w http.ResponseWriter) {
+func (h *Handler) clearRefreshCookie(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     refreshCookieName,
 		Value:    "",
 		Path:     refreshCookiePath,
 		MaxAge:   -1,
 		HttpOnly: true,
-		Secure:   h.isProd,
+		Secure:   h.isSecure(r),
 		SameSite: http.SameSiteStrictMode,
 	})
 }
