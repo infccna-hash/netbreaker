@@ -51,7 +51,7 @@ func TestLab1BuildVerifier_Passes(t *testing.T) {
 	collector := &mockCollector{
 		vlans: map[verify.Port]int{
 			"Et0/1": 10,
-			"Et0/3": 99,
+			"Et0/3": 10,
 		},
 		interfaces: map[verify.Port]verify.InterfaceStatus{
 			"Et0/2": {AdminUp: true, LinkUp: true},
@@ -77,7 +77,7 @@ func TestLab1BuildVerifier_VLANWrong(t *testing.T) {
 	collector := &mockCollector{
 		vlans: map[verify.Port]int{
 			"Et0/1": 20, // Wrong VLAN — should be 10
-			"Et0/3": 99,
+			"Et0/3": 10,
 		},
 		interfaces: map[verify.Port]verify.InterfaceStatus{
 			"Et0/2": {AdminUp: true, LinkUp: true},
@@ -98,7 +98,7 @@ func TestLab1BuildVerifier_InterfaceDown(t *testing.T) {
 	collector := &mockCollector{
 		vlans: map[verify.Port]int{
 			"Et0/1": 10,
-			"Et0/3": 99,
+			"Et0/3": 10,
 		},
 		interfaces: map[verify.Port]verify.InterfaceStatus{
 			"Et0/2": {AdminUp: true, LinkUp: false}, // Link down

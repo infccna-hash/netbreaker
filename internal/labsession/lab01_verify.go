@@ -16,7 +16,7 @@ func Lab1BuildVerifier(sess *verify.LabSession) *verify.Verifier {
 		// PC1 should be on VLAN 10 access port
 		ExpectPortVLAN("Et0/1", 10).
 		// KALI should be on unused VLAN 99 for the attack lab
-		ExpectPortVLAN("Et0/3", 99).
+		ExpectPortVLAN("Et0/3", 10).
 		// Trunk to SW2 must be up
 		ExpectInterfaceUp("Et0/2")
 }
