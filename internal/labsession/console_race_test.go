@@ -17,11 +17,10 @@ import (
 // the Go race detector when the ping goroutine and the tcp→ws relay
 // goroutine write to the WebSocket connection concurrently.
 //
-// Single-run race detection under -race is inherently probabilistic —
-// whether a particular run observes the interleaving that trips the
-// detector depends on goroutine scheduling. To make the test reliable
-// we wrap the scenario in 5 independent shots so the compound catch
-// probability approaches 100 %.
+// The test stress-config uses generous timeouts (PongWait=500ms,
+// WriteWait=500ms, PingPeriod=3ms) so that the shot runs its full
+// read window rather than being cut short by a write-edge timeout
+// cascade under -race slowdown.
 func TestConsoleBridge_NoWriteRace(t *testing.T) {
 	for shot := 0; shot < 5; shot++ {
 		runNoWriteRaceShot(t)
@@ -29,9 +28,8 @@ func TestConsoleBridge_NoWriteRace(t *testing.T) {
 }
 
 func runNoWriteRaceShot(t *testing.T) {
-	// ── Fake telnet endpoint (stands in for the GNS3 console) ────
-	// Blasts output continuously — max concurrency stress on the
-	// tcp→ws relay goroutine.
+	shotStart := time.Now()
+
 	telnetLis, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
@@ -46,7 +44,6 @@ func runNoWriteRaceShot(t *testing.T) {
 			return
 		}
 		defer conn.Close()
-		// Firehose: 1000-byte chunks as fast as the network accepts them.
 		payload := make([]byte, 1000)
 		for i := range payload {
 			payload[i] = 'x'
@@ -59,7 +56,6 @@ func runNoWriteRaceShot(t *testing.T) {
 		}
 	}()
 
-	// ── httptest server with a minimal bridgeConsole wrapper ─────
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -78,20 +74,16 @@ func runNoWriteRaceShot(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		// Fast timers: pings every 3 ms, pongWait 10 ms, writeWait 5 ms.
-		// Dozens of ping/relay interleavings in ~300 ms test duration —
-		// enough to reliably trigger a data race if the mutex is missing.
 		cfg := ConsoleBridgeConfig{
-			PongWait:   10 * time.Millisecond,
+			PongWait:   500 * time.Millisecond,
 			PingPeriod: 3 * time.Millisecond,
-			WriteWait:  5 * time.Millisecond,
+			WriteWait:  500 * time.Millisecond,
 		}
 
 		bridgeConsole(ctx, cancel, ws, tcpConn, cfg, nil)
 	}))
 	defer srv.Close()
 
-	// ── Dial the bridge as a real WebSocket client ───────────────
 	u, _ := url.Parse(srv.URL)
 	u.Scheme = "ws"
 	dialer := websocket.Dialer{HandshakeTimeout: 2 * time.Second}
@@ -101,17 +93,6 @@ func runNoWriteRaceShot(t *testing.T) {
 	}
 	defer client.Close()
 
-	// Read incoming frames for up to 500 ms — a single deadline for
-	// the entire shot, no retries. The ping goroutine fires every 3 ms
-	// (~166 pings in 500 ms) while the relay simultaneously blasts data
-	// through safeWrite, giving the race detector maximum exposure.
-	//
-	// We MUST NOT call ReadMessage again after ANY error, including
-	// timeout: gorilla/websocket poisons the connection (sets readErr)
-	// and panics with "repeated read on failed websocket connection"
-	// on the next call. A single 500 ms deadline avoids the per-
-	// iteration retry that triggered this panic on CI runners where
-	// TCP RST beats the close frame.
 	client.SetReadDeadline(time.Now().Add(500 * time.Millisecond))
 	for {
 		_, _, err := client.ReadMessage()
@@ -119,9 +100,11 @@ func runNoWriteRaceShot(t *testing.T) {
 			if !isClose(err) {
 				t.Logf("client read: %v", err)
 			}
-			return
+			break
 		}
 	}
+
+	t.Logf("shot duration: %v", time.Since(shotStart).Round(time.Millisecond))
 }
 
 func isClose(err error) bool {
