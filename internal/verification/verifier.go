@@ -17,7 +17,7 @@ type LabVerifier interface {
 var Registry = map[int]LabVerifier{
 	1:  suspendedVerifier{&Lab1Verifier{}, 1, "VLAN Warfare"}, // console-truth verifier ready (lab01_verify.go) — remove wrapper when handler migration is wired
 	2:  suspendedVerifier{&Lab2Verifier{}, 2, "STP Sabotage"},
-	3:  suspendedVerifier{&Lab3Verifier{}, 3, "Port Security Breach"},
+	3:  suspendedVerifier{&Lab3Verifier{}, 3, "MAC Flood Chaos"},
 	4:  &GenericVerifier{LabID: 4, Title: "OSPF Infiltration"},
 	5:  &GenericVerifier{LabID: 5, Title: "HSRP Takeover"},
 	6:  &GenericVerifier{LabID: 6, Title: "ACL Bypass Mission"},

@@ -69,6 +69,9 @@ func (m *mockCollector) CollectReachability(ctx context.Context, targets ...stri
 	return result, nil
 }
 
+func (m *mockCollector) CollectSTP(_ context.Context) (*verify.STPInfo, error) { return nil, verify.ErrNotImplemented }
+func (m *mockCollector) CollectPortSecurity(_ context.Context, _ string) (*verify.PortSecurityInfo, error) { return nil, verify.ErrNotImplemented }
+
 // --- individual assertion behavior ---
 
 func TestExpectMACOnPort_Pass(t *testing.T) {

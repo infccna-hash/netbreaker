@@ -57,6 +57,11 @@ type Evidence struct {
 	RunningConfig      string
 	ErrdisableRecovery ErrdisableConfig
 	Reachability       map[string]bool
+
+	// STP and port-security — added for Lab 2 (STP Sabotage) and
+	// Lab 3 (MAC Flood Chaos). Parsers are stubs until real captures.
+	STP            *STPInfo
+	PortSecurities map[string]*PortSecurityInfo
 	VLANs              map[Port]int
 }
 
@@ -71,6 +76,11 @@ type Collector interface {
 	CollectErrdisableRecovery(ctx context.Context) (ErrdisableConfig, error)
 	CollectReachability(ctx context.Context, targets ...string) (map[string]bool, error)
 	CollectVLANs(ctx context.Context) (map[Port]int, error)
+
+	// STP and port-security collectors — added for Lab 2 / Lab 3.
+	// Stubs in IOSCollector; real implementations pending captures.
+	CollectSTP(ctx context.Context) (*STPInfo, error)
+	CollectPortSecurity(ctx context.Context, iface string) (*PortSecurityInfo, error)
 }
 
 // EvidenceStore wraps a Collector with per-run caching so that N
@@ -146,6 +156,7 @@ func (s *EvidenceStore) VLANFor(ctx context.Context, port Port) (int, bool, erro
 	defer s.mu.Unlock()
 	if !s.fetched["vlans"] {
 		vlans, err := s.collector.CollectVLANs(ctx)
+	// STP and port-security collectors — added for Lab 2 / Lab 3.	CollectSTP(ctx context.Context) (*STPInfo, error)	CollectPortSecurity(ctx context.Context, iface string) (*PortSecurityInfo, error)
 		if err != nil {
 			return 0, false, fmt.Errorf("collect vlans: %w", err)
 		}

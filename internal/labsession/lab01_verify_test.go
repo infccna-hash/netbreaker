@@ -44,6 +44,9 @@ func (m *mockCollector) CollectReachability(_ context.Context, targets ...string
 	return nil, nil
 }
 
+func (m *mockCollector) CollectSTP(_ context.Context) (*verify.STPInfo, error) { return nil, verify.ErrNotImplemented }
+func (m *mockCollector) CollectPortSecurity(_ context.Context, _ string) (*verify.PortSecurityInfo, error) { return nil, verify.ErrNotImplemented }
+
 func TestLab1BuildVerifier_Passes(t *testing.T) {
 	sess := &verify.LabSession{MACs: map[string]string{}, IPs: map[string]string{}}
 	v := Lab1BuildVerifier(sess)

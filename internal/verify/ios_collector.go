@@ -95,3 +95,16 @@ func (c *IOSCollector) CollectReachability(ctx context.Context, targets ...strin
 	}
 	return result, nil
 }
+
+// ── STP and port-security stubs (Lab 2 / Lab 3) ─────────────────────
+// TODO(real capture): these return ErrNotImplemented until real
+// `show spanning-tree vlan 1` and `show port-security interface`
+// captures arrive from running IOU sessions.
+
+func (c *IOSCollector) CollectSTP(ctx context.Context) (*STPInfo, error) {
+	return nil, ErrNotImplemented
+}
+
+func (c *IOSCollector) CollectPortSecurity(ctx context.Context, iface string) (*PortSecurityInfo, error) {
+	return nil, ErrNotImplemented
+}
