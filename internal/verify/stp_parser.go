@@ -2,6 +2,7 @@ package verify
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -9,22 +10,15 @@ import (
 //
 // Parsed from real IOU L2 output (Lab 2 captures, 2026-07-30).
 type STPInfo struct {
-	// IsRoot is true when the output contains "This bridge is the root".
-	IsRoot bool
-
-	// RootMAC is the root bridge's MAC (from the Root ID section).
-	RootMAC string
-
-	// BridgeMAC is this bridge's MAC (from the Bridge ID section).
+	IsRoot    bool
+	RootMAC   string
 	BridgeMAC string
-
-	// PortRoles maps interface name → STP role: Root, Desg, Altn, Backup.
 	PortRoles map[string]string
 }
 
 // PortSecurityInfo holds the result of parsing `show port-security interface`.
 //
-// TODO(real capture): this struct and ParsePortSecurity are stubs.
+// Parsed from real IOU L2 capture (Lab 3, 2026-07-30).
 type PortSecurityInfo struct {
 	Enabled        bool
 	MaxMACs        int
@@ -36,45 +30,25 @@ type PortSecurityInfo struct {
 // ── STP parser (from real IOU captures) ────────────────────────────
 
 var (
-	// Root bridge MAC line: "Address     aabb.cc00.0c00"
-	rootAddrRe = regexp.MustCompile(`(?m)^\s*Root ID.*?\n(?:\s+\S.*\n)*?\s+Address\s+([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})`)
-
-	// "This bridge is the root" — only present when the switch IS root
-	isRootRe = regexp.MustCompile(`This bridge is the root`)
-
-	// Bridge MAC line, same format as root
+	rootAddrRe   = regexp.MustCompile(`(?m)^\s*Root ID.*?\n(?:\s+\S.*\n)*?\s+Address\s+([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})`)
+	isRootRe     = regexp.MustCompile(`This bridge is the root`)
 	bridgeAddrRe = regexp.MustCompile(`(?m)^\s*Bridge ID.*?\n(?:\s+\S.*\n)*?\s+Address\s+([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})`)
-
-	// Interface table row: "Et0/0               Desg FWD ..."
-	// The table header is "Interface           Role Sts Cost      Prio.Nbr Type"
-	// Data rows: "Et0/0               Desg FWD 100       128.1    Shr"
-	stpRowRe = regexp.MustCompile(`(?m)^(\S+)\s+(\S+)\s+(\S+)\s+\d+\s+[\d.]+\s+\S+`)
+	stpRowRe     = regexp.MustCompile(`(?m)^(\S+)\s+(\S+)\s+(\S+)\s+\d+\s+[\d.]+\s+\S+`)
 )
 
-// ParseSTP parses `show spanning-tree vlan 1` output from IOU L2.
 func ParseSTP(output string) (*STPInfo, error) {
-	info := &STPInfo{
-		PortRoles: map[string]string{},
-	}
+	info := &STPInfo{PortRoles: map[string]string{}}
 
-	// Root MAC
 	if m := rootAddrRe.FindStringSubmatch(output); m != nil {
 		info.RootMAC = normalizeSTPMAC(m[1])
 	}
-
-	// Is root?
 	info.IsRoot = isRootRe.MatchString(output)
-
-	// Bridge MAC
 	if m := bridgeAddrRe.FindStringSubmatch(output); m != nil {
 		info.BridgeMAC = normalizeSTPMAC(m[1])
 	}
-
-	// Port roles — skip header line, parse data rows
 	for _, match := range stpRowRe.FindAllStringSubmatch(output, -1) {
 		iface := match[1]
 		role := match[2]
-		// Skip lines that aren't real interfaces (e.g. header "Interface")
 		if !strings.HasPrefix(strings.ToLower(iface), "et") &&
 			!strings.HasPrefix(strings.ToLower(iface), "gi") &&
 			!strings.HasPrefix(strings.ToLower(iface), "fa") {
@@ -82,11 +56,9 @@ func ParseSTP(output string) (*STPInfo, error) {
 		}
 		info.PortRoles[iface] = role
 	}
-
 	return info, nil
 }
 
-// normalizeSTPMAC converts Cisco's xxxx.xxxx.xxxx to xx:xx:xx:xx:xx:xx
 func normalizeSTPMAC(cisco string) string {
 	hex := strings.ReplaceAll(cisco, ".", "")
 	var parts []string
@@ -99,13 +71,43 @@ func normalizeSTPMAC(cisco string) string {
 	return strings.ToLower(strings.Join(parts, ":"))
 }
 
-// ── Port-security stub ─────────────────────────────────────────────
+// ── Port-security parser (from real IOU capture) ───────────────────
 
 // ParsePortSecurity parses `show port-security interface <iface>` output.
 //
-// TODO(real capture): stub — real implementation pending capture.
+// The IOU L2 format is simple key-value pairs: "Field Name  : Value".
 func ParsePortSecurity(output string) (*PortSecurityInfo, error) {
-	return nil, errNotImplemented("ParsePortSecurity", "show port-security interface")
+	info := &PortSecurityInfo{}
+
+	for _, line := range strings.Split(output, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		parts := strings.SplitN(line, ":", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(parts[0])
+		val := strings.TrimSpace(parts[1])
+
+		switch key {
+		case "Port Security":
+			info.Enabled = strings.EqualFold(val, "Enabled")
+		case "Maximum MAC Addresses":
+			info.MaxMACs, _ = strconv.Atoi(val)
+		case "Security Violation Count":
+			info.ViolationCount, _ = strconv.Atoi(val)
+		case "Violation Mode":
+			info.ViolationMode = strings.ToLower(val)
+		case "Sticky MAC Addresses":
+			n, _ := strconv.Atoi(val)
+			if n > 0 {
+				info.StickyMACs = make([]string, 0, n)
+			}
+		}
+	}
+	return info, nil
 }
 
 // ── Sentinel ───────────────────────────────────────────────────────

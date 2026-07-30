@@ -159,3 +159,84 @@ func TestParseSTP_RoundTripAllThree(t *testing.T) {
 		}
 	}
 }
+
+// Real capture from Lab 3 SW3 (2026-07-30) — port-security disabled
+// (pre-harden state). Used to test the parser handles the disabled
+// case correctly.
+const portSecDisabled = `Port Security              : Disabled
+Port Status                : Secure-down
+Violation Mode             : Shutdown
+Aging Time                 : 0 mins
+Aging Type                 : Absolute
+SecureStatic Address Aging : Disabled
+Maximum MAC Addresses      : 1
+Total MAC Addresses        : 0
+Configured MAC Addresses   : 0
+Sticky MAC Addresses       : 0
+Last Source Address:Vlan   : 0000.0000.0000:0
+Security Violation Count   : 0`
+
+// Simulated post-harden capture (port-security enabled, violation
+// recorded). Based on the real IOU format with values extrapolated
+// from what the student config would produce after:
+//   switchport port-security
+//   switchport port-security maximum 1
+//   switchport port-security violation shutdown
+//   switchport port-security mac-address sticky
+//   (then macof triggers violation → count >= 1)
+//
+// TODO(real capture): replace with real output once Lab 3 harden
+// phase is run against a live IOU session.
+const portSecEnabled = `Port Security              : Enabled
+Port Status                : Secure-up
+Violation Mode             : Shutdown
+Aging Time                 : 0 mins
+Aging Type                 : Absolute
+SecureStatic Address Aging : Disabled
+Maximum MAC Addresses      : 1
+Total MAC Addresses        : 1
+Configured MAC Addresses   : 0
+Sticky MAC Addresses       : 1
+Last Source Address:Vlan   : aabb.cc00.0200:1
+Security Violation Count   : 5`
+
+func TestParsePortSecurity_Disabled(t *testing.T) {
+	info, err := ParsePortSecurity(portSecDisabled)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if info.Enabled {
+		t.Error("port-security should be disabled")
+	}
+	if info.ViolationCount != 0 {
+		t.Errorf("violation count should be 0, got %d", info.ViolationCount)
+	}
+	if info.MaxMACs != 1 {
+		t.Errorf("max MACs should be 1, got %d", info.MaxMACs)
+	}
+	if info.ViolationMode != "shutdown" {
+		t.Errorf("violation mode should be shutdown, got %s", info.ViolationMode)
+	}
+}
+
+func TestParsePortSecurity_Enabled(t *testing.T) {
+	info, err := ParsePortSecurity(portSecEnabled)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !info.Enabled {
+		t.Error("port-security should be enabled")
+	}
+	if info.ViolationCount != 5 {
+		t.Errorf("violation count should be 5, got %d", info.ViolationCount)
+	}
+	if info.MaxMACs != 1 {
+		t.Errorf("max MACs should be 1, got %d", info.MaxMACs)
+	}
+	if info.ViolationMode != "shutdown" {
+		t.Errorf("violation mode should be shutdown, got %s", info.ViolationMode)
+	}
+	if len(info.StickyMACs) == 0 {
+		t.Log("sticky MACs field is placeholder — real capture will populate")
+	}
+}

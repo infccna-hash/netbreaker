@@ -71,7 +71,7 @@ func (v *Verifier) ExpectMACCount(n int) *Verifier {
 // ExpectPortSecurityViolations asserts that port-security has recorded
 // at least min violations on the given interface.
 //
-// TODO(real capture): stub — ParsePortSecurity is not yet implemented.
+
 func (v *Verifier) ExpectPortSecurityViolations(iface string, min int) *Verifier {
 	name := fmt.Sprintf("port-security violations on %s >= %d", iface, min)
 	return v.add(name, func(ctx context.Context, ev *EvidenceStore) (bool, string) {
@@ -89,7 +89,7 @@ func (v *Verifier) ExpectPortSecurityViolations(iface string, min int) *Verifier
 // ExpectPortSecurityEnabled asserts that port-security is configured
 // on the given interface.
 //
-// TODO(real capture): stub — same as ExpectPortSecurityViolations.
+
 func (v *Verifier) ExpectPortSecurityEnabled(iface string) *Verifier {
 	name := fmt.Sprintf("port-security enabled on %s", iface)
 	return v.add(name, func(ctx context.Context, ev *EvidenceStore) (bool, string) {
