@@ -110,6 +110,19 @@ func (v *Verifier) ExpectInterfaceUp(port Port) *Verifier {
 	})
 }
 
+func (v *Verifier) ExpectInterfaceDown(port Port) *Verifier {
+	return v.add(fmt.Sprintf("%s is administratively down", port), func(ctx context.Context, ev *EvidenceStore) (bool, string) {
+		iface, err := ev.Interface(ctx, port)
+		if err != nil {
+			return false, err.Error()
+		}
+		if iface.AdminUp {
+			return false, "port is administratively up (expected shutdown)"
+		}
+		return true, "administratively down"
+	})
+}
+
 func (v *Verifier) ExpectInterfaceSpeed(port Port, mbps int) *Verifier {
 	return v.add(fmt.Sprintf("%s speed = %dMbps", port, mbps), func(ctx context.Context, ev *EvidenceStore) (bool, string) {
 		iface, err := ev.Interface(ctx, port)
