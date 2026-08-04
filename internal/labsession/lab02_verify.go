@@ -37,6 +37,13 @@ func Lab02HardenVerifier(sess *verify.LabSession) *verify.Verifier {
 }
 
 // RegisterLab02Verifiers wires Lab 2 verifiers into the global registry.
+//
+// Target device per phase is load-bearing: the registry's third
+// argument selects WHICH node's console the collector drives, while
+// the assertion inside picks the port. On 2026-08-04 the harden phase
+// asserted SW3:Et0/3 but was still registered against SW2 — the
+// collector read SW2's STP table (Et0/3 Desg) and the check failed
+// forever despite the lab being correct. Keep both in sync.
 func RegisterLab02Verifiers(reg *verify.VerifierRegistry) {
 	reg.Register(2, "build", "SW1", func(sess *verify.LabSession) *verify.Verifier {
 		return Lab02BuildVerifier(sess)
@@ -44,7 +51,7 @@ func RegisterLab02Verifiers(reg *verify.VerifierRegistry) {
 	reg.Register(2, "attack", "SW3", func(sess *verify.LabSession) *verify.Verifier {
 		return Lab02AttackVerifier(sess)
 	})
-	reg.Register(2, "harden", "SW2", func(sess *verify.LabSession) *verify.Verifier {
+	reg.Register(2, "harden", "SW3", func(sess *verify.LabSession) *verify.Verifier {
 		return Lab02HardenVerifier(sess)
 	})
 }
