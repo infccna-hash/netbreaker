@@ -2,34 +2,23 @@ package labsession
 
 // Lab02Topology is the concrete topology template for Lab 02 "STP Sabotage".
 //
-// Topology (verified against live build-phase content, 2026-07-29 — see
-// fix note below):
+// Verified port mapping (console-truth, 2026-08-03):
 //
-//   SW1 (root) ──Et0/0── SW2 (secondary) ──Et0/3── PC1
-//     │                                              │
-//   Et0/2          Et0/2 (BLK)                      Et0/1
-//     │                                              │
-//   SW3 ──Et0/2── KALI (attacker)                     │
+//   SW1 (root) ──Et0/0── SW2 (secondary)
+//     │  Et0/2                │  Et0/2 (BLK by STP)
+//     │                       │
+//   SW3 ──Et0/2── KALI        │
+//     │                       │
+//    Et0/3 ────────────────────┘
+//   SW1 Et0/1 ── PC1
 //
 // Port notes:
-//   - SW3 Et0/2 is labeled "Fa0/2 → BPDU Guard ⚠" in the SVG — that's the
-//     access port Kali connects through, where BPDU Guard gets configured
-//     during the harden phase.
+//   - SW3 Et0/2 is the access port Kali connects through, where BPDU Guard
+//     gets configured during the harden phase.
 //   - SW2 Et0/2 ↔ SW3 Et0/3 is the loop-prevention link STP blocks.
-//   - PC1 connects to SW1 Et0/1 — confirmed against live build-phase
-//     content ("PC1→SW1 Et0/1"), not a guess. The old comment here
-//     speculated PC1 might belong on SW2 based on the SVG; that was
-//     never actually applied to the Links list below, which still had
-//     PC1 on SW1 Et0/1 the whole time.
-//
-// FIX (2026-07-29): SW1's Et0/1 was double-booked — both the SW1↔SW2
-// trunk AND PC1 were wired to the same port. This isn't a documentation
-// mismatch, it's a topology bug that would fail at GNS3 provisioning
-// (a real interface can't carry two links). Confirmed neither the
-// build, attack, nor harden phase content names a specific port number
-// for the SW1↔SW2 trunk (only PC1's Et0/1 and KALI's Et0/2 are named),
-// so the trunk was moved to Et0/0 — content-safe, since nothing
-// instructs a student to type a port number that would now be wrong.
+//   - PC1 connects to SW1 Et0/1 (matches build phase text "PC1→SW1 Fa0/1").
+//   - SW1↔SW2 trunk uses Et0/0 (moved from Et0/1 to resolve port conflict —
+//     Et0/1 was double-booked for both SW2 trunk and PC1).
 var Lab02Topology = TopologyTemplate{
 	LabID:     2,
 	ComputeID: "local",
@@ -70,15 +59,14 @@ var Lab02Topology = TopologyTemplate{
 		},
 	},
 	Links: []LinkTemplate{
-		// Triangle inter-switch links.
-		{NodeA: "SW1", IfaceA: "Et0/0", NodeB: "SW2", IfaceB: "Et0/1"},
+		// Triangle inter-switch links
+		{NodeA: "SW1", IfaceA: "Et0/0", NodeB: "SW2", IfaceB: "Et0/1"},   // Et0/0 — moved from Et0/1 to resolve conflict with PC1
 		{NodeA: "SW1", IfaceA: "Et0/2", NodeB: "SW3", IfaceB: "Et0/1"},
 		// The link STP blocks for loop prevention (SW2 Et0/2 → SW3 Et0/3)
 		{NodeA: "SW2", IfaceA: "Et0/2", NodeB: "SW3", IfaceB: "Et0/3"},
-		// Host connections — port numbers here are load-bearing (named
-		// explicitly in build-phase content), do not move these two.
-		{NodeA: "SW1", IfaceA: "Et0/1", NodeB: "PC1", IfaceB: "eth0"},
-		{NodeA: "SW3", IfaceA: "Et0/2", NodeB: "KALI", IfaceB: "eth0"},
+		// Host connections
+		{NodeA: "SW1", IfaceA: "Et0/1", NodeB: "PC1", IfaceB: "eth0"},     // matches build text "PC1→SW1 Fa0/1"
+		{NodeA: "SW3", IfaceA: "Et0/2", NodeB: "KALI", IfaceB: "eth0"},    // matches build text "KALI→SW3 Fa0/2"
 	},
 }
 
