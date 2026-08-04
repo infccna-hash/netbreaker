@@ -51,20 +51,28 @@ func devicePromptRe(suffix string) *regexp.Regexp {
 	return regexp.MustCompile(regexp.QuoteMeta(suffix))
 }
 
+// iouHandshake models the GNS3 IOU console handshake the runner
+// performs: 3 drain nudges (each answered with a fresh prompt), the
+// terminal length 0 command, and finally consumes the data-gathering
+// command. After iouHandshake returns, the handler writes its command
+// output.
+func iouHandshake(conn net.Conn, buf []byte, prompt string) {
+	// 3 drain nudges — each CR gets a fresh prompt back
+	for i := 0; i < 3; i++ {
+		conn.Read(buf)
+		conn.Write([]byte("\r\n" + prompt))
+	}
+	// terminal length 0
+	conn.Read(buf)
+	conn.Write([]byte("\r\nterminal length 0\r\n" + prompt))
+	// the actual command
+	conn.Read(buf)
+}
+
 func TestRunCommand_BasicExecution(t *testing.T) {
 	handler := func(conn net.Conn) {
 		buf := make([]byte, 4096)
-
-		// Step 1: consume the runner's CR nudge, then prompt.
-		conn.Read(buf)
-		conn.Write([]byte("\r\nRouter#"))
-
-		// Terminal length 0 handshake
-		conn.Read(buf)
-		conn.Write([]byte("\r\nterminal length 0\r\nRouter#"))
-
-		// Read command, send output with prompt
-		conn.Read(buf)
+		iouHandshake(conn, buf, "Router#")
 		conn.Write([]byte("\r\nshow version\r\nCisco IOS Software, Version 15.1\r\nRouter#"))
 	}
 
@@ -94,17 +102,7 @@ func TestRunCommand_PromptStripping(t *testing.T) {
 	// client finishes consuming the current response.
 	handler := func(conn net.Conn) {
 		buf := make([]byte, 4096)
-
-		// Step 1: consume the runner's CR nudge, then prompt.
-		conn.Read(buf)
-		conn.Write([]byte("\r\nSwitch#"))
-
-		// Terminal length 0 handshake
-		conn.Read(buf)
-		conn.Write([]byte("\r\nterminal length 0\r\nSwitch#"))
-
-		// Read command, send output with prompt
-		conn.Read(buf)
+		iouHandshake(conn, buf, "Switch#")
 		conn.Write([]byte("\r\nshow vlan\r\nVLAN0010 active\r\nVLAN0020 active\r\nSwitch#"))
 	}
 
@@ -149,9 +147,10 @@ func TestRunCommand_ContextCancellation(t *testing.T) {
 	handler := func(conn net.Conn) {
 		defer wg.Done()
 		buf := make([]byte, 4096)
-		conn.Read(buf) // consumes the CR nudge
+		// First drain nudge
+		conn.Read(buf)
 		conn.Write([]byte("\r\nRouter#"))
-		conn.Read(buf) // consumes terminal length 0
+		conn.Read(buf) // second drain nudge
 		<-time.After(10 * time.Second)
 	}
 
@@ -184,7 +183,13 @@ func TestRunCommand_ErrorMessageOnTimeout(t *testing.T) {
 
 	go func() {
 		buf := make([]byte, 4096)
-		server.Write([]byte("\r\nRouter#"))
+		// net.Pipe is synchronous: each Write blocks until the peer
+		// reads, so the server must read the client's nudge BEFORE
+		// writing its prompt (opposite of the TCP tests).
+		for i := 0; i < 3; i++ {
+			server.Read(buf) // drain nudge
+			server.Write([]byte("\r\nRouter#"))
+		}
 		server.Read(buf) // terminal length 0
 		server.Write([]byte("\r\nterminal length 0\r\nRouter#"))
 		server.Read(buf) // show run
@@ -198,10 +203,14 @@ func TestRunCommand_ErrorMessageOnTimeout(t *testing.T) {
 	buf := make([]byte, 4096)
 	promptRe := devicePromptRe("Router#")
 
-	// Steps 1-4: handshake (same as RunCommand, but manual)
-	if _, err := runner.readUntilPrompt(ctx, client, buf, promptRe); err != nil {
-		t.Fatalf("step 1 (initial prompt): %v", err)
+	// Drain nudges (same as RunCommand, but manual)
+	for i := 0; i < 3; i++ {
+		fmt.Fprintf(client, "\r\n")
+		if _, err := runner.readUntilPrompt(ctx, client, buf, promptRe); err != nil {
+			t.Fatalf("drain %d: %v", i, err)
+		}
 	}
+	// terminal length 0
 	fmt.Fprintf(client, "terminal length 0\r\n")
 	if _, err := runner.readUntilPrompt(ctx, client, buf, promptRe); err != nil {
 		t.Fatalf("step 3 (terminal length 0 echo): %v", err)
@@ -228,21 +237,12 @@ func TestRunCommand_ConcurrentDifferentNodes(t *testing.T) {
 	makeHandler := func(nodeName string) func(net.Conn) {
 		return func(conn net.Conn) {
 			buf := make([]byte, 4096)
-
-			// Step 1: consume the runner's CR nudge, then prompt.
-			conn.Read(buf)
-			conn.Write([]byte("\r\n" + nodeName + "#"))
-
-			// Terminal length 0 handshake
-			conn.Read(buf)
-			conn.Write([]byte("\r\nterminal length 0\r\n" + nodeName + "#"))
+			iouHandshake(conn, buf, nodeName+"#")
 
 			mu.Lock()
 			commands[nodeName] = append(commands[nodeName], "received")
 			mu.Unlock()
 
-			// Read command, send output with prompt
-			conn.Read(buf)
 			conn.Write([]byte(fmt.Sprintf("\r\nshow version\r\noutput from %s\r\n%s#", nodeName, nodeName)))
 		}
 	}
@@ -300,18 +300,7 @@ func TestRunCommand_PaginationBlocked(t *testing.T) {
 	// ahead of the client's command and gets consumed prematurely.
 	handler := func(conn net.Conn) {
 		buf := make([]byte, 4096)
-
-		// Step 1: runner nudges with CR to wake the IOU console
-		// (see console_runner.go) — consume the nudge, then prompt.
-		conn.Read(buf)
-		conn.Write([]byte("\r\nRouter#"))
-
-		// Terminal length 0 handshake
-		conn.Read(buf)
-		conn.Write([]byte("\r\nterminal length 0\r\nRouter#"))
-
-		// Read the command, then send long output with prompt
-		conn.Read(buf)
+		iouHandshake(conn, buf, "Router#")
 
 		var lines []string
 		for i := 0; i < 50; i++ {

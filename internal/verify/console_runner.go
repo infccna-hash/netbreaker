@@ -60,24 +60,31 @@ func (r *TelnetConsoleRunner) RunCommand(ctx context.Context, nodeID, cmd string
 
 	buf := make([]byte, 4096)
 
-	// Step 1: read until the first prompt (banner + login may precede it)
-	// GNS3 IOU consoles send telnet IAC negotiation bytes on connect and
-	// wait for input before printing the prompt — nudge with a CR so the
-	// prompt appears, then read until it does. Without the nudge the read
-	// blocks forever on the 12 IAC bytes (observed 2026-08-04: every
-	// console-truth verifier timed out at "wait for prompt").
-	fmt.Fprintf(conn, "\r\n")
-	if _, err := r.readUntilPrompt(ctx, conn, buf, promptRe); err != nil {
-		return "", fmt.Errorf("verify: wait for prompt on %s: %w", nodeID, err)
+	// Step 1: drain any buffered/pending console output to a settled
+	// prompt BEFORE the command handshake. GNS3 IOU consoles replay
+	// pending output (e.g. a previous command's full response, or the
+	// tail of the last command) to a newly opened connection — if we
+	// start reading the prompt immediately, the first prompt match can
+	// land inside the replay, shifting every subsequent command's
+	// output attribution and corrupting the parse (observed 2026-08-04:
+	// verifier read "Desg" for a port the console-truth showed Altn).
+	//
+	// We nudge with CR and drain until a full quiet window passes with
+	// only prompt echoes, so the next command starts from a clean line.
+	for i := 0; i < 3; i++ {
+		fmt.Fprintf(conn, "\r\n")
+		if _, err := r.readUntilPrompt(ctx, conn, buf, promptRe); err != nil {
+			// A hung console mid-drain is still a fatal verify error.
+			return "", fmt.Errorf("verify: drain console on %s: %w", nodeID, err)
+		}
+		// Give any trailing replay a moment to arrive before deciding
+		// the console is quiet.
+		time.Sleep(300 * time.Millisecond)
 	}
 
-	// Step 2: disable pagination so long output (show mac address-table,
-	// show running-config) doesn't hang at --More--.
-	// This is fire-and-forget — if the device doesn't support it, the
-	// next readUntilPrompt will still complete (or time out clearly).
-	//
-	// We send it and re-read the prompt to ensure the command was
-	// consumed before proceeding to the actual data-gathering command.
+	// Step 2: confirm a live prompt, then disable pagination so long
+	// output (show mac address-table, show running-config) doesn't
+	// hang at --More--.
 	fmt.Fprintf(conn, "terminal length 0\r\n")
 	if _, err := r.readUntilPrompt(ctx, conn, buf, promptRe); err != nil {
 		return "", fmt.Errorf("verify: terminal length 0 on %s: %w", nodeID, err)

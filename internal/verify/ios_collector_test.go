@@ -32,13 +32,26 @@ func TestCollectSTP_WiredToParser(t *testing.T) {
 
 	handler := func(conn net.Conn) {
 		buf := make([]byte, 4096)
-		// banner + prompt
+		// Regression: the IOU console replays a previous command's
+		// pending output to the new connection. It arrives during the
+		// FIRST drain — the runner must flush it (and the prompt inside
+		// it) before the handshake proceeds, so the real STP output
+		// isn't misattributed.
+		conn.Read(buf) // drain nudge 1
+		conn.Write([]byte("\xff\xfb\x01\xff\xfb\x03\xff\xfb\x00\xff\xfd\x00an 1\r\nVLAN0001\r\n  Spanning tree enabled protocol ieee\r\nEt0/3               Altn BLK 100       128.4    Shr \r\nSW3#\r\n\r\nSW3#"))
+
+		// remaining 2 drain nudges
+		conn.Read(buf)
 		conn.Write([]byte("\r\nSW3#"))
 		conn.Read(buf)
-		// terminal length 0 handshake
-		conn.Write([]byte("\r\nterminal length 0\r\nSW3#"))
+		conn.Write([]byte("\r\nSW3#"))
+
+		// terminal length 0
 		conn.Read(buf)
+		conn.Write([]byte("\r\nterminal length 0\r\nSW3#"))
+
 		// the actual command
+		conn.Read(buf)
 		conn.Write([]byte(stpOut + "SW3#"))
 	}
 
@@ -89,10 +102,8 @@ func TestCollectPortSecurity_WiredToParser(t *testing.T) {
 
 	handler := func(conn net.Conn) {
 		buf := make([]byte, 4096)
-		conn.Write([]byte("\r\nSW1#"))
-		conn.Read(buf)
-		conn.Write([]byte("\r\nterminal length 0\r\nSW1#"))
-		conn.Read(buf)
+		conn.Write([]byte("\xff\xfb\x01\xff\xfb\x03\xff\xfb\x00\xff\xfd\x00"))
+		iouHandshake(conn, buf, "SW1#")
 		conn.Write([]byte(psOut + "SW1#"))
 	}
 
