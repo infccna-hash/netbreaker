@@ -96,15 +96,23 @@ func (c *IOSCollector) CollectReachability(ctx context.Context, targets ...strin
 	return result, nil
 }
 
-// ── STP and port-security stubs (Lab 2 / Lab 3) ─────────────────────
-// TODO(real capture): these return ErrNotImplemented until real
-// `show spanning-tree vlan 1` and `show port-security interface`
-// captures arrive from running IOU sessions.
+// ── STP and port-security collectors (Lab 2 / Lab 3) ────────────────
+// Wired to the real parsers (stp_parser.go). The console runner
+// disables pagination (terminal length 0) before every command, so
+// `show spanning-tree vlan 1` never hangs at --More--.
 
 func (c *IOSCollector) CollectSTP(ctx context.Context) (*STPInfo, error) {
-	return nil, ErrNotImplemented
+	out, err := c.run(ctx, "show spanning-tree vlan 1")
+	if err != nil {
+		return nil, err
+	}
+	return ParseSTP(out)
 }
 
 func (c *IOSCollector) CollectPortSecurity(ctx context.Context, iface string) (*PortSecurityInfo, error) {
-	return nil, ErrNotImplemented
+	out, err := c.run(ctx, "show port-security interface "+iface)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePortSecurity(out)
 }

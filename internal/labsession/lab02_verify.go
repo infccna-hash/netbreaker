@@ -4,12 +4,9 @@ import "netbreaker.io/api/internal/verify"
 
 // Lab02BuildVerifier checks the Lab 2 Build phase (STP Sabotage).
 //
-// Students build a 3-switch triangle with VLAN 1 trunking. After the
-// build, SW1 should be the STP root bridge by priority manipulation.
-//
-// TODO(real capture): all assertions are stubs until ParseSTP is
-// implemented with real `show spanning-tree vlan 1` captures from
-// SW1, SW2, and SW3.
+// Console-truth (2026-08-04): after trunking + root-primary the
+// default election leaves SW1 as root (lowest MAC, all switches at
+// 32768) — the verifier confirms SW1 holds the root role.
 func Lab02BuildVerifier(sess *verify.LabSession) *verify.Verifier {
 	return verify.New().
 		// SW1 must be the root bridge after priority is set
@@ -21,8 +18,6 @@ func Lab02BuildVerifier(sess *verify.LabSession) *verify.Verifier {
 // Kali floods BPDUs to take over the root role. After the attack,
 // SW3's Et0/2 (Kali's access port) should show a root role — Kali
 // convinced the switch it's the best path to root.
-//
-// TODO(real capture): stub.
 func Lab02AttackVerifier(sess *verify.LabSession) *verify.Verifier {
 	return verify.New().
 		// SW3's Et0/2 should NOT be blocking — Kali is the fake root
@@ -31,15 +26,14 @@ func Lab02AttackVerifier(sess *verify.LabSession) *verify.Verifier {
 
 // Lab02HardenVerifier checks the Lab 2 Harden phase.
 //
-// After BPDU Guard and Root Guard are configured, SW2's Et0/2 (the
-// loop-prevention link) should be in Altn/blocking state — STP's
-// normal loop-free topology is restored.
-//
-// TODO(real capture): stub.
+// Console-truth (walkthrough 2026-08-04): in the healthy hardened
+// triangle the loop is broken on SW3's Et0/3 (the SW2↔SW3 link) —
+// SW3's other uplink Et0/1 faces the root (SW1) and stays FWD, while
+// SW2's Et0/2 is Desg FWD. Only SW3 Et0/3 is Altn/BLK.
 func Lab02HardenVerifier(sess *verify.LabSession) *verify.Verifier {
 	return verify.New().
-		// SW2's Et0/2 should be blocking (Altn) — loop prevention
-		ExpectPortRole("SW2", "Et0/2", "Altn")
+		// SW3's Et0/3 (loop-prevention link to SW2) should be blocking (Altn)
+		ExpectPortRole("SW3", "Et0/3", "Altn")
 }
 
 // RegisterLab02Verifiers wires Lab 2 verifiers into the global registry.

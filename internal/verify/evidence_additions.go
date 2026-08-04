@@ -10,9 +10,6 @@ import (
 // corresponding EvidenceStore methods.
 
 // STPTable returns the parsed spanning-tree state.
-//
-// TODO(real capture): ParseSTP is a stub — this always returns an
-// error until real `show spanning-tree vlan 1` captures are available.
 func (s *EvidenceStore) STPTable(ctx context.Context) (*STPInfo, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -29,8 +26,6 @@ func (s *EvidenceStore) STPTable(ctx context.Context) (*STPInfo, error) {
 
 // PortSecurity returns the parsed port-security state for a specific
 // interface.
-//
-// TODO(real capture): ParsePortSecurity is a stub.
 func (s *EvidenceStore) PortSecurity(ctx context.Context, iface string) (*PortSecurityInfo, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
