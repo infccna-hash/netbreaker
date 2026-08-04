@@ -61,6 +61,12 @@ func (r *TelnetConsoleRunner) RunCommand(ctx context.Context, nodeID, cmd string
 	buf := make([]byte, 4096)
 
 	// Step 1: read until the first prompt (banner + login may precede it)
+	// GNS3 IOU consoles send telnet IAC negotiation bytes on connect and
+	// wait for input before printing the prompt — nudge with a CR so the
+	// prompt appears, then read until it does. Without the nudge the read
+	// blocks forever on the 12 IAC bytes (observed 2026-08-04: every
+	// console-truth verifier timed out at "wait for prompt").
+	fmt.Fprintf(conn, "\r\n")
 	if _, err := r.readUntilPrompt(ctx, conn, buf, promptRe); err != nil {
 		return "", fmt.Errorf("verify: wait for prompt on %s: %w", nodeID, err)
 	}

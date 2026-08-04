@@ -55,8 +55,11 @@ func TestRunCommand_BasicExecution(t *testing.T) {
 	handler := func(conn net.Conn) {
 		buf := make([]byte, 4096)
 
-		// Terminal length 0 handshake
+		// Step 1: consume the runner's CR nudge, then prompt.
+		conn.Read(buf)
 		conn.Write([]byte("\r\nRouter#"))
+
+		// Terminal length 0 handshake
 		conn.Read(buf)
 		conn.Write([]byte("\r\nterminal length 0\r\nRouter#"))
 
@@ -92,8 +95,11 @@ func TestRunCommand_PromptStripping(t *testing.T) {
 	handler := func(conn net.Conn) {
 		buf := make([]byte, 4096)
 
-		// Terminal length 0 handshake
+		// Step 1: consume the runner's CR nudge, then prompt.
+		conn.Read(buf)
 		conn.Write([]byte("\r\nSwitch#"))
+
+		// Terminal length 0 handshake
 		conn.Read(buf)
 		conn.Write([]byte("\r\nterminal length 0\r\nSwitch#"))
 
@@ -142,8 +148,9 @@ func TestRunCommand_ContextCancellation(t *testing.T) {
 
 	handler := func(conn net.Conn) {
 		defer wg.Done()
-		conn.Write([]byte("\r\nRouter#"))
 		buf := make([]byte, 4096)
+		conn.Read(buf) // consumes the CR nudge
+		conn.Write([]byte("\r\nRouter#"))
 		conn.Read(buf) // consumes terminal length 0
 		<-time.After(10 * time.Second)
 	}
@@ -222,8 +229,11 @@ func TestRunCommand_ConcurrentDifferentNodes(t *testing.T) {
 		return func(conn net.Conn) {
 			buf := make([]byte, 4096)
 
-			// Terminal length 0 handshake
+			// Step 1: consume the runner's CR nudge, then prompt.
+			conn.Read(buf)
 			conn.Write([]byte("\r\n" + nodeName + "#"))
+
+			// Terminal length 0 handshake
 			conn.Read(buf)
 			conn.Write([]byte("\r\nterminal length 0\r\n" + nodeName + "#"))
 
@@ -291,8 +301,12 @@ func TestRunCommand_PaginationBlocked(t *testing.T) {
 	handler := func(conn net.Conn) {
 		buf := make([]byte, 4096)
 
-		// Terminal length 0 handshake
+		// Step 1: runner nudges with CR to wake the IOU console
+		// (see console_runner.go) — consume the nudge, then prompt.
+		conn.Read(buf)
 		conn.Write([]byte("\r\nRouter#"))
+
+		// Terminal length 0 handshake
 		conn.Read(buf)
 		conn.Write([]byte("\r\nterminal length 0\r\nRouter#"))
 
