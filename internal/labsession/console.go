@@ -2,6 +2,7 @@ package labsession
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -81,6 +82,17 @@ func checkSameOrigin(r *http.Request) bool {
 	return strings.EqualFold(originBase, hostBase)
 }
 
+// closeDetails extracts the WebSocket close code and reason from a read error.
+// If the error is not a *websocket.CloseError, it returns 0 (abnormal) and
+// the error string as the reason.
+func closeDetails(err error) (code int, reason string) {
+	var ce *websocket.CloseError
+	if errors.As(err, &ce) {
+		return ce.Code, ce.Text
+	}
+	return websocket.CloseAbnormalClosure, err.Error()
+}
+
 
 // usesVNCConsole reports whether a node's console is VNC (which the telnet-only
 // browser bridge can't render) and should therefore be surfaced to the user as
@@ -108,17 +120,21 @@ type ConsoleBridgeConfig struct {
 // so concurrent-write races trigger within a few hundred ms instead of
 // minutes.
 var DefaultBridgeConfig = ConsoleBridgeConfig{
-	PongWait:   120 * time.Second,
-	PingPeriod: 108 * time.Second, // (pongWait * 9) / 10
+	PongWait:   35 * time.Second, // must be > PingPeriod for tolerance
+	PingPeriod: 30 * time.Second, // keep NAT/firewall state alive
 	WriteWait:  10 * time.Second,
 }
+
+// logClose receives the close details once the WebSocket read loop exits.
+// The caller wires it to session-aware logging.
+type CloseReporter func(direction string, closeCode int, closeReason string, readErr error)
 
 // bridgeConsole runs the bidirectional WebSocket↔telnet relay inside the
 // caller's goroutine (it does not return until the WebSocket closes or a
 // fatal error occurs). It is split out from the handler so tests can
 // exercise the concurrent ping/relay/read paths under -race without
 // needing the full session/auth/DB stack.
-func bridgeConsole(ctx context.Context, cancel context.CancelFunc, ws *websocket.Conn, tcpConn net.Conn, cfg ConsoleBridgeConfig, onActivity func()) {
+func bridgeConsole(ctx context.Context, cancel context.CancelFunc, ws *websocket.Conn, tcpConn net.Conn, cfg ConsoleBridgeConfig, onActivity func(), logClose CloseReporter) {
 	// ── Serialize all writes to the WebSocket connection ──────────
 	// gorilla/websocket requires at most one concurrent writer.
 	// The ping goroutine, the tcp→ws relay, and the error-path
@@ -199,6 +215,20 @@ func bridgeConsole(ctx context.Context, cancel context.CancelFunc, ws *websocket
 	for {
 		_, msg, err := ws.ReadMessage()
 		if err != nil {
+			// ── Log the close reason before we exit ──────────
+			if logClose != nil {
+				code, reason := closeDetails(err)
+				dir := "client"
+				// If the TCP relay cancelled us, the direction is server-side.
+				if ctx.Err() != nil {
+					dir = "server"
+				}
+				logClose(dir, code, reason, err)
+			}
+			// Send a clean close frame if the client hasn't already.
+			ws.WriteControl(websocket.CloseMessage,
+				websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""),
+				time.Now().Add(cfg.WriteWait))
 			break
 		}
 		// Extend the read deadline on every message received —
@@ -323,5 +353,8 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 
 	bridgeConsole(ctx, cancel, ws, tcpConn, DefaultBridgeConfig, func() {
 		_ = h.svc.Heartbeat(ctx, sessionID)
+	}, func(direction string, closeCode int, closeReason string, readErr error) {
+		log.Printf("console ws-close session=%s node=%s dir=%s code=%d reason=%q readErr=%v",
+			sessionID, nodeName, direction, closeCode, closeReason, readErr)
 	})
 }

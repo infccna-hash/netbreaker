@@ -55,6 +55,20 @@ export default function LabDetail() {
     return () => { if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null; } };
   }, [session?.id, session?.status]);
 
+  // HTTP heartbeat: independent of WebSocket console state.
+  // Keeps last_active_at fresh so the reaper doesn't suspend the
+  // session while the user is reading a lab phase with the console
+  // tab closed or the WebSocket temporarily disconnected.
+  useEffect(() => {
+    if (!session || session.status !== "running") return;
+
+    const hb = setInterval(() => {
+      api.post(`/labsessions/${session.id}/heartbeat`).catch(() => {});
+    }, 60_000);
+
+    return () => clearInterval(hb);
+  }, [session?.id, session?.status]);
+
   // Session persists in the console tab — only ended via explicit End session button.
   const launchSession = useCallback(async () => {
     setSessionLoading(true);

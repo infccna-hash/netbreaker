@@ -80,7 +80,7 @@ func runNoWriteRaceShot(t *testing.T) {
 			WriteWait:  500 * time.Millisecond,
 		}
 
-		bridgeConsole(ctx, cancel, ws, tcpConn, cfg, nil)
+		bridgeConsole(ctx, cancel, ws, tcpConn, cfg, nil, nil)
 	}))
 	defer srv.Close()
 

@@ -22,6 +22,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
         openssh-client \
         dnsutils \
         yersinia \
+        tmux \
         ettercap-text-only \
         cisco-global-exploiter \
         cisco-auditing-tool \
@@ -34,5 +35,24 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
         frr \
         dnsmasq \
     && rm -rf /var/lib/apt/lists/*
+
+# Layer 3 — fixrows: fixed oversized PTY for yersinia/tmux (uBridge NAWS workaround)
+# fixrows sets a static 40×130 because NAWS is broken end-to-end —
+# there is no path for real browser window dimensions to reach the PTY.
+COPY fixrows /usr/local/bin/fixrows
+RUN chmod +x /usr/local/bin/fixrows \
+    && echo '' >> /root/.bashrc \
+    && echo '# Fixed oversized PTY for yersinia/tmux (uBridge NAWS workaround)' >> /root/.bashrc \
+    && echo 'if [ -t 0 ] && [ -z "${FIXROWS_DONE-}" ]; then' >> /root/.bashrc \
+    && echo '    if python3 /usr/local/bin/fixrows; then' >> /root/.bashrc \
+    && echo '        echo "[fixrows] applied: $(tput lines)x$(tput cols)"' >> /root/.bashrc \
+    && echo '        echo "$(date -Iseconds) [fixrows] applied: $(tput lines)x$(tput cols)" >> /tmp/fixrows.log' >> /root/.bashrc \
+    && echo '    else' >> /root/.bashrc \
+    && echo '        err=$?' >> /root/.bashrc \
+    && echo '        echo "[fixrows] FAILED (exit $err) — check /usr/local/bin/fixrows"' >> /root/.bashrc \
+    && echo '        echo "$(date -Iseconds) [fixrows] FAILED (exit $err)" >> /tmp/fixrows.log' >> /root/.bashrc \
+    && echo '    fi' >> /root/.bashrc \
+    && echo '    export FIXROWS_DONE=1' >> /root/.bashrc \
+    && echo 'fi' >> /root/.bashrc
 
 CMD ["/bin/sh", "-c", "/bin/bash"]

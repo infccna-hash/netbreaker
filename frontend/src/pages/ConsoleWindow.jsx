@@ -42,6 +42,19 @@ export default function ConsoleWindow() {
     };
   }, [sessionId]);
 
+  // HTTP heartbeat — keeps session alive independent of WebSocket state.
+  // Runs while the console tab is open, even if individual node websockets
+  // disconnect or the user is not actively typing.
+  useEffect(() => {
+    if (!session || session.status !== "running") return;
+
+    const hb = setInterval(() => {
+      api.post(`/labsessions/${sessionId}/heartbeat`).catch(() => {});
+    }, 60_000);
+
+    return () => clearInterval(hb);
+  }, [session?.status, sessionId]);
+
   useEffect(() => {
     document.title = session?.lab_title ? `Console · ${session.lab_title}` : "Console · NetBreaker";
   }, [session]);

@@ -32,7 +32,9 @@ export default function ConsolePanel({ sessionId, nodeName, active }) {
       const data = new Uint8Array(event.data);
       term.write(data);
     };
-    ws.onclose = () => term.write('\r\n\x1b[31m[disconnected]\x1b[0m\r\n');
+    ws.onclose = () => term.write(
+      '\r\n\x1b[31m[disconnected — refresh this tab to reconnect]\x1b[0m\r\n'
+    );
 
     term.onData((data) => {
       if (ws.readyState === WebSocket.OPEN) ws.send(data);

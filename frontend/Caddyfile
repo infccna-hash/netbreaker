@@ -1,3 +1,13 @@
+{
+	# Disable idle timeout so WebSocket console connections survive the
+	# entire lab session (default can close them after ~5 min).
+	servers {
+		timeouts {
+			idle 0
+		}
+	}
+}
+
 {$SITE_ADDRESS} {
 	encode gzip zstd
 
