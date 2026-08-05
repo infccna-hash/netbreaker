@@ -29,6 +29,56 @@
       <text x="82" y="22" font-family="Courier New, monospace" fontSize="12" fill="#6e7681">
         root@netbreaker:~/lab7$ topology --render
       </text>
+      <g data-link="R1:Fa0/0↔SW1:Et0/1">
+        <line x1="183" y1="77" x2="247" y2="113" stroke="#4d5560" stroke-width="1.5"
+          data-node-a="R1" data-iface-a="Fa0/0" data-node-b="SW1" data-iface-b="Et0/1" />
+        <title>R1 Fa0/0 ↔ SW1 Et0/1</title>
+      </g>
+      <g data-link="KALI:eth0↔SW1:Et0/2">
+        <line x1="422" y1="80" x2="358" y2="113" stroke="#4d5560" stroke-width="1.5"
+          data-node-a="KALI" data-iface-a="eth0" data-node-b="SW1" data-iface-b="Et0/2" />
+        <title>KALI eth0 ↔ SW1 Et0/2</title>
+      </g>
+      <g data-port="R1" data-iface="Fa0/0">
+        <rect x="180" y="86" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="201" y="99" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Fa0/0</text>
+        <title>R1 Fa0/0</title>
+      </g>
+      <g data-port="SW1" data-iface="Et0/1">
+        <rect x="202" y="98" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="223" y="111" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
+        <title>SW1 Et0/1</title>
+      </g>
+      <g data-port="SW1" data-iface="Et0/2">
+        <rect x="355" y="87" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="376" y="100" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/2</text>
+        <title>SW1 Et0/2</title>
+      </g>
+      <g data-port="KALI" data-iface="eth0">
+        <rect x="376" y="76" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="397" y="89" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
+        <title>KALI eth0</title>
+      </g>
+      <g data-node="R1" data-role="core">
+        <rect x="60" y="17" width="140" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="130" y="53" text-anchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">R1</text>
+        <text x="130" y="71" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">router</text>
+        <title>R1</title>
+      </g>
+      <g data-node="SW1" data-role="core">
+        <rect x="230" y="113" width="140" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="300" y="149" text-anchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">SW1</text>
+        <text x="300" y="167" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">l2 switch</text>
+        <title>SW1</title>
+      </g>
+      <g data-node="KALI" data-role="attacker">
+        <g filter="url(#glow)">
+          <rect x="410" y="20" width="140" height="60" rx="6" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="5 3" />
+        </g>
+        <text x="480" y="56" text-anchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#ff7b72">KALI</text>
+        <text x="480" y="74" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#f85149">attacker / observer</text>
+        <title>KALI</title>
+      </g>
       <line x1="30" y1="405" x2="690" y2="405" stroke="#22272e" stroke-width="1" />
       <text x="30" y="424" font-family="Courier New, monospace" fontSize="10" fill="#6e7681">// device_legend</text>
 

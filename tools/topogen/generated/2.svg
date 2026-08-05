@@ -29,6 +29,113 @@
       <text x="82" y="22" font-family="Courier New, monospace" fontSize="12" fill="#6e7681">
         root@netbreaker:~/lab2$ topology --render
       </text>
+      <g data-link="SW1:Et0/0↔SW2:Et0/1">
+        <line x1="321" y1="115" x2="219" y2="195" stroke="#4d5560" stroke-width="1.5"
+          data-node-a="SW1" data-iface-a="Et0/0" data-node-b="SW2" data-iface-b="Et0/1" />
+        <title>SW1 Et0/0 ↔ SW2 Et0/1</title>
+      </g>
+      <g data-link="SW1:Et0/2↔SW3:Et0/1">
+        <line x1="399" y1="115" x2="501" y2="195" stroke="#4d5560" stroke-width="1.5"
+          data-node-a="SW1" data-iface-a="Et0/2" data-node-b="SW3" data-iface-b="Et0/1" />
+        <title>SW1 Et0/2 ↔ SW3 Et0/1</title>
+      </g>
+      <g data-link="SW2:Et0/2↔SW3:Et0/3">
+        <line x1="250" y1="225" x2="470" y2="225" stroke="#4d5560" stroke-width="1.5"
+          data-node-a="SW2" data-iface-a="Et0/2" data-node-b="SW3" data-iface-b="Et0/3" />
+        <title>SW2 Et0/2 ↔ SW3 Et0/3</title>
+      </g>
+      <g data-link="SW1:Et0/1↔PC1:eth0">
+        <line x1="338" y1="115" x2="198" y2="306" stroke="#4d5560" stroke-width="1.5"
+          data-node-a="SW1" data-iface-a="Et0/1" data-node-b="PC1" data-iface-b="eth0" />
+        <title>SW1 Et0/1 ↔ PC1 eth0</title>
+      </g>
+      <g data-link="SW3:Et0/2↔KALI:eth0">
+        <line x1="540" y1="255" x2="540" y2="315" stroke="#4d5560" stroke-width="1.5"
+          data-node-a="SW3" data-iface-a="Et0/2" data-node-b="KALI" data-iface-b="eth0" />
+        <title>SW3 Et0/2 ↔ KALI eth0</title>
+      </g>
+      <g data-port="SW1" data-iface="Et0/0">
+        <rect x="276" y="111" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="297" y="124" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
+        <title>SW1 Et0/0</title>
+      </g>
+      <g data-port="SW1" data-iface="Et0/2">
+        <rect x="392" y="126" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="413" y="139" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/2</text>
+        <title>SW1 Et0/2</title>
+      </g>
+      <g data-port="SW1" data-iface="Et0/1">
+        <rect x="297" y="121" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="318" y="134" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
+        <title>SW1 Et0/1</title>
+      </g>
+      <g data-port="SW2" data-iface="Et0/1">
+        <rect x="212" y="166" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="233" y="179" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
+        <title>SW2 Et0/1</title>
+      </g>
+      <g data-port="SW2" data-iface="Et0/2">
+        <rect x="253" y="223" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="274" y="236" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/2</text>
+        <title>SW2 Et0/2</title>
+      </g>
+      <g data-port="SW3" data-iface="Et0/1">
+        <rect x="457" y="177" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="478" y="190" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
+        <title>SW3 Et0/1</title>
+      </g>
+      <g data-port="SW3" data-iface="Et0/3">
+        <rect x="425" y="223" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="446" y="236" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/3</text>
+        <title>SW3 Et0/3</title>
+      </g>
+      <g data-port="SW3" data-iface="Et0/2">
+        <rect x="512" y="270" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="533" y="283" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/2</text>
+        <title>SW3 Et0/2</title>
+      </g>
+      <g data-port="PC1" data-iface="eth0">
+        <rect x="185" y="273" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="206" y="286" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
+        <title>PC1 eth0</title>
+      </g>
+      <g data-port="KALI" data-iface="eth0">
+        <rect x="512" y="282" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="533" y="295" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
+        <title>KALI eth0</title>
+      </g>
+      <g data-node="SW1" data-role="core">
+        <rect x="290" y="55" width="140" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="360" y="91" text-anchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">SW1</text>
+        <text x="360" y="109" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">l2 switch</text>
+        <title>SW1</title>
+      </g>
+      <g data-node="SW2" data-role="core">
+        <rect x="110" y="195" width="140" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="180" y="231" text-anchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">SW2</text>
+        <text x="180" y="249" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">l2 switch</text>
+        <title>SW2</title>
+      </g>
+      <g data-node="SW3" data-role="core">
+        <rect x="470" y="195" width="140" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="540" y="231" text-anchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">SW3</text>
+        <text x="540" y="249" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">l2 switch</text>
+        <title>SW3</title>
+      </g>
+      <g data-node="PC1" data-role="host">
+        <circle cx="180" cy="330" r="30" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+        <text x="180" y="334" text-anchor="middle" font-family="Courier New, monospace" fontSize="13" fontWeight="700" fill="#67e8f9">PC1</text>
+        <text x="180" y="348" text-anchor="middle" font-family="Courier New, monospace" fontSize="9" fill="#22d3ee">end host</text>
+        <title>PC1</title>
+      </g>
+      <g data-node="KALI" data-role="attacker">
+        <g filter="url(#glow)">
+          <rect x="470" y="315" width="140" height="60" rx="6" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="5 3" />
+        </g>
+        <text x="540" y="351" text-anchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#ff7b72">KALI</text>
+        <text x="540" y="369" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#f85149">attacker / observer</text>
+        <title>KALI</title>
+      </g>
       <line x1="30" y1="405" x2="690" y2="405" stroke="#22272e" stroke-width="1" />
       <text x="30" y="424" font-family="Courier New, monospace" fontSize="10" fill="#6e7681">// device_legend</text>
 
