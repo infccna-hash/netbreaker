@@ -390,7 +390,9 @@ func renderLab(labID int, pos map[string]NodePos) string {
 	// ── port chips ────────────────────────────────────────────────────
 	// Chips are scheduled PER NODE: each node's chips get angular placement
 	// with enforced minimum separation, so dense nodes (hub with 4 links,
-	// switch with parallel trunks) never stack chips.
+	// switch with parallel trunks) never stack chips. THEN a relaxation pass
+	// resolves CROSS-NODE collisions (H1's chip converging with PC1's/PC2's
+	// chip near a shared link), which per-node scheduling cannot see.
 	chipsByNode := map[string][]chipSpec{}
 	for _, link := range tpl.Links {
 		a, okA := byName[link.NodeA]
@@ -409,6 +411,7 @@ func renderLab(labID int, pos map[string]NodePos) string {
 			ParallelOff: off, PerpSign: -1,
 		})
 	}
+	var placed []placedChip
 	for _, s := range shapes {
 		specs := chipsByNode[s.Name]
 		if len(specs) == 0 {
@@ -416,8 +419,16 @@ func renderLab(labID int, pos map[string]NodePos) string {
 		}
 		angles := scheduleChips(s, specs)
 		for i, c := range specs {
-			renderPortChip(&b, s, c.Other, c.NodeName, c.Iface, angles[i], c.ParallelOff, c.PerpSign)
+			x, y := chipPosition(s, c.Other, angles[i], c.ParallelOff, c.PerpSign)
+			placed = append(placed, placedChip{
+				Spec: c, CX: x, CY: y,
+				AnchorX: x, AnchorY: y, // relaxation pulls back toward home
+			})
 		}
+	}
+	relaxChips(placed)
+	for _, pc := range placed {
+		writeChip(&b, pc.Spec.NodeName, pc.Spec.Iface, pc.CX, pc.CY)
 	}
 
 	// ── nodes ─────────────────────────────────────────────────────────
@@ -535,31 +546,89 @@ func scheduleChips(owner nodeShape, chips []chipSpec) []float64 {
 	return adj
 }
 
-func renderPortChip(b *strings.Builder, owner, other nodeShape, nodeName, iface string, angleDeg float64, parallelOff float64, perpSign float64) {
-	// direction at the scheduled angle (not the raw link direction)
+// placedChip is a chip with a computed position; the anchor is where the
+// scheduler put it (its "home"), and relaxation moves CX/CY away from
+// collisions but keeps the chip near its anchor.
+type placedChip struct {
+	Spec             chipSpec
+	CX, CY           float64
+	AnchorX, AnchorY float64
+}
+
+// chipPosition computes a chip's position from the scheduled angle, mirroring
+// the old renderPortChip placement math.
+func chipPosition(owner, other nodeShape, angleDeg, parallelOff, perpSign float64) (float64, float64) {
 	rad := angleDeg * math.Pi / 180.0
 	rotX, rotY := math.Cos(rad), math.Sin(rad)
 	perpX, perpY := -rotY, rotX
-
 	ex, ey := edgePoint(owner, other)
-	// Place along the scheduled angle. scheduleChips already guarantees the
-	// two endpoints of a link get ~180°-opposite angles, so placing along
-	// the angle (instead of perpendicular) separates them even for nearly
-	// touching nodes. perpSign nudges perpendicular so same-side chips
-	// (multi-link nodes) don't stack exactly.
-	cx := ex + rotX*24 + perpX*float64(perpSign)*7 + perpX*parallelOff
-	cy := ey + rotY*24 + perpY*float64(perpSign)*7 + perpY*parallelOff
-	writeChip(b, nodeName, iface, cx, cy)
+	cx := ex + rotX*24 + perpX*perpSign*7 + perpX*parallelOff
+	cy := ey + rotY*24 + perpY*perpSign*7 + perpY*parallelOff
+	return cx, cy
+}
+
+// chipW, chipH match writeChip's rect (42x18).
+const chipW, chipH = 42.0, 18.0
+
+// relaxChips resolves cross-node chip collisions — the gap per-node angular
+// scheduling cannot see (H1's chip converging with PC1's/PC2's near a shared
+// link). Light pairwise relaxation, NOT full force-directed physics: for a
+// bounded number of iterations, overlapping pairs push each other apart along
+// their center vector, with a pull back toward each chip's anchor so chips
+// don't drift off their links. Deterministic: fixed iterations, fixed push
+// step, sorted pair order.
+func relaxChips(chips []placedChip) {
+	const iterations = 8
+	const push = 4.0 // px per iteration per overlap
+	for it := 0; it < iterations; it++ {
+		moved := false
+		for i := 0; i < len(chips); i++ {
+			for j := i + 1; j < len(chips); j++ {
+				a, b := &chips[i], &chips[j]
+				dx := b.CX - a.CX
+				dy := b.CY - a.CY
+				minDX, minDY := chipW, chipH
+				if math.Abs(dx) >= minDX || math.Abs(dy) >= minDY {
+					continue // no overlap (true rect intersection)
+				}
+				// overlapping — push apart along the center vector
+				moved = true
+				if dx == 0 && dy == 0 {
+					dx, dy = 1, 0
+				}
+				len := math.Hypot(dx, dy)
+				ux, uy := dx/len, dy/len
+				// each moves half the overlap plus a small gap
+				overlapX := minDX - math.Abs(dx)
+				overlapY := minDY - math.Abs(dy)
+				overlap := math.Max(overlapX, overlapY) + 2
+				half := overlap / 2
+				a.CX -= ux * half
+				a.CY -= uy * half
+				b.CX += ux * half
+				b.CY += uy * half
+			}
+		}
+		if !moved {
+			return // converged early
+		}
+		// pull each chip back toward its anchor (keeps chips near their
+		// link; a chip displaced by relaxation drifts back a bit)
+		for i := range chips {
+			chips[i].CX += (chips[i].AnchorX - chips[i].CX) * 0.2
+			chips[i].CY += (chips[i].AnchorY - chips[i].CY) * 0.2
+		}
+	}
 }
 
 func writeChip(b *strings.Builder, nodeName, iface string, cx, cy float64) {
 	fmt.Fprintf(b, `      <g data-port="%s" data-iface="%s">
-        <rect x="%.0f" y="%.0f" width="42" height="18" rx="3" fill="%s" stroke="%s" stroke-width="1" />
+        <rect x="%.0f" y="%.0f" width="%.0f" height="%.0f" rx="3" fill="%s" stroke="%s" stroke-width="1" />
         <text x="%.0f" y="%.0f" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="%s">%s</text>
         <title>%s %s</title>
       </g>
 `, nodeName, iface,
-		cx-21, cy-9, portFill, portStroke,
+		cx-21, cy-9, chipW, chipH, portFill, portStroke,
 		cx, cy+4, portStroke, iface,
 		nodeName, iface)
 }
