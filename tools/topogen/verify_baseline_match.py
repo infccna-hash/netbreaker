@@ -12,7 +12,7 @@ import subprocess
 import sys
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-CLEAN_LABS = [1, 3, 4, 5, 8, 10, 12, 14, 17, 18, 20, 32, 37, 38, 43, 44, 46]
+CLEAN_LABS = [2, 6, 7, 11, 13, 15, 16, 19, 21, 24, 26, 27, 28, 31, 33, 34, 35, 36, 39, 45]
 
 SSH = [
     "ssh", "-o", "ConnectTimeout=15", "-o", "BatchMode=yes",
