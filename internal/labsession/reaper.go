@@ -14,6 +14,14 @@ import (
 // RAM on the compute host when GNS3 is unresponsive.
 const maxStopAttempts = 3
 
+// maxTeardownAttempts is how many consecutive sweeps may fail to CONFIRM a
+// Tier-2 teardown (nodes stopped + project gone + settle) before the reaper
+// escalates to a raw force delete. The verifier already gates the slot release
+// on positive evidence; without an attempt cap, an unresponsive GNS3 (or a
+// broken VPS→Falcon path) retries forever and the slot leaks silently — the
+// 79aa8f2b failure mode. Escalation bounds the silent leak and makes it loud.
+const maxTeardownAttempts = 3
+
 // Reaper is a background goroutine that reclaims stale lab sessions.
 //
 // Two tiers:
@@ -46,6 +54,10 @@ type Reaper struct {
 	// stopAttempts tracks consecutive failed graceful-stop attempts per session.
 	// Single-goroutine access (only touched inside sweep), so no lock needed.
 	stopAttempts map[uuid.UUID]int
+
+	// teardownAttempts tracks consecutive failed Tier-2 teardown confirmations
+	// per session, for escalation to a raw force delete after maxTeardownAttempts.
+	teardownAttempts map[uuid.UUID]int
 }
 
 func NewReaper(repo *Repository, gns3 GNS3Client, idleTimeout, sessionTTL, tickInterval, opTimeout time.Duration) *Reaper {
@@ -55,14 +67,15 @@ func NewReaper(repo *Repository, gns3 GNS3Client, idleTimeout, sessionTTL, tickI
 		opTimeout = tickInterval / 2
 	}
 	return &Reaper{
-		repo:         repo,
-		gns3:         gns3,
-		idleTimeout:  idleTimeout,
-		sessionTTL:   sessionTTL,
-		tickInterval: tickInterval,
-		opTimeout:    opTimeout,
-		verifier:     NewGNS3TeardownVerifier(gns3),
-		stopAttempts: make(map[uuid.UUID]int),
+		repo:             repo,
+		gns3:             gns3,
+		idleTimeout:      idleTimeout,
+		sessionTTL:       sessionTTL,
+		tickInterval:     tickInterval,
+		opTimeout:        opTimeout,
+		verifier:         NewGNS3TeardownVerifier(gns3),
+		stopAttempts:     make(map[uuid.UUID]int),
+		teardownAttempts: make(map[uuid.UUID]int),
 	}
 }
 
@@ -180,6 +193,7 @@ func (r *Reaper) teardown(ctx context.Context, sess *Session) {
 		// Nothing to delete on the compute host — safe to end.
 		_ = r.repo.End(ctx, sess.ID)
 		delete(r.stopAttempts, sess.ID)
+		delete(r.teardownAttempts, sess.ID)
 		return
 	}
 
@@ -197,11 +211,42 @@ func (r *Reaper) teardown(ctx context.Context, sess *Session) {
 		return r.verifier.WaitTeardownComplete(c, *sess.GNS3ProjectID)
 	})
 	if err != nil {
-		log.Printf("reaper: teardown session=%s NOT confirmed (slot kept counted, will retry): %v",
-			sess.ID, err)
+		// Do NOT advance to ended on uncertainty — the slot stays honestly
+		// counted. But bound the silent retry: after maxTeardownAttempts
+		// consecutive unconfirmed teardowns, escalate to a raw force delete
+		// and log loudly. Without this cap an unresponsive GNS3 (or a broken
+		// VPS→Falcon path) leaks the slot forever with zero alerting — the
+		// exact failure that wedged 79aa8f2b.
+		r.teardownAttempts[sess.ID]++
+		attempts := r.teardownAttempts[sess.ID]
+		log.Printf("reaper: teardown session=%s NOT confirmed (attempt %d/%d, slot kept counted): %v",
+			sess.ID, attempts, maxTeardownAttempts, err)
+
+		if attempts >= maxTeardownAttempts {
+			derr := r.op(ctx, func(c context.Context) error {
+				return r.gns3.DeleteProject(c, *sess.GNS3ProjectID)
+			})
+			if derr != nil {
+				log.Printf("reaper: FORCE delete session=%s FAILED after %d teardown attempts: %v "+
+					"(slot kept counted; GNS3 host may need manual attention)",
+					sess.ID, attempts, derr)
+				return // keep counted, retry next sweep
+			}
+			// Forced delete returned OK — release the slot. This is the
+			// escalation path: the verifier could not CONFIRM completion, but
+			// a direct delete succeeded, so the host should reclaim resources.
+			// (Contrast Tier 1: it force-deletes after failed STOP attempts;
+			// here we force-delete after failed VERIFIED-teardown attempts.)
+			_ = r.repo.End(ctx, sess.ID)
+			delete(r.stopAttempts, sess.ID)
+			delete(r.teardownAttempts, sess.ID)
+			log.Printf("reaper: force-ended unconfirmed session=%s user=%s lab=%d after %d teardown attempts",
+				sess.ID, sess.UserID, sess.LabID, attempts)
+		}
 		return
 	}
 	_ = r.repo.End(ctx, sess.ID)
 	delete(r.stopAttempts, sess.ID)
+	delete(r.teardownAttempts, sess.ID)
 	log.Printf("reaper: ended session=%s user=%s lab=%d (teardown verified)", sess.ID, sess.UserID, sess.LabID)
 }

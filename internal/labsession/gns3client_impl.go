@@ -56,7 +56,16 @@ func (c *HTTPGNS3Client) do(ctx context.Context, method, path string, body any, 
 	}
 	defer resp.Body.Close()
 
-	respBody, _ := io.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		// Surface the read error instead of discarding it (the old
+		// `respBody, _ :=` swallowed mid-transfer drops, which then surfaced
+		// as a baffling "unexpected end of JSON input" from Unmarshal below).
+		// A truncated body is exactly the VPS→Falcon path failure: the call
+		// times out mid-transfer, the body is partial, and without this the
+		// true cause is invisible in logs.
+		return fmt.Errorf("gns3 %s %s: read response body: %w", method, path, err)
+	}
 
 	if resp.StatusCode >= 400 {
 		return fmt.Errorf("gns3 %s %s: status %d: %s", method, path, resp.StatusCode, string(respBody))
