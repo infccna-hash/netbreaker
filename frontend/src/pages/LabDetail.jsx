@@ -24,6 +24,73 @@ export default function LabDetail() {
   const [verifyingPhase, setVerifyingPhase] = useState(null);
   const [verifyResults, setVerifyResults] = useState({}); // phase -> VerifyResult
 
+  // ── Topology hover tooltip ─────────────────────────────────────────
+  // Delegated events on the .topology container: hovering a port chip
+  // (data-port/data-iface) or a link line (data-link) shows the full
+  // connection. The peer is resolved FRONTEND-side by matching the
+  // hovered port against the data-link attributes — the SVG carries no
+  // data-peer, so no renderer/migration change was needed.
+  const topoRef = useRef(null);
+  const [tip, setTip] = useState(null); // { text, x, y } or null
+
+  useEffect(() => {
+    const el = topoRef.current;
+    if (!el) return;
+
+    // Parse "SW1:Et0/0↔R1:Et0/1" → ["SW1","Et0/0","R1","Et0/1"]
+    const parseLink = (raw) => {
+      const m = /^([^:]+):([^↔]+)↔([^:]+):(.+)$/.exec(raw);
+      return m ? { aNode: m[1], aIface: m[2], bNode: m[3], bIface: m[4] } : null;
+    };
+    // Resolve the peer of a hovered port by scanning data-link attributes.
+    const resolvePeer = (node, iface) => {
+      for (const g of el.querySelectorAll('[data-link]')) {
+        const l = parseLink(g.getAttribute("data-link"));
+        if (!l) continue;
+        if (l.aNode === node && l.aIface === iface) return `${l.bNode} ${l.bIface}`;
+        if (l.bNode === node && l.bIface === iface) return `${l.aNode} ${l.aIface}`;
+      }
+      return null;
+    };
+    const show = (e, text) => {
+      const rect = el.getBoundingClientRect();
+      setTip({ text, x: e.clientX - rect.left, y: e.clientY - rect.top });
+    };
+    const onOver = (e) => {
+      const chip = e.target.closest("[data-port]");
+      if (chip) {
+        const node = chip.getAttribute("data-port");
+        const iface = chip.getAttribute("data-iface");
+        const peer = resolvePeer(node, iface);
+        show(e, peer ? `${node} ${iface} → ${peer}` : `${node} ${iface}`);
+        return;
+      }
+      const link = e.target.closest("[data-link]");
+      if (link) {
+        const l = parseLink(link.getAttribute("data-link"));
+        if (l) {
+          show(e, `${l.aNode} ${l.aIface} ↔ ${l.bNode} ${l.bIface}`);
+        }
+      }
+    };
+    const onOut = (e) => {
+      if (!e.relatedTarget || !el.contains(e.relatedTarget)) setTip(null);
+    };
+    const onMove = (e) => {
+      // functional update reads current state — no stale-closure guard
+      const rect = el.getBoundingClientRect();
+      setTip((t) => (t ? { ...t, x: e.clientX - rect.left, y: e.clientY - rect.top } : t));
+    };
+    el.addEventListener("mouseover", onOver);
+    el.addEventListener("mouseout", onOut);
+    el.addEventListener("mousemove", onMove);
+    return () => {
+      el.removeEventListener("mouseover", onOver);
+      el.removeEventListener("mouseout", onOut);
+      el.removeEventListener("mousemove", onMove);
+    };
+  }, [topology]);
+
   // ── Session (live lab orchestration) ────────────────────────────────
   const [session, setSession] = useState(null);       // current session object or null
   const [sessionLoading, setSessionLoading] = useState(false);
@@ -219,7 +286,17 @@ export default function LabDetail() {
               <button className="btn btn-sm" onClick={downloadConfig}>Download starter config</button>
             )}
           </div>
-          <div className="topology" dangerouslySetInnerHTML={{ __html: topology.svg_large || topology.svg_small }} />
+          <div
+            className="topology"
+            ref={topoRef}
+            style={{ position: "relative" }}
+            dangerouslySetInnerHTML={{ __html: topology.svg_large || topology.svg_small }}
+          />
+          {tip && (
+            <div className="topo-tip" style={{ left: tip.x, top: tip.y }}>
+              {tip.text}
+            </div>
+          )}
           {Array.isArray(topology.legend) && topology.legend.length > 0 && (
             <div className="topo-legend">
               {topology.legend.map((item, i) => (
