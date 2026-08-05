@@ -71,9 +71,37 @@ func (c *HTTPGNS3Client) do(ctx context.Context, method, path string, body any, 
 		return fmt.Errorf("gns3 %s %s: status %d: %s", method, path, resp.StatusCode, string(respBody))
 	}
 	if out != nil && len(respBody) > 0 {
-		if err := json.Unmarshal(respBody, out); err != nil {
+		if err := decodeStrict(respBody, out); err != nil {
 			return fmt.Errorf("gns3 %s %s: decode response: %w", method, path, err)
 		}
+	}
+	return nil
+}
+
+// decodeStrict decodes a JSON body and REJECTS truncated payloads.
+//
+// json.Unmarshal cannot detect a body truncated at an array/object boundary:
+// a partial `[{"status":"stopped"},{"status":"stopped"}]` (connection dropped
+// mid-next-element) unmarshals cleanly into a SHORTER slice and the caller
+// sees "all stopped" — a false positive that can free a capacity slot while
+// the GNS3 project still runs (the 79aa8f2b cap-fiction failure).
+//
+// json.Decoder DOES detect this: decoding a truncated stream returns
+// io.ErrUnexpectedEOF from the trailing Decode, and a second Decode past the
+// end returns io.EOF — anything else means trailing garbage. Both prove the
+// payload was not a complete single JSON value, so we fail closed.
+func decodeStrict(body []byte, out any) error {
+	dec := json.NewDecoder(bytes.NewReader(body))
+	if err := dec.Decode(out); err != nil {
+		return err
+	}
+	// A second Decode must hit EOF immediately — anything else is trailing
+	// data (or truncation), not a clean single value.
+	if err := dec.Decode(&struct{}{}); err != io.EOF {
+		if err == nil {
+			return fmt.Errorf("trailing data after JSON value")
+		}
+		return fmt.Errorf("truncated or malformed JSON: %w", err)
 	}
 	return nil
 }
