@@ -7,18 +7,30 @@ written evidence (lab_phases text vs Go topology vs SVG).
 Result: **7 clean, 5 with real text bugs.** The design-choice label only covered
 the SVG simplification — the text was never checked until now.
 
-## Closed this session
-- **Migration 088** written + round-trip verified (up → idempotent → down →
-  byte-identical). Fixes false "Already wired" claims:
+## Deployed this session — 088 + Go surgery LIVE on VPS
+- **Migration 088 DEPLOYED** (schema_migrations=88). Fixes false "Already wired"
+  claims:
   - Lab 33: `R1 → KALI directly, or through a switch — either works` → `R1 → SW1 → KALI`
   - Lab 34: `R1 → KALI directly` → `R1 → SW1 → KALI`
   - Lab 35: `PC1 → R1, KALI → R1` → `PC1 → SW1 → R1, KALI → SW1 → R1`
   (R1↔R2 stays — it IS direct in Go.)
-- **Go topology surgery** committed (43f94e2): dropped ghost R2 (Lab 34),
+- **Go topology surgery deployed** (commit 43f94e2): dropped ghost R2 (Lab 34),
   R3+PC2 (Lab 35). Verify-DSL gate passed — no verifier registered for 33/34/35.
   Port-conflict guard + full labsession suite pass.
-- 088 NOT yet applied to VPS (round-trip left DB in original state). Applies on
-  next API container rebuild. The Go topology changes also deploy with that rebuild.
+- API container rebuilt + recreated; `/api/v1/labs/33` serves corrected content.
+- Round-trip verified pre-deploy (up → idempotent → down → byte-identical).
+
+## ⚠ OPEN — surgery NOT verified on real GNS3 yet
+The Go unit suite mocks GNS3; it cannot catch provisioning bugs. The surgery is
+NOT closed until someone runs a fresh session and watches node_map come up:
+- Lab 34 expected node_map: {KALI, R1, SW1} — no R2
+- Lab 35 expected node_map: {KALI, PC1, R1, R2, SW1} — no R3/PC2
+
+Kit: `scripts/walkthrough_34_35_post_surgery.sh` (human-run, option 1 — Yassine
+runs it on Falcon; registers walk34_*@test.local, upgrades to pro, launches both
+labs, prints node_map, ends sessions). Approved paths: register → login →
+POST /api/v1/labs/{id}/session → GET /api/v1/labsessions/{id} (node_map) →
+DELETE. Do NOT mark closed on unit-suite evidence alone.
 
 ## OPEN ITEM #5 — Labs 28/29: R2 is a missing step, NOT a ghost
 - Lab 28 (IPv6): text says "R1 (gateway) + PC1 + PC2 + KALI" but Go has
@@ -29,7 +41,7 @@ the SVG simplification — the text was never checked until now.
   - (a) In-scope: add R2 config step to text (teaches second hop) — richer lab
   - (b) Out-of-scope: flatten Go (PC2↔R1 directly) — topology surgery, changes
     what the lab teaches
-- Do NOT bundle with a cleanup migration. This is a design decision for Yassine.
+- Do NOT bundle with a cleanup migration. Separate ticket, separate number.
 
 ## Reference
 Full methodology + psql CSV-fetch technique + findings:
