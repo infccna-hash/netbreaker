@@ -31,10 +31,10 @@ import (
 // ── SVG model ────────────────────────────────────────────────────────────
 
 type shape struct {
-	Kind  string  // "rect" | "circle"
-	X, Y  float64 // rect top-left / circle center
-	W, H  float64 // rect only
-	R     float64 // circle only
+	Kind string  // "rect" | "circle"
+	X, Y float64 // rect top-left / circle center
+	W, H float64 // rect only
+	R    float64 // circle only
 }
 
 func (s shape) contains(px, py float64) bool {

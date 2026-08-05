@@ -1,0 +1,594 @@
+{
+  "1": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "PC1:eth0↔SW1:Et0/1",
+      "SW1:Et0/2↔SW2:Et0/1",
+      "KALI:eth0↔SW1:Et0/3",
+      "SRV1:eth0↔SW2:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "SW2",
+      "PC1",
+      "KALI",
+      "SRV1"
+    ]
+  },
+  "10": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "PC-A:eth0↔SW1:Et0/1",
+      "PC-B:eth0↔SW1:Et0/2",
+      "KALI:eth0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "PC-A",
+      "PC-B",
+      "KALI"
+    ]
+  },
+  "11": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "KALI"
+    ]
+  },
+  "12": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "PC1:eth0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2",
+      "PC2:eth0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  },
+  "13": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "AP1:Et0/0↔SW1:Et0/1",
+      "PC1:eth0↔SW1:Et0/2",
+      "KALI:eth0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "AP1",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "14": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "PC1:eth0↔SW1:Et0/1",
+      "PC2:eth0↔SW1:Et0/2",
+      "KALI:eth0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  },
+  "15": {
+    "links": [
+      "PC1:eth0↔H1:e0",
+      "PC2:eth0↔H1:e1",
+      "KALI2:eth0↔H1:e3",
+      "H1:e2↔SW1:Et0/0",
+      "PC3:eth0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2",
+      "SW1:Et0/3↔R1:Et0/0",
+      "R1:Et0/1↔FW1:Ethernet0"
+    ],
+    "nodes": [
+      "H1",
+      "SW1",
+      "R1",
+      "FW1",
+      "PC1",
+      "PC2",
+      "PC3",
+      "KALI",
+      "KALI2"
+    ]
+  },
+  "16": {
+    "links": [
+      "PC1:eth0↔SW1:Et0/0",
+      "R1:Fa0/0↔SW1:Et0/1",
+      "SW1:Et0/2↔SW2:Et0/1",
+      "KALI:eth0↔SW2:Et0/0",
+      "PC2:eth0↔SW2:Et0/2"
+    ],
+    "nodes": [
+      "SW1",
+      "SW2",
+      "R1",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  },
+  "17": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "PC1:eth0↔SW1:Et0/1",
+      "PC2:eth0↔SW1:Et0/2",
+      "KALI:eth0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  },
+  "18": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "PC1:eth0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "19": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "PC1:eth0↔SW1:Et0/1",
+      "PC2:eth0↔SW1:Et0/2",
+      "KALI:eth0↔SW1:Et0/3",
+      "R1:Fa0/1↔PC3:eth0",
+      "R1:Fa2/0↔R2:Fa0/0"
+    ],
+    "nodes": [
+      "R1",
+      "R2",
+      "SW1",
+      "PC1",
+      "PC2",
+      "PC3",
+      "KALI"
+    ]
+  },
+  "2": {
+    "links": [
+      "SW1:Et0/0↔SW2:Et0/1",
+      "SW1:Et0/2↔SW3:Et0/1",
+      "SW2:Et0/2↔SW3:Et0/3",
+      "SW1:Et0/1↔PC1:eth0",
+      "SW3:Et0/2↔KALI:eth0"
+    ],
+    "nodes": [
+      "SW1",
+      "SW2",
+      "SW3",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "20": {
+    "links": [
+      "PC1:eth0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2",
+      "R1:Fa0/0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "SW1",
+      "PC1",
+      "R1",
+      "KALI"
+    ]
+  },
+  "21": {
+    "links": [
+      "R1:Fa0/0↔R2:Fa0/0",
+      "R2:Fa0/1↔R3:Fa0/0",
+      "R3:Fa0/1↔R1:Fa0/1",
+      "R1:Gi1/1↔PC1:eth0",
+      "R1:Gi1/2↔KALI:eth0",
+      "R2:Gi1/1↔PC2:eth0",
+      "R3:Gi1/1↔PC3:eth0"
+    ],
+    "nodes": [
+      "R1",
+      "R2",
+      "R3",
+      "PC1",
+      "PC2",
+      "PC3",
+      "KALI"
+    ]
+  },
+  "24": {
+    "links": [
+      "SW1:Et0/0↔SW2:Et0/0",
+      "KALI:eth0↔SW1:Et0/1",
+      "PC1:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "SW1",
+      "SW2",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "25": {
+    "links": [
+      "SW1:Et0/0↔SW2:Et0/0",
+      "SW1:Et0/1↔SW3:Et0/0",
+      "SW2:Et0/1↔SW3:Et0/1",
+      "KALI:eth0↔SW1:Et0/2",
+      "PC1:eth0↔SW1:Et0/3",
+      "PC2:eth0↔SW3:Et0/2"
+    ],
+    "nodes": [
+      "SW1",
+      "SW2",
+      "SW3",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  },
+  "26": {
+    "links": [
+      "SW1:Et0/0↔SW2:Et0/0",
+      "SW1:Et0/1↔SW2:Et0/1",
+      "KALI:eth0↔SW1:Et0/2",
+      "PC1:eth0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "SW1",
+      "SW2",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "27": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "R1:Fa0/1↔R2:Fa0/0",
+      "R2:Fa0/1↔R3:Fa0/0",
+      "R3:Fa0/1↔PC2:eth0",
+      "PC1:eth0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "R2",
+      "R3",
+      "SW1",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  },
+  "28": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "R1:Fa0/1↔R2:Fa0/0",
+      "R2:Fa0/1↔PC2:eth0",
+      "PC1:eth0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "R2",
+      "SW1",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  },
+  "29": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "R1:Fa0/1↔R2:Fa0/0",
+      "R2:Fa0/1↔PC2:eth0",
+      "PC1:eth0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "R2",
+      "SW1",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  },
+  "3": {
+    "links": [
+      "PC1:eth0↔SW1:Et0/1",
+      "PC2:eth0↔SW1:Et0/2",
+      "KALI:eth0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "SW1",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  },
+  "31": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "R1:Fa0/1↔R2:Fa0/0",
+      "KALI:eth0↔SW1:Et0/1",
+      "PC1:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "R2",
+      "SW1",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "32": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "KALI:eth0↔SW1:Et0/1",
+      "PC1:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "33": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "KALI:eth0↔SW1:Et0/1",
+      "PC1:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "34": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "KALI:eth0↔SW1:Et0/1"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "KALI"
+    ]
+  },
+  "35": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "R1:Fa0/1↔R2:Fa0/0",
+      "PC1:eth0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "R2",
+      "SW1",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "36": {
+    "links": [
+      "PC1:eth0↔SW1:Et0/0",
+      "PC2:eth0↔SW1:Et0/2",
+      "KALI:eth0↔SW1:Et0/1"
+    ],
+    "nodes": [
+      "SW1",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  },
+  "37": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "KALI:eth0↔SW1:Et0/1",
+      "PC1:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "38": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "PC-A:eth0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "PC-A",
+      "KALI"
+    ]
+  },
+  "39": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "R1:Fa0/1↔R2:Fa0/0",
+      "R2:Fa0/1↔R3:Fa0/0",
+      "R3:Fa0/1↔SW2:Et0/0",
+      "PC1:eth0↔SW1:Et0/1",
+      "PC2:eth0↔SW1:Et0/2",
+      "PC3:eth0↔SW2:Et0/1",
+      "KALI:eth0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "R1",
+      "R2",
+      "R3",
+      "SW1",
+      "SW2",
+      "PC1",
+      "PC2",
+      "PC3",
+      "KALI"
+    ]
+  },
+  "4": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "R2:Fa0/0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "SW1",
+      "R1",
+      "R2",
+      "KALI"
+    ]
+  },
+  "43": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "KALI:eth0↔SW1:Et0/1"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "KALI"
+    ]
+  },
+  "44": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "KALI:eth0↔SW1:Et0/1"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "KALI"
+    ]
+  },
+  "45": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "KALI:eth0↔SW1:Et0/1"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "KALI"
+    ]
+  },
+  "46": {
+    "links": [
+      "PC-A:eth0↔SW1:Et0/1",
+      "PC-B:eth0↔SW1:Et0/2",
+      "KALI:eth0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "SW1",
+      "PC-A",
+      "PC-B",
+      "KALI"
+    ]
+  },
+  "5": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "R2:Fa0/0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "SW1",
+      "R1",
+      "R2",
+      "KALI"
+    ]
+  },
+  "6": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "KALI:eth0↔SW1:Et0/1",
+      "R1:Fa0/1↔SERVER:eth0"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "SERVER",
+      "KALI"
+    ]
+  },
+  "7": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/2"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "KALI"
+    ]
+  },
+  "8": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "PC1:eth0↔SW1:Et0/1",
+      "KALI:eth0↔SW1:Et0/3"
+    ],
+    "nodes": [
+      "R1",
+      "SW1",
+      "PC1",
+      "KALI"
+    ]
+  },
+  "9": {
+    "links": [
+      "R1:Fa0/0↔SW1:Et0/0",
+      "PC1:eth0↔SW1:Et0/1",
+      "R1:Fa0/1↔SW2:Et0/0",
+      "R2:Fa0/0↔SW2:Et0/1",
+      "KALI:eth0↔SW2:Et0/2",
+      "R2:Fa0/1↔PC2:eth0"
+    ],
+    "nodes": [
+      "R1",
+      "R2",
+      "SW1",
+      "SW2",
+      "PC1",
+      "PC2",
+      "KALI"
+    ]
+  }
+}
