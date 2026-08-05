@@ -143,7 +143,7 @@ func autoLayout(shapes []nodeShape, used map[string]bool) []nodeShape {
 	sort.Slice(coreIdx, func(i, j int) bool { return shapes[coreIdx[i]].Name < shapes[coreIdx[j]].Name })
 	sort.Slice(leafIdx, func(i, j int) bool { return shapes[leafIdx[i]].Name < shapes[leafIdx[j]].Name })
 
-	place := func(idxs []int, startY float64) {
+	place := func(idxs []int, startY, rowH float64) {
 		// perRow must fit within the 720px canvas: 4 cells of 190 = 760 >
 		// 720, so 4 only works with margin math; 3 is always safe.
 		perRow := 3
@@ -160,10 +160,10 @@ func autoLayout(shapes []nodeShape, used map[string]bool) []nodeShape {
 			totalW := float64(rowCount)*cellW - 50
 			x0 := (viewW - totalW) / 2
 			shapes[idx].CX = x0 + float64(col)*cellW + cellW/2
-			shapes[idx].CY = startY + float64(row)*cellH
+			shapes[idx].CY = startY + float64(row)*rowH
 		}
 	}
-	place(coreIdx, 110)
+	place(coreIdx, 110, cellH)
 	// Leaves start BELOW the last core row. Core rows are ceil(len/3)
 	// (perRow=3); the old (len+3)/4 formula assumed perRow=4 and let
 	// leaf row 0 overlap core row 1 for 4+ core nodes.
@@ -171,26 +171,30 @@ func autoLayout(shapes []nodeShape, used map[string]bool) []nodeShape {
 	if coreRows < 1 {
 		coreRows = 1
 	}
-	// The legend footer starts at y=405, so the last leaf row's bottom edge
+	// The legend footer starts at y=405, so the last row's bottom edge
 	// (center + 30px for circles) must stay above it. Dense labs (e.g. Lab
-	// 39's 9 nodes) need tighter leaf rows than the 120px default or the
-	// bottom row clips the canvas. Compress leaf spacing to fit.
+	// 39's 9 nodes = 2 core rows + 2 leaf rows) cannot fit 4 rows at the
+	// 120px default in the 110..395 band. Compress the ROW HEIGHT for the
+	// whole grid (core AND leaves) so the last row clears the legend.
 	leafRows := (len(leafIdx) + 2) / 3
 	if leafRows < 1 {
 		leafRows = 1
 	}
-	leafCellH := cellH
-	leafStart := 110 + cellH*float64(coreRows)
-	// max bottom of the last leaf row: leafStart + (leafRows-1)*cellH + 30
-	for bottom := leafStart + float64(leafRows-1)*leafCellH + 30; bottom > 395; {
-		leafCellH -= 8
-		leafStart = 110 + cellH*float64(coreRows)
-		bottom = leafStart + float64(leafRows-1)*leafCellH + 30
-		if leafCellH < 70 {
-			break
+	totalRows := coreRows + leafRows
+	// band = 110 (first core row) .. 395 (legend) = 285px usable
+	rowH := cellH
+	if 110+float64(totalRows-1)*rowH+60 > 395 {
+		rowH = (395 - 170) / float64(totalRows-1)
+		if rowH < 60 {
+			rowH = 60
 		}
 	}
-	placeLeaf(shapes, leafIdx, leafStart, leafCellH)
+	leafStart := 110 + rowH*float64(coreRows)
+	// re-place core with the compressed row height (only if it changed)
+	if rowH != cellH {
+		place(coreIdx, 110, rowH)
+	}
+	placeLeaf(shapes, leafIdx, leafStart, rowH)
 	return shapes
 }
 
@@ -288,6 +292,32 @@ func layoutLab(labID int, pos map[string]NodePos) ([]nodeShape, map[string]nodeS
 			shift := topClearance - minTop
 			for i := range shapes {
 				shapes[i].CY += shift
+			}
+		}
+		// Legend clearance: the legend divider sits at y=405. A top-shift
+		// can push bottom nodes (extracted from old SVGs that had no legend)
+		// into it — Lab 1's PC1/SRV1/KALI at bottom=418+. Compress the
+		// layout vertically into the 55..395 band, preserving relative
+		// spacing. Only when needed (dense extracted layouts).
+		const legendClearance = 395.0
+		maxBottom := math.Inf(-1)
+		for _, s := range shapes {
+			halfH := 30.0
+			if s.IsHost {
+				halfH = hostR
+			}
+			if b := s.CY + halfH; b > maxBottom {
+				maxBottom = b
+			}
+		}
+		if maxBottom > legendClearance {
+			// scale CY: 55 (top) stays, everything below compresses into
+			// 55..(legendClearance - 30) so the lowest node clears 395
+			band := legendClearance - 30 - topClearance // available: 55..365
+			cur := maxBottom - topClearance
+			scale := band / cur
+			for i := range shapes {
+				shapes[i].CY = topClearance + (shapes[i].CY-topClearance)*scale
 			}
 		}
 		for _, s := range shapes {
@@ -642,6 +672,12 @@ const chipW, chipH = 42.0, 18.0
 // their center vector, with a pull back toward each chip's anchor so chips
 // don't drift off their links. Deterministic: fixed iterations, fixed push
 // step, sorted pair order.
+//
+// Dense congestion clusters (3+ chips in a tight region — the SW1-SW2-SW3
+// triangle in Lab 25, the R1-R2-SW1 triangle in Lab 29) are NOT resolved
+// here: a radial cluster pass was tried and failed (anchor pull rewinds the
+// radial push; it also regressed Labs 11/21/31). Those labs are handled
+// manually per-lab — see qa_geometry notes.
 func relaxChips(chips []placedChip) {
 	const iterations = 8
 	const push = 4.0 // px per iteration per overlap

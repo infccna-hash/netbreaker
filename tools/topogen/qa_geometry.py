@@ -145,6 +145,13 @@ def main():
             if cy - 9 < 40:
                 problems.append(f"G8 chip {cname} collides with header (top={cy-9:.0f} < 40)")
 
+        # G9 legend collision — the legend divider sits at y=405; no node may
+        # render into it (the Lab 39 PC3 failure — QA missed it because G1
+        # only checks canvas bounds, not the legend overlay).
+        for name, (cx, cy, kind, hw, hh) in boxes.items():
+            if cy + hh > 405:
+                problems.append(f"G9 {name} collides with legend (bottom={cy+hh:.0f} > 405)")
+
         # G2 node overlaps (true box intersection for rect/rect, center
         # distance vs sum of radii for circle/circle, approximate for mixed)
         names = list(boxes.items())
