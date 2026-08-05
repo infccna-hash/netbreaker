@@ -58,6 +58,7 @@ func (h *Handler) launch(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
+	userID, _ := authFromContext(r.Context())
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Error(w, "invalid session id", http.StatusBadRequest)
@@ -72,13 +73,33 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
+	// ── Auth: verify this session belongs to the requesting user ──────
+	if sess.UserID != userID {
+		http.Error(w, "session does not belong to this user", http.StatusForbidden)
+		return
+	}
 	writeJSON(w, http.StatusOK, sess)
 }
 
 func (h *Handler) heartbeat(w http.ResponseWriter, r *http.Request) {
+	userID, _ := authFromContext(r.Context())
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Error(w, "invalid session id", http.StatusBadRequest)
+		return
+	}
+	sess, err := h.svc.Get(r.Context(), id)
+	if errors.Is(err, ErrNotFound) {
+		http.Error(w, "not found", http.StatusNotFound)
+		return
+	}
+	if err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	// ── Auth: verify this session belongs to the requesting user ──────
+	if sess.UserID != userID {
+		http.Error(w, "session does not belong to this user", http.StatusForbidden)
 		return
 	}
 	if err := h.svc.Heartbeat(r.Context(), id); err != nil {
@@ -89,9 +110,24 @@ func (h *Handler) heartbeat(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) end(w http.ResponseWriter, r *http.Request) {
+	userID, _ := authFromContext(r.Context())
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Error(w, "invalid session id", http.StatusBadRequest)
+		return
+	}
+	sess, err := h.svc.Get(r.Context(), id)
+	if errors.Is(err, ErrNotFound) {
+		http.Error(w, "not found", http.StatusNotFound)
+		return
+	}
+	if err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	// ── Auth: verify this session belongs to the requesting user ──────
+	if sess.UserID != userID {
+		http.Error(w, "session does not belong to this user", http.StatusForbidden)
 		return
 	}
 	if err := h.svc.EndLab(r.Context(), id); err != nil {
