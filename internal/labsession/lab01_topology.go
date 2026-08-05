@@ -1,8 +1,11 @@
 package labsession
 
 // Lab 01 — VLAN Warfare / DTP Hijack
-// Text: "PC1→SW1 Fa0/1, KALI→SW1 Fa0/3, SW1↔SW2 Fa0/2, R1→SW1 Fa0/24, SRV1→SW2 Fa0/1"
-// IOU 4-port limit: "Fa0/24" is conceptual — use Et0/0 for R1 trunk.
+// L2 IOU image (i86bi-linux-l2-upk9-12.2) — must remain L2:
+// the L3 IOU image (i86bi-linux-l3-jk9s-15.0.1) boots as a ROUTER (no
+// switchport/VLAN support) and would break the lab. The 12.2 image supports
+// DTP negotiation (verified: yersinia DTP attack → Operational Mode: trunk),
+// unlike the newer 15.1a images which do not process DTP from yersinia.
 // Port allocation:
 //   SW1: Et0/0=R1, Et0/1=PC1, Et0/2=trunk→SW2, Et0/3=KALI
 //   SW2: Et0/1=trunk→SW1, Et0/2=SRV1
@@ -20,18 +23,22 @@ var Lab01Topology = TopologyTemplate{
 			},
 		},
 		{
-			Name:     "SW1",
-			NodeType: "iou",
+			Name:       "SW1",
+			NodeType:   "iou",
+			TemplateID: "26f0cc8d-debb-4897-b042-cd55978710cd", // i86bi-linux-l2-upk9-12.2 (switch, DTP-capable)
 			Properties: map[string]any{
-				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+				"path": "i86bi-linux-l2-upk9-12.2.bin",
 			},
+			StartupConfig: lab01SW1Startup,
 		},
 		{
-			Name:     "SW2",
-			NodeType: "iou",
+			Name:       "SW2",
+			NodeType:   "iou",
+			TemplateID: "26f0cc8d-debb-4897-b042-cd55978710cd", // i86bi-linux-l2-upk9-12.2 (switch, DTP-capable)
 			Properties: map[string]any{
-				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+				"path": "i86bi-linux-l2-upk9-12.2.bin",
 			},
+			StartupConfig: lab01SW2Startup,
 		},
 		{
 			Name:     "PC1",
@@ -56,3 +63,15 @@ var Lab01Topology = TopologyTemplate{
 		{NodeA: "SRV1", IfaceA: "eth0", NodeB: "SW2", IfaceB: "Et0/2"},
 	},
 }
+
+// Startup configs for Lab 01 IOU switches — hostname so the student sees
+// SW1#/SW2# prompts (not the 12.2 default Router#). NOTE: the 12.2 image
+// ignores interface blocks (no shutdown) in startup config content — ports
+// boot administratively down; the lab build phase configures them anyway.
+const lab01SW1Startup = `hostname SW1
+!
+end`
+
+const lab01SW2Startup = `hostname SW2
+!
+end`

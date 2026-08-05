@@ -134,6 +134,23 @@ type CloseReporter func(direction string, closeCode int, closeReason string, rea
 // fatal error occurs). It is split out from the handler so tests can
 // exercise the concurrent ping/relay/read paths under -race without
 // needing the full session/auth/DB stack.
+//
+// ── uBridge / NAWS limitation ─────────────────────────────────────
+// The GNS3 compute uses uBridge as a raw TCP↔PTY pipe. uBridge does NOT
+// forward NAWS (Negotiate About Window Size) telnet options, so the PTY
+// inside the Docker container never learns the browser's real terminal
+// dimensions. The PTY defaults to 0×0 or 24×80, which breaks ncurses
+// apps (yersinia, tmux) that require larger dimensions.
+//
+// We do NOT attempt NAWS forwarding here — it's a uBridge wire-level
+// limitation. Instead, the KALI Docker image ships a fixrows script in
+// .bashrc that calls TIOCSWINSZ directly to set 40×130 on the PTY.
+// See docker/kali/fixrows and docker/kali/Dockerfile (Layer 3).
+//
+// Future: if GNS3 migrates from uBridge to a NAWS-capable pipe
+// (e.g. vhost-user or a custom agent), we can remove fixrows and
+// forward xterm.js resize events from the WebSocket to the PTY.
+// ─────────────────────────────────────────────────────────────────
 func bridgeConsole(ctx context.Context, cancel context.CancelFunc, ws *websocket.Conn, tcpConn net.Conn, cfg ConsoleBridgeConfig, onActivity func(), logClose CloseReporter) {
 	// ── Serialize all writes to the WebSocket connection ──────────
 	// gorilla/websocket requires at most one concurrent writer.

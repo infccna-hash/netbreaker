@@ -3,6 +3,8 @@ package labsession
 // Lab 20 — Interfaces & Autonegotiation
 // Topology: SW1 (IOU) + PC1 (VPCS) + R1 (c3725) + KALI (QEMU)
 // Text: "Gi0/1–3 (access), Gi0/24 (trunk)" — IOU L2 image has 4 ports (Et0/0–3)
+// Uses upk9-12.2 image: supports yersinia DTP spoofing (verified trunk),
+// unlike 15.1a which does not process DTP from yersinia.
 // Port mapping (0-indexed to fit IOU's 4-port limit):
 //   Et0/1 ← PC1 (access, VLAN 10)
 //   Et0/2 ← KALI (access)
@@ -11,11 +13,13 @@ var Lab20Topology = TopologyTemplate{
 	ComputeID: "local",
 	Nodes: []NodeTemplate{
 		{
-			Name:     "SW1",
-			NodeType: "iou",
+			Name:       "SW1",
+			NodeType:   "iou",
+			TemplateID: "26f0cc8d-debb-4897-b042-cd55978710cd", // i86bi-linux-l2-upk9-12.2 (switch, DTP-capable)
 			Properties: map[string]any{
-				"path": "i86bi-linux-l2-adventerprisek9-15.1a.bin",
+				"path": "i86bi-linux-l2-upk9-12.2.bin",
 			},
+			StartupConfig: lab20SW1Startup,
 		},
 		{
 			Name:     "PC1",
@@ -45,3 +49,11 @@ var Lab20Topology = TopologyTemplate{
 		{NodeA: "R1", IfaceA: "Fa0/0", NodeB: "SW1", IfaceB: "Et0/3"},
 	},
 }
+
+// Startup config for Lab 20 — hostname so the student sees SW1#
+// (not the 12.2 default Router#). NOTE: 12.2 ignores interface blocks
+// (no shutdown) in startup config content — ports boot down; the lab
+// build phase configures them.
+const lab20SW1Startup = `hostname SW1
+!
+end`
