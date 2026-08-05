@@ -171,9 +171,48 @@ func autoLayout(shapes []nodeShape, used map[string]bool) []nodeShape {
 	if coreRows < 1 {
 		coreRows = 1
 	}
+	// The legend footer starts at y=405, so the last leaf row's bottom edge
+	// (center + 30px for circles) must stay above it. Dense labs (e.g. Lab
+	// 39's 9 nodes) need tighter leaf rows than the 120px default or the
+	// bottom row clips the canvas. Compress leaf spacing to fit.
+	leafRows := (len(leafIdx) + 2) / 3
+	if leafRows < 1 {
+		leafRows = 1
+	}
+	leafCellH := cellH
 	leafStart := 110 + cellH*float64(coreRows)
-	place(leafIdx, leafStart)
+	// max bottom of the last leaf row: leafStart + (leafRows-1)*cellH + 30
+	for bottom := leafStart + float64(leafRows-1)*leafCellH + 30; bottom > 395; {
+		leafCellH -= 8
+		leafStart = 110 + cellH*float64(coreRows)
+		bottom = leafStart + float64(leafRows-1)*leafCellH + 30
+		if leafCellH < 70 {
+			break
+		}
+	}
+	placeLeaf(shapes, leafIdx, leafStart, leafCellH)
 	return shapes
+}
+
+// placeLeaf places leaf nodes with a custom row height (used when dense labs
+// need tighter vertical spacing to stay above the legend footer).
+func placeLeaf(shapes []nodeShape, idxs []int, startY, cellHh float64) {
+	perRow := 3
+	if len(idxs) <= 3 {
+		perRow = len(idxs)
+	}
+	for k, idx := range idxs {
+		row := k / perRow
+		col := k % perRow
+		rowCount := perRow
+		if rem := len(idxs) - row*perRow; rem < rowCount {
+			rowCount = rem
+		}
+		totalW := float64(rowCount)*cellW - 50
+		x0 := (viewW - totalW) / 2
+		shapes[idx].CX = x0 + float64(col)*cellW + cellW/2
+		shapes[idx].CY = startY + float64(row)*cellHh
+	}
 }
 
 func max(a, b int) int {
