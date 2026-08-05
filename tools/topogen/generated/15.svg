@@ -70,18 +70,18 @@
         <title>R1 Et0/1 ↔ FW1 Ethernet0</title>
       </g>
       <g data-port="H1" data-iface="e0">
-        <rect x="86" y="266" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="107" y="279" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">e0</text>
+        <rect x="73" y="252" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="94" y="265" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">e0</text>
         <title>H1 e0</title>
       </g>
       <g data-port="H1" data-iface="e1">
-        <rect x="125" y="261" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="146" y="274" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">e1</text>
+        <rect x="118" y="254" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="139" y="267" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">e1</text>
         <title>H1 e1</title>
       </g>
       <g data-port="H1" data-iface="e3">
-        <rect x="155" y="252" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="176" y="265" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">e3</text>
+        <rect x="169" y="249" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="190" y="262" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">e3</text>
         <title>H1 e3</title>
       </g>
       <g data-port="H1" data-iface="e2">
@@ -100,13 +100,13 @@
         <title>SW1 Et0/1</title>
       </g>
       <g data-port="SW1" data-iface="Et0/2">
-        <rect x="378" y="137" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="399" y="150" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/2</text>
+        <rect x="372" y="137" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="393" y="150" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/2</text>
         <title>SW1 Et0/2</title>
       </g>
       <g data-port="SW1" data-iface="Et0/3">
-        <rect x="417" y="138" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="438" y="151" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/3</text>
+        <rect x="423" y="138" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="444" y="151" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/3</text>
         <title>SW1 Et0/3</title>
       </g>
       <g data-port="R1" data-iface="Et0/0">
@@ -115,23 +115,23 @@
         <title>R1 Et0/0</title>
       </g>
       <g data-port="R1" data-iface="Et0/1">
-        <rect x="572" y="265" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="593" y="278" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
+        <rect x="572" y="251" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="593" y="264" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
         <title>R1 Et0/1</title>
       </g>
       <g data-port="FW1" data-iface="Ethernet0">
-        <rect x="572" y="277" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="593" y="290" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Ethernet0</text>
+        <rect x="572" y="291" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="593" y="304" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Ethernet0</text>
         <title>FW1 Ethernet0</title>
       </g>
       <g data-port="PC1" data-iface="eth0">
-        <rect x="80" y="283" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="101" y="296" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
+        <rect x="80" y="297" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="101" y="310" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
         <title>PC1 eth0</title>
       </g>
       <g data-port="PC2" data-iface="eth0">
-        <rect x="132" y="278" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="153" y="291" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
+        <rect x="138" y="287" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="159" y="300" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
         <title>PC2 eth0</title>
       </g>
       <g data-port="PC3" data-iface="eth0">
