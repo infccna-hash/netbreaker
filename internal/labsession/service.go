@@ -156,6 +156,12 @@ func HasLiveSession(labID int) bool {
 	return len(lookupTopologyTemplate(labID).Nodes) > 0
 }
 
+// TopologyForLab returns the topology template for a lab ID, for tooling that
+// needs read access to the registry (e.g. the topogen SVG generator).
+func TopologyForLab(labID int) TopologyTemplate {
+	return lookupTopologyTemplate(labID)
+}
+
 func lookupTopologyTemplate(labID int) TopologyTemplate {
 	switch labID {
 	case 1:
