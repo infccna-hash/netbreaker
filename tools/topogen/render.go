@@ -267,6 +267,32 @@ func layoutLab(labID int, pos map[string]NodePos) ([]nodeShape, map[string]nodeS
 		for _, s := range shapes {
 			byName[s.Name] = s
 		}
+		// Top-clearance: the canonical chrome draws a ~40px terminal header
+		// at the top of the canvas. Extracted positions come from old
+		// hand-authored SVGs with NO header, so their nodes can start at
+		// y=7-26 — directly under the header bar (Labs 9/25/29). Shift the
+		// whole layout down so the highest node's top edge clears the header
+		// (55px), preserving the hand-tuned relative positions.
+		const topClearance = 55.0
+		minTop := math.Inf(1)
+		for _, s := range shapes {
+			halfH := 30.0
+			if s.IsHost {
+				halfH = hostR
+			}
+			if t := s.CY - halfH; t < minTop {
+				minTop = t
+			}
+		}
+		if minTop < topClearance {
+			shift := topClearance - minTop
+			for i := range shapes {
+				shapes[i].CY += shift
+			}
+		}
+		for _, s := range shapes {
+			byName[s.Name] = s
+		}
 		return shapes, byName
 	}
 

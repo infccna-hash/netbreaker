@@ -136,6 +136,15 @@ def main():
             if cx - hw < 0 or cx + hw > VIEW_W or cy - hh < 0 or cy + hh > VIEW_H:
                 problems.append(f"G1 {name} out of bounds ({cx:.0f},{cy:.0f})")
 
+        # G8 top clearance — the terminal header bar occupies the top ~40px;
+        # no node or chip may render into it (the Labs 9/25/29 failure).
+        for name, (cx, cy, kind, hw, hh) in boxes.items():
+            if cy - hh < 45:
+                problems.append(f"G8 {name} collides with header (top={cy-hh:.0f} < 45)")
+        for cname, cx, cy in chip_list:
+            if cy - 9 < 40:
+                problems.append(f"G8 chip {cname} collides with header (top={cy-9:.0f} < 40)")
+
         # G2 node overlaps (true box intersection for rect/rect, center
         # distance vs sum of radii for circle/circle, approximate for mixed)
         names = list(boxes.items())
