@@ -52,10 +52,8 @@ func TestLab15AttackScenario_SendsExactFaultSequence(t *testing.T) {
 		"interface Et0/1",
 		"switchport access vlan 99",
 		"interface Et0/2",
-		"switchport port-security",
-		"switchport port-security maximum 1",
-		"switchport port-security violation shutdown",
-		"switchport port-security mac-address 0000.0000.0001",
+		"spanning-tree portfast",
+		"spanning-tree bpduguard enable",
 		"interface Et0/3",
 		"shutdown",
 		"end",
@@ -79,7 +77,7 @@ func TestLab15AttackScenario_SendsExactFaultSequence(t *testing.T) {
 // real gap in the scaffold, called out deliberately rather than
 // silently accepted.
 func TestLab15AttackScenario_StopsOnFirstFailure(t *testing.T) {
-	mock := &mockConsoleRunner{failAtIdx: 5} // fails on "switchport port-security"
+	mock := &mockConsoleRunner{failAtIdx: 5} // fails on "spanning-tree portfast"
 	runner := &verify.ScenarioRunner{
 		Console:  mock,
 		NodeID:   "SW1",
