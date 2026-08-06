@@ -21,3 +21,13 @@ Thumbs.db
 # Docker volumes
 postgres-data/
 minio-data/
+
+# topogen build artifacts (the checked-in source lives in tools/topogen)
+/topogen
+tools/topogen/__pycache__/
+**/__pycache__/
+
+# temporary working previews
+lab2_*.html
+lab2_*.png
+lab2_*.svg
