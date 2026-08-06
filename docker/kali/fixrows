@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+"""Force PTY dimensions to 40×130 for yersinia/tmux compatibility.
+
+GNS3 uses uBridge as a raw TCP↔PTY pipe, which does not forward NAWS
+(window-size) telnet negotiation from xterm.js.  The resulting PTY is
+stuck at 0×0 (or the Linux default 24×80), making yersinia -I fail
+with "need 25 rows and 80 columns".
+
+This script applies TIOCSWINSZ directly on fd 0 (stdin, which is the
+console PTY inside the container) and sends SIGWINCH to the foreground
+process group so shells and ncurses apps pick up the new size.
+
+Exit codes:
+  0 — applied successfully, or fd 0 is not a TTY (graceful skip)
+  1 — fd 0 is a TTY but the ioctl or SIGWINCH failed (regression alert)
+"""
+import fcntl, struct, termios, os, sys
+
+ROWS, COLS = 40, 130
+
+if not os.isatty(0):
+    # Not a terminal — e.g. scp, rsync, or non-console session.
+    # This is normal and expected; exit silently.
+    sys.exit(0)
+
+try:
+    buf = struct.pack("HHHH", ROWS, COLS, 0, 0)
+    fcntl.ioctl(0, termios.TIOCSWINSZ, buf)
+    os.kill(os.getpgrp(), 28)  # SIGWINCH = 28
+except Exception as exc:
+    print(f"fixrows: {exc}", file=sys.stderr)
+    sys.exit(1)

@@ -1,0 +1,13 @@
+<svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <circle cx="160" cy="120" r="60" fill="#fff" stroke="#0d7050" stroke-width="1.8"/>
+  <text x="160" y="116" text-anchor="middle" font-size="13" fill="#0d7050" font-weight="700">AP</text>
+  <text x="160" y="132" text-anchor="middle" font-size="8" fill="#6b7480">beacons + PMF</text>
+  <rect x="330" y="40" width="160" height="46" rx="8" fill="#fff" stroke="#1d4fc7" stroke-width="1.6"/>
+  <text x="410" y="62" text-anchor="middle" font-size="12" fill="#1d4fc7" font-weight="600">Client</text>
+  <text x="410" y="76" text-anchor="middle" font-size="8" fill="#6b7480">4-way handshake</text>
+  <rect x="500" y="150" width="170" height="50" rx="9" fill="#fff" stroke="#c02a30" stroke-width="1.8"/>
+  <text x="585" y="172" text-anchor="middle" font-size="12" fill="#c02a30" font-weight="600">KALI · monitor mode</text>
+  <text x="585" y="188" text-anchor="middle" font-size="8" fill="#6b7480">captures + forged deauth (blocked by PMF)</text>
+  <path d="M 220 100 Q 280 60 330 63" stroke="#0d7050" stroke-width="2" fill="none"/>
+  <path d="M 220 140 Q 350 200 500 175" stroke="#c02a30" stroke-width="2" fill="none" stroke-dasharray="6 5"/>
+</svg>

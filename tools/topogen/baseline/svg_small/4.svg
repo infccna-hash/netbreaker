@@ -1,0 +1,42 @@
+<svg viewBox="0 0 720 340" role="img" aria-label="Topology: R1 fronting a server subnet and R2 fronting a client subnet, joined on an OSPF transit segment through SW1, with a Kali attacker also on the transit segment">
+      <!-- server subnet -->
+      <rect x="40" y="26" width="150" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="115" y="46" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#0f172a">SERVER LAN</text>
+      <text x="115" y="62" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.20.0/24</text>
+
+      <!-- R1 -->
+      <rect x="55" y="120" width="120" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="140" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="156" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">.1 on transit</text>
+      <line x1="115" y1="72" x2="115" y2="120" stroke="#2563eb" stroke-width="2"/>
+
+      <!-- SW1 transit -->
+      <rect x="300" y="120" width="130" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="140" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="156" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">transit · 10.0.99.0/24</text>
+
+      <!-- R2 -->
+      <rect x="545" y="120" width="120" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="605" y="140" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R2</text>
+      <text x="605" y="156" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">.2 on transit</text>
+
+      <!-- client subnet -->
+      <rect x="530" y="26" width="150" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="605" y="46" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#0f172a">CLIENT LAN</text>
+      <text x="605" y="62" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.10.0/24</text>
+      <line x1="605" y1="72" x2="605" y2="120" stroke="#2563eb" stroke-width="2"/>
+
+      <!-- transit links -->
+      <line x1="175" y1="143" x2="300" y2="143" stroke="#2563eb" stroke-width="2"/>
+      <line x1="430" y1="143" x2="545" y2="143" stroke="#2563eb" stroke-width="2"/>
+      <text x="237" y="135" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a">OSPF area 0</text>
+      <text x="487" y="135" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a">OSPF area 0</text>
+
+      <!-- Kali on transit -->
+      <line x1="365" y1="166" x2="365" y2="250" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <rect x="305" y="250" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="365" y="272" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="365" y="288" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">.66 · rogue OSPF</text>
+
+      <text x="365" y="326" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">on the transit segment, an unauthenticated router is just another neighbor</text>
+    </svg>

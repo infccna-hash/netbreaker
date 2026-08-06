@@ -1,0 +1,11 @@
+<svg viewBox="0 0 340 140" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="130" y="50" width="80" height="34" rx="7" fill="#fff" stroke="#14161a" stroke-width="1.4"/>
+  <text x="170" y="72" text-anchor="middle" font-size="10" fill="#14161a" font-weight="600">R1 ↔ R2</text>
+  <rect x="10" y="10" width="90" height="30" rx="6" fill="#fff" stroke="#1d4fc7" stroke-width="1.5"/>
+  <text x="55" y="30" text-anchor="middle" font-size="9" fill="#1d4fc7" font-weight="600">PC1 (voice)</text>
+  <rect x="240" y="10" width="90" height="30" rx="6" fill="#fff" stroke="#c02a30" stroke-width="1.5"/>
+  <text x="285" y="30" text-anchor="middle" font-size="9" fill="#c02a30" font-weight="600">KALI (bulk)</text>
+  <line x1="55" y1="40" x2="130" y2="60" stroke="#1d4fc7" stroke-width="2"/>
+  <line x1="285" y1="40" x2="210" y2="60" stroke="#c02a30" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="170" y="100" text-anchor="middle" font-size="8" fill="#6b7480">512 kbps contended link</text>
+</svg>

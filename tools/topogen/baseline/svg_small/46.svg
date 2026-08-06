@@ -1,0 +1,33 @@
+<svg viewBox="0 0 720 300" role="img" aria-label="Network topology: one switch with two legitimate hosts and one Kali attacker">
+      <!-- switch -->
+      <rect x="290" y="30" width="140" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="360" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="360" y="68" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">IOU L2 · VLAN 10</text>
+
+      <!-- links -->
+      <line x1="330" y1="76" x2="150" y2="210" stroke="#2563eb" stroke-width="2"/>
+      <line x1="360" y1="76" x2="360" y2="210" stroke="#2563eb" stroke-width="2"/>
+      <line x1="390" y1="76" x2="575" y2="210" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+
+      <!-- port labels -->
+      <text x="250" y="140" font-family="monospace" font-size="10" fill="#64748b">e0/1</text>
+      <text x="368" y="140" font-family="monospace" font-size="10" fill="#64748b">e0/2</text>
+      <text x="470" y="140" font-family="monospace" font-size="10" fill="#e5484d">e0/3</text>
+
+      <!-- PC-A -->
+      <rect x="90" y="210" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="150" y="232" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-A</text>
+      <text x="150" y="248" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.10.10 · finance</text>
+
+      <!-- PC-B -->
+      <rect x="300" y="210" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="360" y="232" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-B</text>
+      <text x="360" y="248" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.10.20 · server</text>
+
+      <!-- Kali -->
+      <rect x="515" y="210" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="575" y="232" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="575" y="248" text-anchor="middle" font-family="monospace" font-size="10" fill="#e5484d">10.0.10.66 · attacker</text>
+
+      <text x="575" y="292" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">same VLAN, access port — no L3 hop needed</text>
+    </svg>

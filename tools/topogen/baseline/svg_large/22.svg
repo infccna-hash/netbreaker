@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" font-family="ui-monospace,monospace">
+  <rect x="160" y="14" width="280" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="300" y="40" text-anchor="middle" font-size="14" fill="#14161a" font-weight="700">3 routers · WAN links</text>
+  <text x="300" y="56" text-anchor="middle" font-size="9" fill="#6b7480">/30 WAN · /27 LANs</text>
+  <rect x="40" y="130" width="160" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="120" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN A: /27</text>
+  <text x="120" y="170" text-anchor="middle" font-size="8" fill="#6b7480">192.168.1.0/27 · 30 hosts</text>
+  <rect x="220" y="130" width="160" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="300" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN B: /27</text>
+  <text x="300" y="170" text-anchor="middle" font-size="8" fill="#6b7480">192.168.1.32/27 · 30 hosts</text>
+  <rect x="400" y="130" width="160" height="46" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="480" y="156" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="600">KALI</text>
+  <text x="480" y="170" text-anchor="middle" font-size="8" fill="#6b7480">overlap · wrong mask</text>
+  <line x1="120" y1="130" x2="210" y2="64" stroke="#2563eb" stroke-width="2"/>
+  <line x1="300" y1="130" x2="300" y2="64" stroke="#2563eb" stroke-width="2"/>
+  <line x1="480" y1="130" x2="400" y2="64" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+</svg>

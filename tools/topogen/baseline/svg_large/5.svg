@@ -1,0 +1,21 @@
+<svg viewBox="0 0 720 340" role="img" aria-label="R1 and R2 running HSRP with virtual IP .1, Kali on the same subnet, SW1 access switch">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">HSRP pri 110 · .2</text>
+      <rect x="530" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="605" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R2</text>
+      <text x="605" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">HSRP pri 100 · .3</text>
+      <rect x="285" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="360" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="360" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">IOU L2 · VLAN 10</text>
+      <line x1="190" y1="55" x2="285" y2="55" stroke="#2563eb" stroke-width="2"/>
+      <text x="238" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">e0/0</text>
+      <line x1="435" y1="55" x2="530" y2="55" stroke="#2563eb" stroke-width="2"/>
+      <text x="483" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">e0/1</text>
+      <line x1="360" y1="80" x2="360" y2="250" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="375" y="170" font-family="monospace" font-size="9" fill="#e5484d">e0/2 · access</text>
+      <rect x="300" y="250" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="360" y="272" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="360" y="288" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">HSRP hijacker</text>
+      <text x="360" y="328" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">VIP: 10.0.10.1 — whoever shouts loudest owns it</text>
+    </svg>

@@ -1,0 +1,13 @@
+<svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="120" y="55" width="90" height="34" rx="7" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="165" y="77" text-anchor="middle" font-size="10" fill="#c02a30" font-weight="600">SW1 (everything)</text>
+  <rect x="10" y="10" width="80" height="28" rx="6" fill="#fff" stroke="#1d4fc7" stroke-width="1.4"/>
+  <text x="50" y="28" text-anchor="middle" font-size="9" fill="#1d4fc7">PC1</text>
+  <rect x="10" y="100" width="80" height="28" rx="6" fill="#fff" stroke="#1d4fc7" stroke-width="1.4"/>
+  <text x="50" y="118" text-anchor="middle" font-size="9" fill="#1d4fc7">PC2</text>
+  <rect x="230" y="55" width="80" height="30" rx="6" fill="#fff" stroke="#0d7050" stroke-width="1.4"/>
+  <text x="270" y="74" text-anchor="middle" font-size="9" fill="#0d7050">R1</text>
+  <line x1="50" y1="38" x2="130" y2="65" stroke="#1d4fc7" stroke-width="2"/>
+  <line x1="50" y1="100" x2="130" y2="80" stroke="#1d4fc7" stroke-width="2"/>
+  <line x1="210" y1="72" x2="230" y2="72" stroke="#0d7050" stroke-width="2"/>
+</svg>

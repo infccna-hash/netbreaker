@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 280" font-family="ui-monospace,monospace">
+  <rect x="40" y="20" width="180" height="54" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="130" y="46" text-anchor="middle" font-size="14" fill="#14161a" font-weight="700">R1</text>
+  <text x="130" y="64" text-anchor="middle" font-size="10" fill="#6b7480">CDP: enabled · LLDP: enabled</text>
+  <rect x="190" y="120" width="220" height="46" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="300" y="144" text-anchor="middle" font-size="14" fill="#14161a" font-weight="600">SW1</text>
+  <text x="300" y="160" text-anchor="middle" font-size="10" fill="#6b7480">Trunk to R1 · Access to KALI</text>
+  <line x1="170" y1="74" x2="250" y2="120" stroke="#6b7480" stroke-width="2.5"/>
+  <rect x="380" y="20" width="200" height="60" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="480" y="46" text-anchor="middle" font-size="14" fill="#e5484d" font-weight="700">KALI</text>
+  <text x="480" y="64" text-anchor="middle" font-size="10" fill="#6b7480">CDP: IOSvL2, vlan 1, VTP lab.local</text>
+  <line x1="410" y1="143" x2="380" y2="50" stroke="#e5484d" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <text x="420" y="130" font-size="10" fill="#e5484d">CDP multicast every 60s</text>
+</svg>

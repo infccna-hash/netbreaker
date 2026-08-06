@@ -1,0 +1,8 @@
+<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <circle cx="80" cy="70" r="30" fill="#fff" stroke="#0d7050" stroke-width="1.6"/>
+  <text x="80" y="74" text-anchor="middle" font-size="9" fill="#0d7050" font-weight="600">AP</text>
+  <rect x="200" y="55" width="90" height="30" rx="6" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="245" y="74" text-anchor="middle" font-size="9" fill="#c02a30" font-weight="600">KALI mon0</text>
+  <path d="M 110 60 Q 150 40 195 62" stroke="#0d7050" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
+  <path d="M 110 80 Q 150 100 195 78" stroke="#0d7050" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
+</svg>

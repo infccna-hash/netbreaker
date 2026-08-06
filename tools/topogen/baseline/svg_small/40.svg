@@ -1,0 +1,8 @@
+<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="20" y="40" width="110" height="60" rx="8" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="75" y="65" text-anchor="middle" font-size="10" fill="#c02a30" font-weight="600">tenant-a</text>
+  <rect x="190" y="40" width="110" height="60" rx="8" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="245" y="65" text-anchor="middle" font-size="10" fill="#c02a30" font-weight="600">tenant-b</text>
+  <line x1="130" y1="70" x2="190" y2="70" stroke="#c02a30" stroke-width="2.5" stroke-dasharray="5 4"/>
+  <text x="160" y="60" text-anchor="middle" font-size="8" fill="#6b7480">shared bridge</text>
+</svg>

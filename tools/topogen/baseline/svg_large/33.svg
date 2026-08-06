@@ -1,0 +1,11 @@
+<svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="60" y="80" width="160" height="52" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="140" y="103" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1</text>
+  <text x="140" y="120" text-anchor="middle" font-size="9" fill="#6b7480">logging host + seq-numbers</text>
+  <rect x="380" y="80" width="170" height="56" rx="9" fill="#fff" stroke="#c02a30" stroke-width="1.8"/>
+  <text x="465" y="103" text-anchor="middle" font-size="13" fill="#c02a30" font-weight="700">KALI</text>
+  <text x="465" y="120" text-anchor="middle" font-size="9" fill="#6b7480">rsyslog collector</text>
+  <text x="465" y="132" text-anchor="middle" font-size="8" fill="#6b7480">+ forged UDP source</text>
+  <line x1="220" y1="106" x2="380" y2="106" stroke="#6b7480" stroke-width="2.5"/>
+  <text x="300" y="96" text-anchor="middle" font-size="9" fill="#6b7480">UDP 514 → TCP 6514</text>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 320" font-family="ui-monospace,monospace">
+  <rect x="30" y="14" width="180" height="46" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="120" y="38" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1</text>
+  <text x="120" y="54" text-anchor="middle" font-size="8" fill="#6b7480">.1.1 · 10.0.0.1/30</text>
+  <rect x="260" y="14" width="180" height="46" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="350" y="38" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R2</text>
+  <text x="350" y="54" text-anchor="middle" font-size="8" fill="#6b7480">.2.1 · 10.0.0.5/30</text>
+  <rect x="490" y="14" width="180" height="46" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="580" y="38" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R3</text>
+  <text x="580" y="54" text-anchor="middle" font-size="8" fill="#6b7480">.3.1 · 10.0.0.10/30</text>
+  <line x1="210" y1="37" x2="260" y2="37" stroke="#6b7480" stroke-width="2.5"/>
+  <line x1="440" y1="37" x2="490" y2="37" stroke="#6b7480" stroke-width="2.5"/>
+  <rect x="30" y="130" width="180" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="120" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN: 192.168.1.0/24</text>
+  <rect x="260" y="130" width="180" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="350" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN: 192.168.2.0/24</text>
+  <rect x="490" y="130" width="180" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="580" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN: 192.168.3.0/24</text>
+  <rect x="240" y="240" width="220" height="54" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="350" y="266" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="700">KALI</text>
+  <text x="350" y="284" text-anchor="middle" font-size="9" fill="#6b7480">blackhole · hijack · loop</text>
+  <line x1="350" y1="240" x2="120" y2="60" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+</svg>

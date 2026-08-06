@@ -290,14 +290,12 @@
   "28": {
     "links": [
       "R1:Fa0/0↔SW1:Et0/0",
-      "R1:Fa0/1↔R2:Fa0/0",
-      "R2:Fa0/1↔PC2:eth0",
       "PC1:eth0↔SW1:Et0/1",
-      "KALI:eth0↔SW1:Et0/2"
+      "KALI:eth0↔SW1:Et0/2",
+      "PC2:eth0↔SW1:Et0/3"
     ],
     "nodes": [
       "R1",
-      "R2",
       "SW1",
       "PC1",
       "PC2",
@@ -307,14 +305,12 @@
   "29": {
     "links": [
       "R1:Fa0/0↔SW1:Et0/0",
-      "R1:Fa0/1↔R2:Fa0/0",
-      "R2:Fa0/1↔PC2:eth0",
       "PC1:eth0↔SW1:Et0/1",
-      "KALI:eth0↔SW1:Et0/2"
+      "KALI:eth0↔SW1:Et0/2",
+      "PC2:eth0↔SW1:Et0/3"
     ],
     "nodes": [
       "R1",
-      "R2",
       "SW1",
       "PC1",
       "PC2",

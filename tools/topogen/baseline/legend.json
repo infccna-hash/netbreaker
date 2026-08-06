@@ -1,0 +1,228 @@
+{
+ "1": [
+  "VLAN 10 \u2014 Users",
+  "VLAN 20 \u2014 Servers (target)",
+  "802.1Q Trunk",
+  "Attacker (Kali)"
+ ],
+ "2": [
+  "Root bridge (SW1)",
+  "Secondary root (SW2)",
+  "Blocked link (loop prevention)",
+  "Attacker (Kali) \u2014 BPDU claim"
+ ],
+ "3": [
+  "Layer-2 switch",
+  "Access port (VLAN 1)",
+  "End host (10.0.0.0/24)",
+  "Attacker (macof flood source)"
+ ],
+ "4": [],
+ "5": [],
+ "6": [],
+ "7": [
+  "Router (CDP/LLDP active)",
+  "Layer-2 switch",
+  "Attacker (sniffing CDP/LLDP)",
+  "Leaked discovery info"
+ ],
+ "8": [],
+ "9": [
+  "Internal host (NAT'd)",
+  "NAT gateway",
+  "ISP / outside router",
+  "Attacker (NAT probing)"
+ ],
+ "10": [],
+ "11": [
+  "Router (Telnet + SSH)",
+  "Layer-2 switch",
+  "Attacker (sniffer)",
+  "Cleartext credential \u2717"
+ ],
+ "12": [
+  "RADIUS authentication server",
+  "802.1X authenticator switch",
+  "Authenticated client",
+  "Unauthorized / attacker"
+ ],
+ "13": [
+  "Legitimate access point",
+  "Legitimate client",
+  "Rogue access point (evil twin)",
+  "Deauthentication attack"
+ ],
+ "14": [
+  "IPv6 router / gateway",
+  "Switch with RA Guard",
+  "IPv6 host",
+  "Attacker (NDP spoof)"
+ ],
+ "15": [
+  "switch / router / firewall",
+  "hub \u2014 single collision domain",
+  "end host",
+  "observer / attacker"
+ ],
+ "16": [
+  "Layer-2 switch",
+  "Inter-switch trunk (Et0/2)",
+  "Router (console-access port)",
+  "End host",
+  "Attacker (observation point)"
+ ],
+ "17": [
+  "Client (packet origin)",
+  "Layer-2 switch",
+  "Router (multi-layer defense)",
+  "Server / responder",
+  "Attacker (layer-by-layer)"
+ ],
+ "18": [
+  "Cisco device (CLI target)",
+  "Switch",
+  "Attacker (CLI hijack)",
+  "Admin user"
+ ],
+ "19": [
+  "LAN A subnet",
+  "Router / gateway",
+  "WAN / other subnet",
+  "LAN B subnet",
+  "Attacker"
+ ],
+ "20": [
+  "Layer-2 switch",
+  "VLAN 10 client",
+  "Router",
+  "Attacker (VLAN 20 \u00b7 interface attacks)"
+ ],
+ "21": [
+  "Router",
+  "Router with route poisoning",
+  "Router",
+  "End-host LAN",
+  "Attacker"
+ ],
+ "22": [
+  "Router / WAN core",
+  "LAN A (FLSM /27)",
+  "LAN B (FLSM /27)",
+  "Attacker / misconfiguration"
+ ],
+ "23": [
+  "VLSM routers + WAN links",
+  "LAN A /26",
+  "LAN B /27",
+  "Attacker / subnet squatter"
+ ],
+ "24": [
+  "VTP server",
+  "VTP client",
+  "VTP transparent",
+  "Host",
+  "Attacker"
+ ],
+ "25": [
+  "RSTP root bridge",
+  "RSTP switch",
+  "RSTP switch",
+  "Edge host",
+  "Attacker"
+ ],
+ "26": [
+  "Switch",
+  "Switch with EtherChannel",
+  "Bundle (logical link)",
+  "Attacker"
+ ],
+ "27": [
+  "RIP router",
+  "RIP router",
+  "RIP router",
+  "Attacker (rogue RIP)"
+ ],
+ "28": [
+  "IPv6 router",
+  "IPv6 host",
+  "Attacker"
+ ],
+ "29": [
+  "Client (TCP/UDP)",
+  "Router with transport protection",
+  "Server (TCP/UDP)",
+  "Attacker"
+ ],
+ "30": [
+  "ACL router",
+  "Permitted hosts",
+  "Protected server",
+  "Attacker"
+ ],
+ "31": [
+  "NTP server",
+  "NTP client",
+  "Attacker"
+ ],
+ "32": [
+  "SNMP agent",
+  "SNMP manager (attacker)"
+ ],
+ "33": [
+  "Log source (R1)",
+  "Syslog collector (Kali)",
+  "Forged UDP packets"
+ ],
+ "34": [
+  "Router (backup source)",
+  "TFTP/FTP server (attacker-controlled)",
+  "Unauthenticated transfer"
+ ],
+ "35": [
+  "Voice endpoint",
+  "Bulk traffic source",
+  "Contended link with LLQ policy",
+  "Priority queue (voice) vs. class-default (bulk)"
+ ],
+ "36": [
+  "Authorized device (sticky-learned)",
+  "Attacker (MAC-spoofed impersonation)",
+  "Locked port"
+ ],
+ "37": [],
+ "38": [],
+ "39": [
+  "Access tier",
+  "Distribution/core tier",
+  "Redundant uplinks"
+ ],
+ "40": [
+  "Tenant A network (isolated)",
+  "Tenant B network (isolated)",
+  "No path between them"
+ ],
+ "41": [
+  "Access point",
+  "Legitimate client",
+  "Attacker (passive capture + deauth attempt)"
+ ],
+ "42": [
+  "WLC",
+  "Access point",
+  "Attacker"
+ ],
+ "43": [
+  "RESTCONF device",
+  "API client"
+ ],
+ "44": [
+  "NETCONF device",
+  "NETCONF client"
+ ],
+ "45": [
+  "Ansible control node",
+  "Managed device",
+  "Attacker"
+ ],
+ "46": []
+}

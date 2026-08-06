@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 180" font-family="ui-monospace,monospace">
+  <rect x="120" y="14" width="140" height="42" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="190" y="36" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1</text>
+  <text x="190" y="50" text-anchor="middle" font-size="9" fill="#6b7480">Telnet:23 · SSH:22</text>
+  <rect x="120" y="74" width="140" height="36" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="190" y="95" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW1</text>
+  <line x1="190" y1="56" x2="190" y2="74" stroke="#6b7480" stroke-width="2"/>
+  <line x1="190" y1="110" x2="190" y2="132" stroke="#6b7480" stroke-width="2"/>
+  <rect x="100" y="132" width="180" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="190" y="155" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="600">KALI · Wireshark</text>
+</svg>

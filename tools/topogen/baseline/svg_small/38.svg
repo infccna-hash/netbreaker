@@ -1,0 +1,21 @@
+<svg viewBox="0 0 720 320" role="img" aria-label="Router gateway, switch with DHCP snooping, a client, and a Kali attacker poisoning ARP to sit between them">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">gateway · 10.0.10.1</text>
+      <rect x="300" y="30" width="130" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">snooping + DAI</text>
+      <line x1="190" y1="55" x2="300" y2="55" stroke="#16a34a" stroke-width="3"/>
+      <text x="245" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a" font-weight="700">e0/0 · trusted</text>
+      <line x1="330" y1="80" x2="200" y2="230" stroke="#64748b" stroke-width="2"/>
+      <line x1="400" y1="80" x2="560" y2="230" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="250" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/1 · untrusted</text>
+      <text x="460" y="160" font-family="monospace" font-size="9" fill="#e5484d">e0/3 · untrusted</text>
+      <rect x="130" y="230" width="130" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="195" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-A</text>
+      <text x="195" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">10.0.10.10 (DHCP)</text>
+      <rect x="500" y="230" width="130" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="565" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="565" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">claims to be .1</text>
+      <text x="360" y="308" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">Kali tells PC-A "I am 10.0.10.1" — DAI checks that claim against the binding table</text>
+    </svg>

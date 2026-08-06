@@ -1,0 +1,1532 @@
+1|<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <line x1="90" y1="70" x2="230" y2="70" stroke="#6b7480" stroke-width="3"/>
+  <text x="160" y="62" text-anchor="middle" font-size="9" fill="#6b7480">802.1Q TRUNK</text>
+  <line x1="70" y1="150" x2="70" y2="92" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+  <line x1="250" y1="150" x2="250" y2="92" stroke="#7c3aed" stroke-width="2"/>
+  <rect x="30" y="52" width="80" height="36" rx="7" fill="#fff" stroke="#14161a" stroke-width="1.4"/>
+  <text x="70" y="74" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW1</text>
+  <rect x="210" y="52" width="80" height="36" rx="7" fill="#fff" stroke="#14161a" stroke-width="1.4"/>
+  <text x="250" y="74" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW2</text>
+  <rect x="28" y="150" width="84" height="34" rx="7" fill="#fff" stroke="#e5484d" stroke-width="1.6"/>
+  <text x="70" y="168" text-anchor="middle" font-size="11" fill="#e5484d" font-weight="600">KALI</text>
+  <text x="70" y="179" text-anchor="middle" font-size="8" fill="#6b7480">attacker</text>
+  <rect x="206" y="150" width="88" height="34" rx="7" fill="#fff" stroke="#7c3aed" stroke-width="1.6"/>
+  <text x="250" y="168" text-anchor="middle" font-size="11" fill="#7c3aed" font-weight="600">SRV1 🏆</text>
+  <text x="250" y="179" text-anchor="middle" font-size="8" fill="#6b7480">VLAN 20</text>
+</svg>|<svg viewBox="0 0 760 440" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <!-- links -->
+  <line x1="380" y1="72" x2="212" y2="168" stroke="#6b7480" stroke-width="2.5"/>
+  <text x="300" y="112" text-anchor="middle" font-size="10" fill="#6b7480">trunk</text>
+  <line x1="272" y1="196" x2="488" y2="196" stroke="#6b7480" stroke-width="4"/>
+  <line x1="118" y1="330" x2="180" y2="222" stroke="#2563eb" stroke-width="2"/>
+  <line x1="310" y1="338" x2="238" y2="222" stroke="#e5484d" stroke-width="2.2" stroke-dasharray="6 4"/>
+  <line x1="628" y1="330" x2="556" y2="222" stroke="#7c3aed" stroke-width="2"/>
+
+  <!-- trunk label -->
+  <rect x="316" y="185" width="128" height="22" rx="11" fill="#fff" stroke="#e6e8ec"/>
+  <text x="380" y="200" text-anchor="middle" font-size="10.5" fill="#6b7480">802.1Q TRUNK</text>
+
+  <!-- R1 -->
+  <rect x="328" y="28" width="104" height="44" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="380" y="49" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1</text>
+  <text x="380" y="63" text-anchor="middle" font-size="9" fill="#6b7480">router-on-a-stick</text>
+
+  <!-- SW1 -->
+  <rect x="140" y="170" width="132" height="52" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="206" y="193" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">SW1</text>
+  <text x="206" y="210" text-anchor="middle" font-size="9" fill="#6b7480">VLAN 10 · 20 · 99</text>
+
+  <!-- SW2 -->
+  <rect x="488" y="170" width="132" height="52" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="554" y="193" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">SW2</text>
+  <text x="554" y="210" text-anchor="middle" font-size="9" fill="#6b7480">VLAN 10 · 20 · 99</text>
+
+  <!-- PC1 -->
+  <rect x="56" y="330" width="118" height="46" rx="9" fill="#fff" stroke="#2563eb" stroke-width="1.6"/>
+  <text x="115" y="352" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC1</text>
+  <text x="115" y="367" text-anchor="middle" font-size="8.5" fill="#6b7480">VLAN 10 · 10.0.10.10</text>
+
+  <!-- KALI -->
+  <rect x="250" y="338" width="128" height="50" rx="9" fill="#fff" stroke="#e5484d" stroke-width="1.8"/>
+  <text x="314" y="360" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="700">KALI · attacker</text>
+  <text x="314" y="375" text-anchor="middle" font-size="8.5" fill="#6b7480">Fa0/3 · dynamic-auto ⚠</text>
+
+  <!-- SRV1 -->
+  <rect x="560" y="330" width="140" height="48" rx="9" fill="#fff" stroke="#7c3aed" stroke-width="1.8"/>
+  <text x="630" y="352" text-anchor="middle" font-size="12" fill="#7c3aed" font-weight="700">SRV1 · 🏆</text>
+  <text x="630" y="367" text-anchor="middle" font-size="8.5" fill="#6b7480">VLAN 20 · 10.0.20.10</text>
+</svg>
+2|<svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" font-family="Courier New, monospace">
+   <rect width="320" height="220" rx="6" fill="#0b0f14" stroke="#22272e" stroke-width="1" />
+   <line x1="160" y1="40" x2="70" y2="120" stroke="#4d5560" stroke-width="1.5" />
+   <line x1="160" y1="40" x2="250" y2="120" stroke="#4d5560" stroke-width="1.5" />
+   <line x1="70" y1="120" x2="250" y2="120" stroke="#e5484d" stroke-width="1.5" stroke-dasharray="6 4" />
+   <rect x="110" y="15" width="100" height="36" rx="5" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+   <text x="160" y="37" text-anchor="middle" font-size="12" font-weight="700" fill="#e6edf3">SW1 👑</text>
+   <rect x="30" y="120" width="80" height="36" rx="5" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+   <text x="70" y="142" text-anchor="middle" font-size="12" font-weight="700" fill="#e6edf3">SW2</text>
+   <rect x="210" y="120" width="80" height="36" rx="5" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+   <text x="250" y="142" text-anchor="middle" font-size="12" font-weight="700" fill="#e6edf3">SW3</text>
+   <circle cx="70" cy="185" r="16" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+   <text x="70" y="189" text-anchor="middle" font-size="9" font-weight="700" fill="#67e8f9">PC1</text>
+   <rect x="210" y="173" width="70" height="30" rx="4" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4 2" />
+   <text x="245" y="192" text-anchor="middle" font-size="9" font-weight="700" fill="#ff7b72">KALI</text>
+   <text x="160" y="212" text-anchor="middle" font-size="8" fill="#e5484d">✂ one link BLOCKED by STP</text>
+ </svg>|<svg
+  width="100%"
+  viewBox="0 0 720 490"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label="NetBreaker Lab 2 topology: SW1 root bridge connects to SW2 and SW3 (trunk). SW2↔SW3 blocked by STP. PC1 on SW1 Et0/2. KALI attacker floods BPDU via SW3 Et0/1."
+>
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#1b2129" stroke-width="1" />
+    </pattern>
+    <filter id="glow-kali" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="720" height="490" rx="10" fill="#0b0f14" />
+  <rect x="1" y="37" width="718" height="452" fill="url(#grid)" />
+  <rect x="0.5" y="0.5" width="719" height="489" rx="10" fill="none" stroke="#22272e" stroke-width="1" />
+
+  <line x1="0" y1="36" x2="720" y2="36" stroke="#22272e" stroke-width="1" />
+  <circle cx="20" cy="18" r="6" fill="#ff5f56" />
+  <circle cx="40" cy="18" r="6" fill="#ffbd2e" />
+  <circle cx="60" cy="18" r="6" fill="#27c93f" />
+  <text x="82" y="22" font-family="Courier New, monospace" font-size="12" fill="#6e7681">
+    root@netbreaker:~/lab2$ topology --render
+  </text>
+
+  <line x1="310" y1="115" x2="130" y2="195" stroke="#4d5560" stroke-width="1.5" />
+  <line x1="410" y1="115" x2="510" y2="195" stroke="#4d5560" stroke-width="1.5" />
+  <line x1="228" y1="225" x2="572" y2="225" stroke="#e5484d" stroke-width="2" stroke-dasharray="8 5" />
+  <text x="400" y="218" text-anchor="middle" font-family="Courier New, monospace" font-size="9" fill="#e5484d">✂ blocked by STP (loop-prevention)</text>
+  <line x1="360" y1="115" x2="170" y2="300" stroke="#22d3ee" stroke-width="1.5" />
+  <line x1="540" y1="225" x2="540" y2="310" stroke="#f85149" stroke-width="1.5" stroke-dasharray="5 3" />
+
+  <rect x="288" y="95" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+  <text x="309" y="106" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#3fb950">Et0/0</text>
+  <rect x="339" y="95" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+  <text x="360" y="106" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#3fb950">Et0/2</text>
+  <rect x="390" y="95" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+  <text x="411" y="106" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#3fb950">Et0/1</text>
+
+  <rect x="108" y="175" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+  <text x="129" y="186" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#3fb950">Et0/0</text>
+  <rect x="206" y="175" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+  <text x="227" y="186" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#3fb950">Et0/2</text>
+
+  <rect x="488" y="175" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+  <text x="509" y="186" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#3fb950">Et0/0</text>
+  <rect x="550" y="175" width="42" height="16" rx="3" fill="#0b0f14" stroke="#f85149" stroke-width="1" />
+  <text x="571" y="186" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#f85149">Et0/1</text>
+
+  <g>
+    <rect x="280" y="55" width="160" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+    <text x="360" y="78" text-anchor="middle" font-family="Courier New, monospace" font-size="15" font-weight="700" fill="#e6edf3">SW1 👑</text>
+    <text x="360" y="97" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#8b98a5">root bridge — l2_switch</text>
+  </g>
+  <g>
+    <rect x="100" y="195" width="160" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+    <text x="180" y="218" text-anchor="middle" font-family="Courier New, monospace" font-size="15" font-weight="700" fill="#e6edf3">SW2</text>
+    <text x="180" y="237" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#8b98a5">secondary root</text>
+  </g>
+  <g>
+    <rect x="460" y="195" width="160" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+    <text x="540" y="218" text-anchor="middle" font-family="Courier New, monospace" font-size="15" font-weight="700" fill="#e6edf3">SW3</text>
+    <text x="540" y="237" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#8b98a5">BPDU Guard ⚠ — l2_switch</text>
+  </g>
+
+  <circle cx="180" cy="330" r="30" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+  <text x="180" y="335" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#67e8f9">PC1</text>
+
+  <g filter="url(#glow-kali)">
+    <rect x="470" y="315" width="140" height="60" rx="6" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="5 3" />
+  </g>
+  <text x="540" y="340" text-anchor="middle" font-family="Courier New, monospace" font-size="15" font-weight="700" fill="#ff7b72">KALI</text>
+  <text x="540" y="359" text-anchor="middle" font-family="Courier New, monospace" font-size="10" fill="#f85149">observer / attacker</text>
+
+  <line x1="30" y1="405" x2="690" y2="405" stroke="#22272e" stroke-width="1" />
+  <text x="30" y="424" font-family="Courier New, monospace" font-size="10" fill="#6e7681">// device_legend</text>
+  <rect x="30" y="438" width="12" height="12" rx="2" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+  <text x="50" y="448" font-family="Courier New, monospace" font-size="11" fill="#8b98a5">switch</text>
+  <circle cx="120" cy="444" r="6" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+  <text x="134" y="448" font-family="Courier New, monospace" font-size="11" fill="#22d3ee">end host</text>
+  <rect x="230" y="438" width="12" height="12" rx="2" fill="#131a21" stroke="#3fb950" stroke-width="1.5" />
+  <text x="250" y="448" font-family="Courier New, monospace" font-size="11" fill="#3fb950">active port</text>
+  <rect x="370" y="438" width="12" height="12" rx="2" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="3 2" />
+  <text x="390" y="448" font-family="Courier New, monospace" font-size="11" fill="#f85149">observer / attacker</text>
+  <rect x="550" y="438" width="12" height="12" rx="2" fill="none" stroke="#e5484d" stroke-width="1.5" stroke-dasharray="3 2" />
+  <text x="570" y="448" font-family="Courier New, monospace" font-size="11" fill="#e5484d">blocked (STP)</text>
+  <text x="30" y="475" font-family="Courier New, monospace" font-size="10" fill="#4d5560">
+    build: sw1(root)·sw2·sw3+kali · pc1→sw1(et0/2) · kali→sw3(et0/1) · stp blocks sw2↔sw3
+  </text>
+</svg>
+3|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 200" font-family="ui-monospace,monospace">
+  <rect x="130" y="24" width="120" height="40" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="190" y="48" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">SW1</text>
+  <line x1="70" y1="118" x2="150" y2="64" stroke="#6b7480" stroke-width="2"/>
+  <line x1="190" y1="64" x2="310" y2="118" stroke="#6b7480" stroke-width="2"/>
+  <line x1="190" y1="64" x2="190" y2="140" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+  <rect x="12" y="118" width="116" height="36" rx="7" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="70" y="139" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">PC1</text>
+  <rect x="252" y="118" width="116" height="36" rx="7" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="310" y="139" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">PC2</text>
+  <rect x="128" y="148" width="124" height="36" rx="7" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="190" y="169" text-anchor="middle" font-size="11" fill="#e5484d" font-weight="600">KALI</text>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 260" font-family="ui-monospace,monospace">
+  <rect x="180" y="18" width="200" height="52" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="280" y="42" text-anchor="middle" font-size="15" fill="#14161a" font-weight="600">SW1</text>
+  <text x="280" y="60" text-anchor="middle" font-size="9" fill="#6b7480">CAM table · MAC flooding target</text>
+  <line x1="100" y1="160" x2="210" y2="70" stroke="#6b7480" stroke-width="2"/>
+  <text x="165" y="108" text-anchor="middle" font-size="8" fill="#6b7480">Et0/1</text>
+  <line x1="280" y1="70" x2="460" y2="160" stroke="#6b7480" stroke-width="2"/>
+  <text x="370" y="108" text-anchor="middle" font-size="8" fill="#6b7480">Et0/2</text>
+  <line x1="280" y1="70" x2="280" y2="186" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="294" y="130" font-size="8" fill="#e5484d">Et0/3</text>
+  <rect x="12" y="160" width="150" height="44" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="87" y="184" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC1</text>
+  <text x="87" y="198" text-anchor="middle" font-size="9" fill="#6b7480">10.0.0.10 /24</text>
+  <rect x="398" y="160" width="150" height="44" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="473" y="184" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC2</text>
+  <text x="473" y="198" text-anchor="middle" font-size="9" fill="#6b7480">10.0.0.20 /24</text>
+  <rect x="200" y="196" width="160" height="44" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="280" y="220" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="600">KALI (attacker)</text>
+  <text x="280" y="234" text-anchor="middle" font-size="9" fill="#6b7480">macof · dsniff</text>
+</svg>
+4|<svg viewBox="0 0 720 340" role="img" aria-label="Topology: R1 fronting a server subnet and R2 fronting a client subnet, joined on an OSPF transit segment through SW1, with a Kali attacker also on the transit segment">
+      <!-- server subnet -->
+      <rect x="40" y="26" width="150" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="115" y="46" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#0f172a">SERVER LAN</text>
+      <text x="115" y="62" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.20.0/24</text>
+
+      <!-- R1 -->
+      <rect x="55" y="120" width="120" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="140" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="156" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">.1 on transit</text>
+      <line x1="115" y1="72" x2="115" y2="120" stroke="#2563eb" stroke-width="2"/>
+
+      <!-- SW1 transit -->
+      <rect x="300" y="120" width="130" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="140" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="156" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">transit · 10.0.99.0/24</text>
+
+      <!-- R2 -->
+      <rect x="545" y="120" width="120" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="605" y="140" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R2</text>
+      <text x="605" y="156" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">.2 on transit</text>
+
+      <!-- client subnet -->
+      <rect x="530" y="26" width="150" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="605" y="46" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#0f172a">CLIENT LAN</text>
+      <text x="605" y="62" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.10.0/24</text>
+      <line x1="605" y1="72" x2="605" y2="120" stroke="#2563eb" stroke-width="2"/>
+
+      <!-- transit links -->
+      <line x1="175" y1="143" x2="300" y2="143" stroke="#2563eb" stroke-width="2"/>
+      <line x1="430" y1="143" x2="545" y2="143" stroke="#2563eb" stroke-width="2"/>
+      <text x="237" y="135" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a">OSPF area 0</text>
+      <text x="487" y="135" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a">OSPF area 0</text>
+
+      <!-- Kali on transit -->
+      <line x1="365" y1="166" x2="365" y2="250" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <rect x="305" y="250" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="365" y="272" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="365" y="288" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">.66 · rogue OSPF</text>
+
+      <text x="365" y="326" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">on the transit segment, an unauthenticated router is just another neighbor</text>
+    </svg>|<svg viewBox="0 0 720 340" role="img" aria-label="Topology: R1 fronting a server subnet and R2 fronting a client subnet, joined on an OSPF transit segment through SW1, with a Kali attacker also on the transit segment">
+      <!-- server subnet -->
+      <rect x="40" y="26" width="150" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="115" y="46" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#0f172a">SERVER LAN</text>
+      <text x="115" y="62" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.20.0/24</text>
+
+      <!-- R1 -->
+      <rect x="55" y="120" width="120" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="140" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="156" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">.1 on transit</text>
+      <line x1="115" y1="72" x2="115" y2="120" stroke="#2563eb" stroke-width="2"/>
+
+      <!-- SW1 transit -->
+      <rect x="300" y="120" width="130" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="140" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="156" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">transit · 10.0.99.0/24</text>
+
+      <!-- R2 -->
+      <rect x="545" y="120" width="120" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="605" y="140" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R2</text>
+      <text x="605" y="156" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">.2 on transit</text>
+
+      <!-- client subnet -->
+      <rect x="530" y="26" width="150" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="605" y="46" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#0f172a">CLIENT LAN</text>
+      <text x="605" y="62" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.10.0/24</text>
+      <line x1="605" y1="72" x2="605" y2="120" stroke="#2563eb" stroke-width="2"/>
+
+      <!-- transit links -->
+      <line x1="175" y1="143" x2="300" y2="143" stroke="#2563eb" stroke-width="2"/>
+      <line x1="430" y1="143" x2="545" y2="143" stroke="#2563eb" stroke-width="2"/>
+      <text x="237" y="135" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a">OSPF area 0</text>
+      <text x="487" y="135" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a">OSPF area 0</text>
+
+      <!-- Kali on transit -->
+      <line x1="365" y1="166" x2="365" y2="250" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <rect x="305" y="250" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="365" y="272" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="365" y="288" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">.66 · rogue OSPF</text>
+
+      <text x="365" y="326" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">on the transit segment, an unauthenticated router is just another neighbor</text>
+    </svg>
+5|<svg viewBox="0 0 720 340" role="img" aria-label="R1 and R2 running HSRP with virtual IP .1, Kali on the same subnet, SW1 access switch">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">HSRP pri 110 · .2</text>
+      <rect x="530" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="605" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R2</text>
+      <text x="605" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">HSRP pri 100 · .3</text>
+      <rect x="285" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="360" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="360" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">IOU L2 · VLAN 10</text>
+      <line x1="190" y1="55" x2="285" y2="55" stroke="#2563eb" stroke-width="2"/>
+      <text x="238" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">e0/0</text>
+      <line x1="435" y1="55" x2="530" y2="55" stroke="#2563eb" stroke-width="2"/>
+      <text x="483" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">e0/1</text>
+      <line x1="360" y1="80" x2="360" y2="250" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="375" y="170" font-family="monospace" font-size="9" fill="#e5484d">e0/2 · access</text>
+      <rect x="300" y="250" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="360" y="272" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="360" y="288" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">HSRP hijacker</text>
+      <text x="360" y="328" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">VIP: 10.0.10.1 — whoever shouts loudest owns it</text>
+    </svg>|<svg viewBox="0 0 720 340" role="img" aria-label="R1 and R2 running HSRP with virtual IP .1, Kali on the same subnet, SW1 access switch">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">HSRP pri 110 · .2</text>
+      <rect x="530" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="605" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R2</text>
+      <text x="605" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">HSRP pri 100 · .3</text>
+      <rect x="285" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="360" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="360" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">IOU L2 · VLAN 10</text>
+      <line x1="190" y1="55" x2="285" y2="55" stroke="#2563eb" stroke-width="2"/>
+      <text x="238" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">e0/0</text>
+      <line x1="435" y1="55" x2="530" y2="55" stroke="#2563eb" stroke-width="2"/>
+      <text x="483" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">e0/1</text>
+      <line x1="360" y1="80" x2="360" y2="250" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="375" y="170" font-family="monospace" font-size="9" fill="#e5484d">e0/2 · access</text>
+      <rect x="300" y="250" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="360" y="272" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="360" y="288" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">HSRP hijacker</text>
+      <text x="360" y="328" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">VIP: 10.0.10.1 — whoever shouts loudest owns it</text>
+    </svg>
+6|<svg viewBox="0 0 720 250" role="img" aria-label="Kali outside, a router enforcing an inbound ACL, and an internal server behind it">
+      <rect x="40" y="95" width="130" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="105" y="117" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="105" y="133" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">outside · 203.0.113.66</text>
+      <rect x="295" y="90" width="140" height="66" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="114" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="365" y="132" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">ACL OUTSIDE-IN (in)</text>
+      <text x="365" y="146" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">c3725</text>
+      <rect x="555" y="95" width="130" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="620" y="117" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">SERVER</text>
+      <text x="620" y="133" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">10.0.20.10 · :80</text>
+      <line x1="170" y1="123" x2="295" y2="123" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="232" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">f0/0 · filtered</text>
+      <line x1="435" y1="123" x2="555" y2="123" stroke="#2563eb" stroke-width="2"/>
+      <text x="495" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">f0/1 · inside</text>
+      <text x="360" y="230" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">the inbound ACL is meant to block outside→inside except "replies" — that exception is the hole</text>
+    </svg>|<svg viewBox="0 0 720 250" role="img" aria-label="Kali outside, a switch, a router enforcing an inbound ACL, and an internal server behind it">
+       <rect x="40" y="95" width="130" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+       <text x="105" y="117" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+       <text x="105" y="133" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">outside · 203.0.113.66</text>
+       <rect x="210" y="95" width="120" height="56" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+       <text x="270" y="117" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">SW1</text>
+       <text x="270" y="133" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">IOU L2 · VLAN 20</text>
+       <rect x="370" y="90" width="140" height="66" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+       <text x="440" y="114" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+       <text x="440" y="132" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">ACL OUTSIDE-IN (in)</text>
+       <text x="440" y="146" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">c3725</text>
+       <rect x="550" y="95" width="130" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+       <text x="615" y="117" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">SERVER</text>
+       <text x="615" y="133" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">10.0.20.10 · :80</text>
+       <line x1="170" y1="123" x2="210" y2="123" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+       <text x="190" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">Et0/1</text>
+       <line x1="330" y1="123" x2="370" y2="123" stroke="#6b7480" stroke-width="2"/>
+       <text x="350" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">Et0/0</text>
+       <line x1="510" y1="123" x2="550" y2="123" stroke="#2563eb" stroke-width="2"/>
+       <text x="530" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">f0/1 · inside</text>
+       <text x="360" y="230" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">the inbound ACL is meant to block outside→inside except "replies" — that exception is the hole</text>
+     </svg>
+7|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 180" font-family="ui-monospace,monospace">
+  <rect x="10" y="10" width="110" height="40" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="65" y="33" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">R1</text>
+  <text x="65" y="46" text-anchor="middle" font-size="8" fill="#e5484d">CDP✗ LLDP✗</text>
+  <rect x="140" y="80" width="100" height="34" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="190" y="100" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">SW1</text>
+  <line x1="65" y1="50" x2="150" y2="80" stroke="#6b7480" stroke-width="2"/>
+  <rect x="260" y="10" width="110" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="315" y="33" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="600">KALI</text>
+  <text x="315" y="46" text-anchor="middle" font-size="8" fill="#6b7480">tcpdump CDP</text>
+  <line x1="240" y1="97" x2="260" y2="30" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 280" font-family="ui-monospace,monospace">
+  <rect x="40" y="20" width="180" height="54" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="130" y="46" text-anchor="middle" font-size="14" fill="#14161a" font-weight="700">R1</text>
+  <text x="130" y="64" text-anchor="middle" font-size="10" fill="#6b7480">CDP: enabled · LLDP: enabled</text>
+  <rect x="190" y="120" width="220" height="46" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="300" y="144" text-anchor="middle" font-size="14" fill="#14161a" font-weight="600">SW1</text>
+  <text x="300" y="160" text-anchor="middle" font-size="10" fill="#6b7480">Trunk to R1 · Access to KALI</text>
+  <line x1="170" y1="74" x2="250" y2="120" stroke="#6b7480" stroke-width="2.5"/>
+  <rect x="380" y="20" width="200" height="60" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="480" y="46" text-anchor="middle" font-size="14" fill="#e5484d" font-weight="700">KALI</text>
+  <text x="480" y="64" text-anchor="middle" font-size="10" fill="#6b7480">CDP: IOSvL2, vlan 1, VTP lab.local</text>
+  <line x1="410" y1="143" x2="380" y2="50" stroke="#e5484d" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <text x="420" y="130" font-size="10" fill="#e5484d">CDP multicast every 60s</text>
+</svg>
+8|<svg viewBox="0 0 720 320" role="img" aria-label="Router as gateway and DHCP server, a switch, two clients, and a Kali attacker running a rogue DHCP server">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">gateway + DHCP · 10.0.10.1</text>
+      <rect x="300" y="30" width="130" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">IOU L2 · VLAN 10</text>
+      <line x1="190" y1="55" x2="300" y2="55" stroke="#2563eb" stroke-width="2"/>
+      <text x="245" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a">e0/0 · uplink</text>
+      <line x1="330" y1="80" x2="160" y2="230" stroke="#2563eb" stroke-width="2"/>
+      <line x1="365" y1="80" x2="365" y2="230" stroke="#2563eb" stroke-width="2"/>
+      <line x1="400" y1="80" x2="575" y2="230" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="255" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/1</text>
+      <text x="372" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/2</text>
+      <text x="475" y="160" font-family="monospace" font-size="9" fill="#e5484d">e0/3</text>
+      <rect x="100" y="230" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="160" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-A</text>
+      <text x="160" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">DHCP client</text>
+      <rect x="305" y="230" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="365" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-B</text>
+      <text x="365" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">boots mid-attack</text>
+      <rect x="515" y="230" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="575" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="575" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">rogue DHCP · .66</text>
+      <text x="360" y="308" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">two moves: drain R1's pool, then answer in its place</text>
+    </svg>|<svg viewBox="0 0 720 320" role="img" aria-label="Router as gateway and DHCP server, a switch, two clients, and a Kali attacker running a rogue DHCP server">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">gateway + DHCP · 10.0.10.1</text>
+      <rect x="300" y="30" width="130" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">IOU L2 · VLAN 10</text>
+      <line x1="190" y1="55" x2="300" y2="55" stroke="#2563eb" stroke-width="2"/>
+      <text x="245" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a">e0/0 · uplink</text>
+      <line x1="330" y1="80" x2="160" y2="230" stroke="#2563eb" stroke-width="2"/>
+      <line x1="365" y1="80" x2="365" y2="230" stroke="#2563eb" stroke-width="2"/>
+      <line x1="400" y1="80" x2="575" y2="230" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="255" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/1</text>
+      <text x="372" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/2</text>
+      <text x="475" y="160" font-family="monospace" font-size="9" fill="#e5484d">e0/3</text>
+      <rect x="100" y="230" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="160" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC1</text>
+      <text x="160" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">DHCP client</text>
+      <rect x="305" y="230" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="365" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-B</text>
+      <text x="365" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">boots mid-attack</text>
+      <rect x="515" y="230" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="575" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="575" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">rogue DHCP · .66</text>
+      <text x="360" y="308" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">two moves: drain R1's pool, then answer in its place</text>
+    </svg>
+9|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" font-family="ui-monospace,monospace">
+  <rect x="6" y="10" width="110" height="40" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="61" y="33" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC1 (inside)</text>
+  <rect x="140" y="10" width="120" height="40" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="200" y="33" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1 (NAT)</text>
+  <rect x="284" y="10" width="110" height="40" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="339" y="33" text-anchor="middle" font-size="12" fill="#6b7480" font-weight="600">R2 (ISP)</text>
+  <line x1="116" y1="30" x2="140" y2="30" stroke="#2563eb" stroke-width="2"/>
+  <line x1="260" y1="30" x2="284" y2="30" stroke="#6b7480" stroke-width="2"/>
+  <rect x="284" y="100" width="110" height="40" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="339" y="123" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC2 (outside)</text>
+  <rect x="6" y="100" width="110" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="61" y="123" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="600">KALI (outside)</text>
+  <line x1="61" y1="100" x2="200" y2="50" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+  <line x1="339" y1="50" x2="339" y2="100" stroke="#6b7480" stroke-width="2"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 380" font-family="ui-monospace,monospace">
+  <rect x="40" y="20" width="180" height="54" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="130" y="46" text-anchor="middle" font-size="14" fill="#2563eb" font-weight="600">PC1 (inside)</text>
+  <text x="130" y="64" text-anchor="middle" font-size="10" fill="#6b7480">192.168.1.100</text>
+  <rect x="240" y="20" width="220" height="54" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="350" y="46" text-anchor="middle" font-size="15" fill="#14161a" font-weight="700">R1 · NAT Gateway</text>
+  <text x="350" y="64" text-anchor="middle" font-size="10" fill="#6b7480">inside 192.168.1.1 → outside 10.0.0.1</text>
+  <rect x="480" y="20" width="180" height="54" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="570" y="46" text-anchor="middle" font-size="14" fill="#6b7480" font-weight="600">R2 (ISP)</text>
+  <text x="570" y="64" text-anchor="middle" font-size="10" fill="#6b7480">203.0.113.0/24</text>
+  <line x1="220" y1="47" x2="240" y2="47" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="460" y1="47" x2="480" y2="47" stroke="#6b7480" stroke-width="2.5"/>
+  <rect x="70" y="180" width="180" height="54" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="160" y="206" text-anchor="middle" font-size="14" fill="#e5484d" font-weight="700">KALI (outside)</text>
+  <text x="160" y="224" text-anchor="middle" font-size="10" fill="#6b7480">10.0.0.x · IP ID · ALG · port prediction</text>
+  <rect x="460" y="180" width="180" height="54" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="550" y="206" text-anchor="middle" font-size="14" fill="#2563eb" font-weight="600">PC2 (outside)</text>
+  <text x="550" y="224" text-anchor="middle" font-size="10" fill="#6b7480">203.0.113.100 · server</text>
+  <line x1="160" y1="180" x2="350" y2="74" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+  <line x1="550" y1="180" x2="350" y2="74" stroke="#6b7480" stroke-width="2.5"/>
+</svg>
+10|<svg viewBox="0 0 720 320" role="img" aria-label="Router as gateway and DNS, switch, two clients, and Kali intercepting DNS to redirect a domain">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">gateway + real DNS</text>
+      <rect x="300" y="30" width="130" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">IOU L2</text>
+      <line x1="190" y1="55" x2="300" y2="55" stroke="#2563eb" stroke-width="2"/>
+      <line x1="310" y1="80" x2="100" y2="230" stroke="#2563eb" stroke-width="2"/>
+      <line x1="365" y1="80" x2="365" y2="230" stroke="#2563eb" stroke-width="2"/>
+      <line x1="420" y1="80" x2="630" y2="230" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="195" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/1</text>
+      <text x="378" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/2</text>
+      <text x="505" y="160" font-family="monospace" font-size="9" fill="#e5484d">e0/3</text>
+      <rect x="30" y="230" width="130" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="95" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-A</text>
+      <text x="95" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">DHCP client · DNS→Kali</text>
+      <rect x="300" y="230" width="130" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="365" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-B</text>
+      <text x="365" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">visits "bank.com"</text>
+      <rect x="570" y="230" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="630" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="630" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">dnschef · .66</text>
+      <text x="360" y="308" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">PC-B asks "where is bank.com?" — Kali answers first, with its own IP</text>
+    </svg>|<svg viewBox="0 0 720 320" role="img" aria-label="Router as gateway and DNS, switch, two clients, and Kali intercepting DNS to redirect a domain">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">gateway + real DNS</text>
+      <rect x="300" y="30" width="130" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">IOU L2</text>
+      <line x1="190" y1="55" x2="300" y2="55" stroke="#2563eb" stroke-width="2"/>
+      <line x1="310" y1="80" x2="100" y2="230" stroke="#2563eb" stroke-width="2"/>
+      <line x1="365" y1="80" x2="365" y2="230" stroke="#2563eb" stroke-width="2"/>
+      <line x1="420" y1="80" x2="630" y2="230" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="195" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/1</text>
+      <text x="378" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/2</text>
+      <text x="505" y="160" font-family="monospace" font-size="9" fill="#e5484d">e0/3</text>
+      <rect x="30" y="230" width="130" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="95" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-A</text>
+      <text x="95" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">DHCP client · DNS→Kali</text>
+      <rect x="300" y="230" width="130" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="365" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-B</text>
+      <text x="365" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">visits "bank.com"</text>
+      <rect x="570" y="230" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="630" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="630" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">dnschef · .66</text>
+      <text x="360" y="308" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">PC-B asks "where is bank.com?" — Kali answers first, with its own IP</text>
+    </svg>
+11|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 180" font-family="ui-monospace,monospace">
+  <rect x="120" y="14" width="140" height="42" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="190" y="36" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1</text>
+  <text x="190" y="50" text-anchor="middle" font-size="9" fill="#6b7480">Telnet:23 · SSH:22</text>
+  <rect x="120" y="74" width="140" height="36" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="190" y="95" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW1</text>
+  <line x1="190" y1="56" x2="190" y2="74" stroke="#6b7480" stroke-width="2"/>
+  <line x1="190" y1="110" x2="190" y2="132" stroke="#6b7480" stroke-width="2"/>
+  <rect x="100" y="132" width="180" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="190" y="155" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="600">KALI · Wireshark</text>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" font-family="ui-monospace,monospace">
+  <rect x="200" y="14" width="200" height="54" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="300" y="40" text-anchor="middle" font-size="16" fill="#14161a" font-weight="700">R1</text>
+  <text x="300" y="56" text-anchor="middle" font-size="11" fill="#6b7480">Telnet 🠕 cleartext · SSH 🠕 encrypted</text>
+  <line x1="300" y1="68" x2="300" y2="100" stroke="#6b7480" stroke-width="2"/>
+  <rect x="200" y="100" width="200" height="46" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="300" y="126" text-anchor="middle" font-size="14" fill="#14161a" font-weight="600">SW1 (transparent)</text>
+  <line x1="300" y1="146" x2="300" y2="188" stroke="#6b7480" stroke-width="2"/>
+  <rect x="140" y="188" width="320" height="70" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="300" y="216" text-anchor="middle" font-size="15" fill="#e5484d" font-weight="700">KALI · Wireshark</text>
+  <text x="300" y="234" text-anchor="middle" font-size="11" fill="#6b7480">Telnet:  "admin:cisco123" 🠔 cleartext</text>
+  <text x="300" y="250" text-anchor="middle" font-size="11" fill="#6b7480">SSH:     "1a3f8c2b...e7d0" 🠔 encrypted</text>
+</svg>
+12|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 200" font-family="ui-monospace,monospace">
+  <rect x="130" y="10" width="120" height="40" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="190" y="33" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1 (RADIUS)</text>
+  <rect x="130" y="74" width="120" height="36" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="190" y="95" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW1 (802.1X)</text>
+  <line x1="190" y1="50" x2="190" y2="74" stroke="#6b7480" stroke-width="2"/>
+  <rect x="10" y="148" width="100" height="40" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="60" y="171" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC1 ✅</text>
+  <rect x="140" y="148" width="100" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="190" y="171" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="600">KALI ❌</text>
+  <rect x="270" y="148" width="100" height="40" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="320" y="171" text-anchor="middle" font-size="12" fill="#6b7480" font-weight="600">PC2 ❌</text>
+  <line x1="60" y1="148" x2="155" y2="110" stroke="#2563eb" stroke-width="2"/>
+  <line x1="190" y1="148" x2="190" y2="110" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+  <line x1="320" y1="148" x2="225" y2="110" stroke="#6b7480" stroke-width="2" stroke-dasharray="3 3"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 380" font-family="ui-monospace,monospace">
+  <rect x="230" y="20" width="240" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="350" y="46" text-anchor="middle" font-size="15" fill="#14161a" font-weight="700">R1 · RADIUS Server</text>
+  <text x="350" y="62" text-anchor="middle" font-size="10" fill="#6b7480">AAA · EAP · port 1812</text>
+  <rect x="230" y="100" width="240" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="350" y="126" text-anchor="middle" font-size="14" fill="#14161a" font-weight="600">SW1 · 802.1X Authenticator</text>
+  <text x="350" y="142" text-anchor="middle" font-size="10" fill="#6b7480">dot1x pae authenticator</text>
+  <line x1="350" y1="70" x2="350" y2="100" stroke="#6b7480" stroke-width="2.5"/>
+  <rect x="30" y="260" width="180" height="54" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="120" y="286" text-anchor="middle" font-size="14" fill="#2563eb" font-weight="600">PC1 ✅</text>
+  <text x="120" y="304" text-anchor="middle" font-size="10" fill="#6b7480">supplicant · EAP-MD5</text>
+  <rect x="260" y="260" width="180" height="54" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="350" y="286" text-anchor="middle" font-size="14" fill="#e5484d" font-weight="700">KALI ❌</text>
+  <text x="350" y="304" text-anchor="middle" font-size="10" fill="#6b7480">EAP relay · MAB bypass · RADIUS DoS</text>
+  <rect x="490" y="260" width="180" height="54" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="580" y="286" text-anchor="middle" font-size="14" fill="#6b7480" font-weight="600">PC2 ❌</text>
+  <text x="580" y="304" text-anchor="middle" font-size="10" fill="#6b7480">no supplicant · port blocked</text>
+  <line x1="120" y1="260" x2="290" y2="150" stroke="#2563eb" stroke-width="2"/>
+  <line x1="350" y1="260" x2="350" y2="150" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+  <line x1="580" y1="260" x2="410" y2="150" stroke="#6b7480" stroke-width="2" stroke-dasharray="3 3"/>
+</svg>
+13|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 200" font-family="ui-monospace,monospace">
+  <circle cx="60" cy="90" r="40" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="4 4"/>
+  <text x="55" y="40" text-anchor="middle" font-size="10" fill="#2563eb">legit AP</text>
+  <circle cx="320" cy="90" r="40" fill="none" stroke="#e5484d" stroke-width="2" stroke-dasharray="4 4"/>
+  <text x="325" y="40" text-anchor="middle" font-size="10" fill="#e5484d">rogue AP</text>
+  <rect x="130" y="14" width="120" height="38" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="190" y="36" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW1</text>
+  <line x1="190" y1="52" x2="190" y2="100" stroke="#6b7480" stroke-width="2"/>
+  <text x="190" y="80" text-anchor="middle" font-size="11" fill="#6b7480">NetBreaker-WiFi</text>
+  <line x1="135" y1="110" x2="120" y2="130" stroke="#2563eb" stroke-width="2"/>
+  <line x1="245" y1="110" x2="260" y2="130" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+  <rect x="50" y="130" width="140" height="40" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="120" y="155" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC1 (client)</text>
+  <rect x="190" y="130" width="140" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="260" y="155" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="600">KALI (rogue AP)</text>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 380" font-family="ui-monospace,monospace">
+  <rect x="230" y="10" width="240" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="350" y="36" text-anchor="middle" font-size="14" fill="#14161a" font-weight="600">SW1 (wired backbone)</text>
+  <line x1="140" y1="60" x2="260" y2="140" stroke="#2563eb" stroke-width="2"/>
+  <line x1="560" y1="60" x2="440" y2="140" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+  <rect x="220" y="168" width="260" height="50" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="350" y="196" text-anchor="middle" font-size="14" fill="#2563eb" font-weight="700">AP1 · legit NetBreaker-WiFi</text>
+  <text x="350" y="212" text-anchor="middle" font-size="10" fill="#6b7480">BSSID: AA:BB:CC:11:22:33 · ch 6 · WPA2</text>
+  <rect x="40" y="250" width="180" height="54" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="130" y="276" text-anchor="middle" font-size="14" fill="#2563eb" font-weight="600">PC1 (client)</text>
+  <text x="130" y="294" text-anchor="middle" font-size="10" fill="#6b7480">connected to NetBreaker-WiFi</text>
+  <rect x="480" y="250" width="180" height="60" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="570" y="276" text-anchor="middle" font-size="14" fill="#e5484d" font-weight="700">KALI (rogue AP)</text>
+  <text x="570" y="294" text-anchor="middle" font-size="10" fill="#6b7480">hostapd · SSID: NetBreaker-WiFi</text>
+  <line x1="130" y1="250" x2="300" y2="218" stroke="#2563eb" stroke-width="2"/>
+  <line x1="480" y1="280" x2="400" y2="218" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="570" y="230" font-size="11" fill="#e5484d">↑ deauth → client roams here</text>
+</svg>
+14|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 200" font-family="ui-monospace,monospace">
+  <rect x="130" y="10" width="120" height="40" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="190" y="33" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1 (IPv6 gw)</text>
+  <rect x="130" y="74" width="120" height="36" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="190" y="95" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW1</text>
+  <line x1="190" y1="50" x2="190" y2="74" stroke="#6b7480" stroke-width="2"/>
+  <rect x="10" y="148" width="100" height="40" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="60" y="171" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">PC1</text>
+  <rect x="140" y="148" width="100" height="40" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="190" y="171" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">PC2</text>
+  <rect x="270" y="148" width="100" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="320" y="171" text-anchor="middle" font-size="11" fill="#e5484d" font-weight="600">KALI</text>
+  <line x1="60" y1="148" x2="155" y2="110" stroke="#2563eb" stroke-width="2"/>
+  <line x1="190" y1="148" x2="190" y2="110" stroke="#2563eb" stroke-width="2"/>
+  <line x1="320" y1="148" x2="225" y2="110" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 380" font-family="ui-monospace,monospace">
+   <rect x="230" y="20" width="240" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+   <text x="350" y="46" text-anchor="middle" font-size="15" fill="#14161a" font-weight="700">R1 · IPv6 Gateway</text>
+   <text x="350" y="62" text-anchor="middle" font-size="10" fill="#6b7480">2001:db8:1::1/64 · RA every 200s</text>
+   <rect x="230" y="100" width="240" height="46" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+   <text x="350" y="126" text-anchor="middle" font-size="14" fill="#14161a" font-weight="600">SW1 · RA Guard</text>
+   <text x="350" y="142" text-anchor="middle" font-size="10" fill="#6b7480">port Gi0/3: untrusted · RAs dropped</text>
+   <line x1="350" y1="70" x2="350" y2="100" stroke="#6b7480" stroke-width="2.5"/>
+   <rect x="40" y="250" width="180" height="54" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+   <text x="130" y="276" text-anchor="middle" font-size="14" fill="#2563eb" font-weight="600">PC1</text>
+   <text x="130" y="294" text-anchor="middle" font-size="10" fill="#6b7480">SLAAC: 2001:db8:1::100</text>
+   <rect x="260" y="250" width="180" height="54" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+   <text x="350" y="276" text-anchor="middle" font-size="14" fill="#2563eb" font-weight="600">PC2</text>
+   <text x="350" y="294" text-anchor="middle" font-size="10" fill="#6b7480">SLAAC: 2001:db8:1::200</text>
+   <rect x="480" y="250" width="180" height="54" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+   <text x="570" y="276" text-anchor="middle" font-size="14" fill="#e5484d" font-weight="700">KALI</text>
+   <text x="570" y="294" text-anchor="middle" font-size="10" fill="#6b7480">rogue RA · NA spoof · mitm6</text>
+   <line x1="130" y1="250" x2="290" y2="146" stroke="#2563eb" stroke-width="2"/>
+   <line x1="350" y1="250" x2="350" y2="146" stroke="#2563eb" stroke-width="2"/>
+   <line x1="480" y1="276" x2="410" y2="146" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+ </svg>
+15|<svg
+      width="100%"
+      viewBox="0 0 720 490"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="NetBreaker Lab 15 topology: SW1 switch routes to H1 hub (Et0/0), PC3 (Et0/1), KALI (Et0/2), R1 (Et0/3), and a spare unused port (Et0/4). H1 connects to PC1, PC2, and KALI2 — all three share the hub's single collision domain. R1 connects to FW1."
+    >
+      <defs>
+        <pattern id="grid-kali2" width="24" height="24" patternUnits="userSpaceOnUse">
+          <path d="M24 0H0V24" fill="none" stroke="#1b2129" stroke-width="1" />
+        </pattern>
+        <filter id="glow-kali2" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <rect x="0" y="0" width="720" height="490" rx="10" fill="#0b0f14" />
+      <rect x="1" y="37" width="718" height="452" fill="url(#grid-kali2)" />
+      <rect x="0.5" y="0.5" width="719" height="489" rx="10" fill="none" stroke="#22272e" stroke-width="1" />
+
+      <line x1="0" y1="36" x2="720" y2="36" stroke="#22272e" stroke-width="1" />
+      <circle cx="20" cy="18" r="6" fill="#ff5f56" />
+      <circle cx="40" cy="18" r="6" fill="#ffbd2e" />
+      <circle cx="60" cy="18" r="6" fill="#27c93f" />
+      <text x="82" y="22" font-family="Courier New, monospace" fontSize="12" fill="#6e7681">
+        root@netbreaker:~/lab15$ topology --render
+      </text>
+
+      <line x1="360" y1="130" x2="360" y2="160" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="120" y1="160" x2="699" y2="160" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="120" y1="160" x2="120" y2="190" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="280" y1="160" x2="280" y2="190" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="440" y1="160" x2="440" y2="190" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="600" y1="160" x2="600" y2="190" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="699" y1="160" x2="699" y2="190" stroke="#4d5560" stroke-width="1.5" stroke-dasharray="3 2" />
+
+      <rect x="99" y="150" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+      <text x="120" y="161" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
+      <rect x="259" y="150" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+      <text x="280" y="161" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
+      <rect x="419" y="150" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+      <text x="440" y="161" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/2</text>
+      <rect x="579" y="150" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+      <text x="600" y="161" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/3</text>
+      <rect x="678" y="150" width="42" height="16" rx="3" fill="#0b0f14" stroke="#8b98a5" stroke-width="1" stroke-dasharray="3 2" />
+      <text x="699" y="161" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">Et0/4</text>
+      <text x="699" y="204" textAnchor="middle" font-family="Courier New, monospace" fontSize="9" fill="#6e7681">spare</text>
+
+      <line x1="120" y1="250" x2="120" y2="280" stroke="#22d3ee" stroke-width="1.5" />
+      <line x1="75" y1="280" x2="255" y2="280" stroke="#22d3ee" stroke-width="1.5" />
+      <line x1="75" y1="280" x2="75" y2="310" stroke="#22d3ee" stroke-width="1.5" />
+      <line x1="165" y1="280" x2="165" y2="310" stroke="#22d3ee" stroke-width="1.5" />
+      <line x1="255" y1="280" x2="255" y2="310" stroke="#22d3ee" stroke-width="1.5" />
+      <line x1="600" y1="250" x2="600" y2="310" stroke="#4d5560" stroke-width="1.5" />
+
+
+      <g>
+        <rect x="280" y="70" width="160" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="360" y="95" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">SW1</text>
+        <text x="360" y="114" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">l2_switch — 5 ports</text>
+      </g>
+
+      <g>
+        <rect x="50" y="190" width="140" height="60" rx="6" fill="#131a21" stroke="#d29922" stroke-width="1.5" />
+        <text x="120" y="215" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#d29922">H1</text>
+        <text x="120" y="234" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#a17f2f">hub — shared domain</text>
+      </g>
+
+      <g>
+        <rect x="210" y="190" width="140" height="60" rx="6" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+        <text x="280" y="215" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#67e8f9">PC3</text>
+        <text x="280" y="234" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#22d3ee">end_host</text>
+      </g>
+
+      <g filter="url(#glow-kali2)">
+        <rect x="370" y="190" width="140" height="60" rx="6" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="5 3" />
+      </g>
+      <text x="440" y="215" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#ff7b72">KALI</text>
+      <text x="440" y="234" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#f85149">observer / sniffer</text>
+
+      <g>
+        <rect x="530" y="190" width="140" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="600" y="215" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">R1</text>
+        <text x="600" y="234" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">router</text>
+      </g>
+
+      <circle cx="75" cy="340" r="30" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+      <text x="75" y="345" textAnchor="middle" font-family="Courier New, monospace" fontSize="13" fontWeight="700" fill="#67e8f9">PC1</text>
+
+      <circle cx="165" cy="340" r="30" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+      <text x="165" y="345" textAnchor="middle" font-family="Courier New, monospace" fontSize="13" fontWeight="700" fill="#67e8f9">PC2</text>
+
+      <g filter="url(#glow-kali2)">
+        <circle cx="255" cy="340" r="30" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4 2" />
+      </g>
+      <text x="255" y="345" textAnchor="middle" font-family="Courier New, monospace" fontSize="12" fontWeight="700" fill="#ff7b72">KALI2</text>
+
+      <g>
+        <rect x="530" y="310" width="140" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="600" y="335" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">FW1</text>
+        <text x="600" y="354" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">firewall</text>
+      </g>
+
+      <line x1="30" y1="405" x2="690" y2="405" stroke="#22272e" stroke-width="1" />
+      <text x="30" y="424" font-family="Courier New, monospace" fontSize="10" fill="#6e7681">// device_legend</text>
+
+      <rect x="30" y="438" width="12" height="12" rx="2" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+      <text x="50" y="448" font-family="Courier New, monospace" fontSize="11" fill="#8b98a5">switch / router / firewall</text>
+
+      <rect x="230" y="438" width="12" height="12" rx="2" fill="#131a21" stroke="#d29922" stroke-width="1.5" />
+      <text x="250" y="448" font-family="Courier New, monospace" fontSize="11" fill="#a17f2f">hub — single collision domain</text>
+
+      <circle cx="486" cy="444" r="6" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+      <text x="500" y="448" font-family="Courier New, monospace" fontSize="11" fill="#22d3ee">end host</text>
+
+      <rect x="580" y="438" width="12" height="12" rx="2" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="3 2" />
+      <text x="600" y="448" font-family="Courier New, monospace" fontSize="11" fill="#f85149">observer / attacker</text>
+
+      <text x="30" y="475" font-family="Courier New, monospace" fontSize="10" fill="#4d5560">
+        initial_build: pc1+pc2+kali2→h1→sw1(et0/0) · pc3→sw1(et0/1) · kali→sw1(et0/2) · sw1→r1(et0/3) · sw1(et0/4)=spare · r1→fw1
+      </text>
+    </svg>|<svg
+      width="100%"
+      viewBox="0 0 720 490"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="NetBreaker Lab 15 topology: SW1 switch routes to H1 hub (Et0/0), PC3 (Et0/1), KALI (Et0/2), R1 (Et0/3), and a spare unused port (Et0/4). H1 connects to PC1, PC2, and KALI2 — all three share the hub's single collision domain. R1 connects to FW1."
+    >
+      <defs>
+        <pattern id="grid-kali2" width="24" height="24" patternUnits="userSpaceOnUse">
+          <path d="M24 0H0V24" fill="none" stroke="#1b2129" stroke-width="1" />
+        </pattern>
+        <filter id="glow-kali2" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <rect x="0" y="0" width="720" height="490" rx="10" fill="#0b0f14" />
+      <rect x="1" y="37" width="718" height="452" fill="url(#grid-kali2)" />
+      <rect x="0.5" y="0.5" width="719" height="489" rx="10" fill="none" stroke="#22272e" stroke-width="1" />
+
+      <line x1="0" y1="36" x2="720" y2="36" stroke="#22272e" stroke-width="1" />
+      <circle cx="20" cy="18" r="6" fill="#ff5f56" />
+      <circle cx="40" cy="18" r="6" fill="#ffbd2e" />
+      <circle cx="60" cy="18" r="6" fill="#27c93f" />
+      <text x="82" y="22" font-family="Courier New, monospace" fontSize="12" fill="#6e7681">
+        root@netbreaker:~/lab15$ topology --render
+      </text>
+
+      <line x1="360" y1="130" x2="360" y2="160" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="120" y1="160" x2="699" y2="160" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="120" y1="160" x2="120" y2="190" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="280" y1="160" x2="280" y2="190" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="440" y1="160" x2="440" y2="190" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="600" y1="160" x2="600" y2="190" stroke="#4d5560" stroke-width="1.5" />
+      <line x1="699" y1="160" x2="699" y2="190" stroke="#4d5560" stroke-width="1.5" stroke-dasharray="3 2" />
+
+      <rect x="99" y="150" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+      <text x="120" y="161" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
+      <rect x="259" y="150" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+      <text x="280" y="161" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
+      <rect x="419" y="150" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+      <text x="440" y="161" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/2</text>
+      <rect x="579" y="150" width="42" height="16" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+      <text x="600" y="161" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/3</text>
+      <rect x="678" y="150" width="42" height="16" rx="3" fill="#0b0f14" stroke="#8b98a5" stroke-width="1" stroke-dasharray="3 2" />
+      <text x="699" y="161" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">Et0/4</text>
+      <text x="699" y="204" textAnchor="middle" font-family="Courier New, monospace" fontSize="9" fill="#6e7681">spare</text>
+
+      <line x1="120" y1="250" x2="120" y2="280" stroke="#22d3ee" stroke-width="1.5" />
+      <line x1="75" y1="280" x2="255" y2="280" stroke="#22d3ee" stroke-width="1.5" />
+      <line x1="75" y1="280" x2="75" y2="310" stroke="#22d3ee" stroke-width="1.5" />
+      <line x1="165" y1="280" x2="165" y2="310" stroke="#22d3ee" stroke-width="1.5" />
+      <line x1="255" y1="280" x2="255" y2="310" stroke="#22d3ee" stroke-width="1.5" />
+      <line x1="600" y1="250" x2="600" y2="310" stroke="#4d5560" stroke-width="1.5" />
+
+
+      <g>
+        <rect x="280" y="70" width="160" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="360" y="95" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">SW1</text>
+        <text x="360" y="114" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">l2_switch — 5 ports</text>
+      </g>
+
+      <g>
+        <rect x="50" y="190" width="140" height="60" rx="6" fill="#131a21" stroke="#d29922" stroke-width="1.5" />
+        <text x="120" y="215" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#d29922">H1</text>
+        <text x="120" y="234" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#a17f2f">hub — shared domain</text>
+      </g>
+
+      <g>
+        <rect x="210" y="190" width="140" height="60" rx="6" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+        <text x="280" y="215" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#67e8f9">PC3</text>
+        <text x="280" y="234" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#22d3ee">end_host</text>
+      </g>
+
+      <g filter="url(#glow-kali2)">
+        <rect x="370" y="190" width="140" height="60" rx="6" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="5 3" />
+      </g>
+      <text x="440" y="215" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#ff7b72">KALI</text>
+      <text x="440" y="234" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#f85149">observer / sniffer</text>
+
+      <g>
+        <rect x="530" y="190" width="140" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="600" y="215" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">R1</text>
+        <text x="600" y="234" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">router</text>
+      </g>
+
+      <circle cx="75" cy="340" r="30" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+      <text x="75" y="345" textAnchor="middle" font-family="Courier New, monospace" fontSize="13" fontWeight="700" fill="#67e8f9">PC1</text>
+
+      <circle cx="165" cy="340" r="30" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+      <text x="165" y="345" textAnchor="middle" font-family="Courier New, monospace" fontSize="13" fontWeight="700" fill="#67e8f9">PC2</text>
+
+      <g filter="url(#glow-kali2)">
+        <circle cx="255" cy="340" r="30" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4 2" />
+      </g>
+      <text x="255" y="345" textAnchor="middle" font-family="Courier New, monospace" fontSize="12" fontWeight="700" fill="#ff7b72">KALI2</text>
+
+      <g>
+        <rect x="530" y="310" width="140" height="60" rx="6" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+        <text x="600" y="335" textAnchor="middle" font-family="Courier New, monospace" fontSize="15" fontWeight="700" fill="#e6edf3">FW1</text>
+        <text x="600" y="354" textAnchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#8b98a5">firewall</text>
+      </g>
+
+      <line x1="30" y1="405" x2="690" y2="405" stroke="#22272e" stroke-width="1" />
+      <text x="30" y="424" font-family="Courier New, monospace" fontSize="10" fill="#6e7681">// device_legend</text>
+
+      <rect x="30" y="438" width="12" height="12" rx="2" fill="#131a21" stroke="#8b98a5" stroke-width="1.5" />
+      <text x="50" y="448" font-family="Courier New, monospace" fontSize="11" fill="#8b98a5">switch / router / firewall</text>
+
+      <rect x="230" y="438" width="12" height="12" rx="2" fill="#131a21" stroke="#d29922" stroke-width="1.5" />
+      <text x="250" y="448" font-family="Courier New, monospace" fontSize="11" fill="#a17f2f">hub — single collision domain</text>
+
+      <circle cx="486" cy="444" r="6" fill="#131a21" stroke="#22d3ee" stroke-width="1.5" />
+      <text x="500" y="448" font-family="Courier New, monospace" fontSize="11" fill="#22d3ee">end host</text>
+
+      <rect x="580" y="438" width="12" height="12" rx="2" fill="#1a0f11" stroke="#f85149" stroke-width="1.5" stroke-dasharray="3 2" />
+      <text x="600" y="448" font-family="Courier New, monospace" fontSize="11" fill="#f85149">observer / attacker</text>
+
+      <text x="30" y="475" font-family="Courier New, monospace" fontSize="10" fill="#4d5560">
+        initial_build: pc1+pc2+kali2→h1→sw1(et0/0) · pc3→sw1(et0/1) · kali→sw1(et0/2) · sw1→r1(et0/3) · sw1(et0/4)=spare · r1→fw1
+      </text>
+    </svg>
+16|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 180" font-family="ui-monospace,monospace">
+  <rect x="10" y="10" width="90" height="34" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="55" y="31" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">SW1</text>
+  <rect x="280" y="10" width="90" height="34" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="325" y="31" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">SW2</text>
+  <line x1="100" y1="27" x2="280" y2="27" stroke="#6b7480" stroke-width="2"/>
+  <text x="190" y="23" text-anchor="middle" font-size="7" fill="#6b7480">Et0/2 trunk</text>
+  <rect x="10" y="130" width="70" height="32" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="45" y="150" text-anchor="middle" font-size="9" fill="#2563eb">PC1</text>
+  <rect x="95" y="130" width="70" height="32" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="130" y="150" text-anchor="middle" font-size="9" fill="#14161a">R1</text>
+  <rect x="215" y="130" width="70" height="32" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="250" y="150" text-anchor="middle" font-size="9" fill="#2563eb">PC2</text>
+  <rect x="300" y="130" width="75" height="32" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="337" y="150" text-anchor="middle" font-size="9" fill="#e5484d">KALI</text>
+  <line x1="45" y1="130" x2="45" y2="44" stroke="#2563eb" stroke-width="2"/>
+  <line x1="130" y1="130" x2="95" y2="44" stroke="#14161a" stroke-width="2"/>
+  <line x1="250" y1="130" x2="295" y2="44" stroke="#2563eb" stroke-width="2"/>
+  <line x1="337" y1="130" x2="337" y2="44" stroke="#e5484d" stroke-width="2"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 280" font-family="ui-monospace,monospace">
+  <rect x="60" y="14" width="180" height="44" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="150" y="36" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">SW1</text>
+  <text x="150" y="52" text-anchor="middle" font-size="8" fill="#6b7480">ports: Et0/0-2</text>
+  <rect x="360" y="14" width="180" height="44" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="450" y="36" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">SW2</text>
+  <text x="450" y="52" text-anchor="middle" font-size="8" fill="#6b7480">ports: Et0/0-2</text>
+  <line x1="240" y1="36" x2="360" y2="36" stroke="#6b7480" stroke-width="2"/>
+<text x="300" y="30" text-anchor="middle" font-size="9" fill="#6b7480">Et0/2 trunk</text>
+  <rect x="20" y="190" width="130" height="40" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="85" y="214" text-anchor="middle" font-size="11" fill="#2563eb">PC1</text>
+  <rect x="170" y="190" width="130" height="40" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="235" y="214" text-anchor="middle" font-size="11" fill="#14161a">R1 (console)</text>
+  <rect x="330" y="190" width="130" height="40" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="395" y="214" text-anchor="middle" font-size="11" fill="#2563eb">PC2</text>
+  <rect x="470" y="190" width="130" height="44" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="535" y="216" text-anchor="middle" font-size="11" fill="#e5484d">KALI (tapper)</text>
+  <line x1="85" y1="190" x2="85" y2="58" stroke="#2563eb" stroke-width="2"/>
+  <line x1="235" y1="190" x2="200" y2="58" stroke="#14161a" stroke-width="2"/>
+  <line x1="395" y1="190" x2="420" y2="58" stroke="#2563eb" stroke-width="2"/>
+  <line x1="535" y1="190" x2="500" y2="58" stroke="#e5484d" stroke-width="2"/>
+</svg>
+17|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 200" font-family="ui-monospace,monospace">
+  <rect x="10" y="10" width="100" height="36" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="60" y="33" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">PC1</text>
+  <rect x="140" y="10" width="100" height="36" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="190" y="33" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">SW1</text>
+  <rect x="270" y="10" width="100" height="36" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="320" y="33" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">R1</text>
+  <line x1="110" y1="28" x2="140" y2="28" stroke="#2563eb" stroke-width="2"/>
+  <line x1="240" y1="28" x2="270" y2="28" stroke="#6b7480" stroke-width="2"/>
+  <rect x="270" y="100" width="100" height="36" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="320" y="123" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">PC2</text>
+  <rect x="10" y="100" width="100" height="36" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="60" y="123" text-anchor="middle" font-size="11" fill="#e5484d" font-weight="600">KALI</text>
+  <line x1="320" y1="46" x2="320" y2="100" stroke="#2563eb" stroke-width="2"/>
+  <line x1="60" y1="100" x2="170" y2="46" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="185" y="175" text-anchor="middle" font-size="8" fill="#6b7480">10.0.0.0/24</text>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 340" font-family="ui-monospace,monospace">
+  <rect x="40" y="20" width="160" height="44" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="120" y="42" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC1 (client)</text>
+  <text x="120" y="58" text-anchor="middle" font-size="8" fill="#6b7480">App → L7 → L4 → L3 → L2 → wire</text>
+  <rect x="250" y="20" width="200" height="44" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="350" y="42" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">SW1 (L2 switch)</text>
+  <text x="350" y="58" text-anchor="middle" font-size="8" fill="#6b7480">DHCP snoop · DAI · port-security</text>
+  <rect x="500" y="20" width="160" height="44" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="580" y="42" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1 (gateway)</text>
+  <text x="580" y="58" text-anchor="middle" font-size="8" fill="#6b7480">uRPF · TCP intercept · ACL</text>
+  <line x1="200" y1="42" x2="250" y2="42" stroke="#2563eb" stroke-width="2"/>
+  <line x1="450" y1="42" x2="500" y2="42" stroke="#6b7480" stroke-width="2"/>
+  <rect x="500" y="140" width="160" height="44" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="580" y="162" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC2 (server)</text>
+  <text x="580" y="178" text-anchor="middle" font-size="8" fill="#6b7480">HTTP · responds to PC1</text>
+  <rect x="40" y="220" width="200" height="54" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="140" y="244" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="600">KALI</text>
+  <text x="140" y="262" text-anchor="middle" font-size="9" fill="#6b7480">L2: ARP spoof · L3: fragment · L4: SYN flood</text>
+  <line x1="580" y1="64" x2="580" y2="140" stroke="#2563eb" stroke-width="2"/>
+  <line x1="140" y1="220" x2="320" y2="64" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+</svg>
+18|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 140" font-family="ui-monospace,monospace">
+  <rect x="10" y="10" width="120" height="44" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="70" y="33" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">R1</text>
+  <text x="70" y="48" text-anchor="middle" font-size="8" fill="#6b7480">IOS · CLI</text>
+  <rect x="160" y="10" width="120" height="44" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="220" y="33" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW1</text>
+  <text x="220" y="48" text-anchor="middle" font-size="8" fill="#6b7480">IOS · CLI</text>
+  <rect x="10" y="84" width="120" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="70" y="108" text-anchor="middle" font-size="11" fill="#e5484d" font-weight="600">KALI</text>
+  <rect x="160" y="84" width="120" height="40" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="220" y="108" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">PC1 (admin)</text>
+  <line x1="130" y1="32" x2="160" y2="32" stroke="#6b7480" stroke-width="2"/>
+  <line x1="70" y1="84" x2="130" y2="54" stroke="#e5484d" stroke-width="2"/>
+  <line x1="220" y1="84" x2="190" y2="54" stroke="#2563eb" stroke-width="2"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" font-family="ui-monospace,monospace">
+  <rect x="40" y="20" width="180" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="130" y="46" text-anchor="middle" font-size="14" fill="#14161a" font-weight="600">R1 · CLI Target</text>
+  <text x="130" y="62" text-anchor="middle" font-size="9" fill="#6b7480">IP: 192.168.1.1 · SNMP: public/private</text>
+  <rect x="380" y="20" width="180" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="470" y="46" text-anchor="middle" font-size="14" fill="#14161a" font-weight="600">SW1</text>
+  <text x="470" y="62" text-anchor="middle" font-size="9" fill="#6b7480">management interface</text>
+  <rect x="40" y="160" width="200" height="54" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="140" y="186" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="600">KALI (attacker)</text>
+  <text x="140" y="204" text-anchor="middle" font-size="9" fill="#6b7480">SSH · SNMP · tcpdump port 23</text>
+  <rect x="380" y="160" width="180" height="54" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="470" y="186" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC1 (admin)</text>
+  <text x="470" y="204" text-anchor="middle" font-size="9" fill="#6b7480">SSH / Telnet to R1</text>
+  <line x1="130" y1="160" x2="130" y2="70" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+  <line x1="470" y1="160" x2="200" y2="70" stroke="#2563eb" stroke-width="2"/>
+</svg>
+19|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 200" font-family="ui-monospace,monospace">
+  <rect x="10" y="10" width="100" height="36" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="60" y="33" text-anchor="middle" font-size="10" fill="#2563eb" font-weight="600">PC1 (.10)</text>
+  <rect x="140" y="10" width="100" height="36" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="190" y="33" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">R1</text>
+  <line x1="110" y1="28" x2="140" y2="28" stroke="#2563eb" stroke-width="2"/>
+  <rect x="10" y="80" width="100" height="36" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="60" y="103" text-anchor="middle" font-size="10" fill="#6b7480">SW1</text>
+  <rect x="140" y="80" width="100" height="36" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="190" y="103" text-anchor="middle" font-size="10" fill="#6b7480" font-weight="600">R2</text>
+  <line x1="190" y1="46" x2="190" y2="80" stroke="#14161a" stroke-width="2"/>
+  <line x1="60" y1="46" x2="60" y2="80" stroke="#2563eb" stroke-width="2"/>
+  <line x1="240" y1="46" x2="240" y2="80" stroke="#6b7480" stroke-width="2"/>
+  <rect x="270" y="80" width="100" height="36" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="320" y="103" text-anchor="middle" font-size="10" fill="#2563eb" font-weight="600">PC3 (.20)</text>
+  <rect x="10" y="152" width="100" height="36" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="60" y="175" text-anchor="middle" font-size="10" fill="#e5484d" font-weight="600">KALI</text>
+  <line x1="60" y1="152" x2="130" y2="46" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+  <line x1="60" y1="116" x2="60" y2="152" stroke="#6b7480" stroke-width="2"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 340" font-family="ui-monospace,monospace">
+  <rect x="30" y="20" width="170" height="50" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="115" y="46" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">LAN A: 192.168.10.0/24</text>
+  <text x="115" y="62" text-anchor="middle" font-size="9" fill="#6b7480">PC1 .10 · PC2 .20 · R1 .1</text>
+  <rect x="260" y="20" width="180" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="350" y="46" text-anchor="middle" font-size="14" fill="#14161a" font-weight="700">R1 · Gateway</text>
+  <text x="350" y="62" text-anchor="middle" font-size="9" fill="#6b7480">gi0/0 (.10.1) · gi0/1 (.20.1) · gi0/2 (10.0.0.1)</text>
+  <rect x="500" y="20" width="170" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="585" y="46" text-anchor="middle" font-size="13" fill="#6b7480" font-weight="600">WAN: 10.0.0.0/30</text>
+  <text x="585" y="62" text-anchor="middle" font-size="9" fill="#6b7480">R1 .1 → R2 .2</text>
+  <line x1="200" y1="45" x2="260" y2="45" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="440" y1="45" x2="500" y2="45" stroke="#6b7480" stroke-width="2.5"/>
+  <rect x="500" y="130" width="170" height="50" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="585" y="156" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">LAN B: 172.16.20.0/24</text>
+  <text x="585" y="172" text-anchor="middle" font-size="9" fill="#6b7480">PC3 .10 · R1 .1</text>
+  <line x1="440" y1="70" x2="540" y2="130" stroke="#6b7480" stroke-width="2.5"/>
+  <rect x="40" y="210" width="200" height="54" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="140" y="236" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="600">KALI</text>
+  <text x="140" y="254" text-anchor="middle" font-size="9" fill="#6b7480">nmap scan · IP spoof · DHCP flood</text>
+  <rect x="440" y="210" width="180" height="54" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="530" y="236" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC2</text>
+  <text x="530" y="254" text-anchor="middle" font-size="9" fill="#6b7480">192.168.10.20</text>
+  <line x1="140" y1="210" x2="210" y2="70" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+</svg>
+20|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 200" font-family="ui-monospace,monospace">
+  <rect x="120" y="10" width="140" height="40" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="190" y="33" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW1</text>
+  <line x1="60" y1="84" x2="150" y2="50" stroke="#2563eb" stroke-width="2"/>
+  <line x1="190" y1="50" x2="190" y2="100" stroke="#6b7480" stroke-width="2"/>
+  <line x1="230" y1="50" x2="310" y2="84" stroke="#14161a" stroke-width="2"/>
+  <rect x="10" y="84" width="100" height="36" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="60" y="107" text-anchor="middle" font-size="10" fill="#2563eb">PC1 (V10)</text>
+  <rect x="140" y="100" width="100" height="36" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+  <text x="190" y="123" text-anchor="middle" font-size="10" fill="#6b7480">PC2 (V20)</text>
+  <rect x="260" y="84" width="110" height="36" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="315" y="107" text-anchor="middle" font-size="10" fill="#14161a">R1 · Lo0</text>
+  <rect x="140" y="154" width="100" height="36" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="190" y="177" text-anchor="middle" font-size="10" fill="#e5484d">KALI</text>
+  <line x1="190" y1="154" x2="140" y2="100" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 340" font-family="ui-monospace,monospace">
+  <rect x="220" y="14" width="260" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="350" y="40" text-anchor="middle" font-size="15" fill="#14161a" font-weight="600">SW1 · L2 Switch</text>
+  <text x="350" y="56" text-anchor="middle" font-size="9" fill="#6b7480">Gi0/1: V10 · Gi0/2: V20 · Gi0/24: trunk</text>
+  <line x1="120" y1="130" x2="280" y2="64" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="420" y1="64" x2="580" y2="130" stroke="#14161a" stroke-width="2.5"/>
+  <line x1="350" y1="64" x2="350" y2="220" stroke="#e5484d" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <rect x="30" y="130" width="180" height="50" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="120" y="156" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC1 · VLAN 10</text>
+  <text x="120" y="174" text-anchor="middle" font-size="9" fill="#6b7480">192.168.10.10/24 · access port</text>
+  <rect x="490" y="130" width="180" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="580" y="156" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1 · Router</text>
+  <text x="580" y="174" text-anchor="middle" font-size="9" fill="#6b7480">Gi0/0: routed · Lo0: 1.1.1.1</text>
+  <rect x="220" y="220" width="260" height="60" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="350" y="246" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="700">KALI</text>
+  <text x="350" y="264" text-anchor="middle" font-size="9" fill="#6b7480">DTP spoof · duplex mismatch · port flap</text>
+</svg>
+21|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 180" font-family="ui-monospace,monospace">
+  <rect x="10" y="10" width="100" height="36" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="60" y="33" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">R1</text>
+  <rect x="140" y="10" width="100" height="36" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="190" y="33" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">R2</text>
+  <rect x="270" y="10" width="100" height="36" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="320" y="33" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">R3</text>
+  <line x1="110" y1="28" x2="140" y2="28" stroke="#6b7480" stroke-width="2"/>
+  <line x1="240" y1="28" x2="270" y2="28" stroke="#6b7480" stroke-width="2"/>
+  <rect x="10" y="80" width="100" height="36" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="60" y="103" text-anchor="middle" font-size="10" fill="#2563eb">PC1 .1.0/24</text>
+  <rect x="140" y="80" width="100" height="36" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="190" y="103" text-anchor="middle" font-size="10" fill="#2563eb">PC2 .2.0/24</text>
+  <rect x="270" y="80" width="100" height="36" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="320" y="103" text-anchor="middle" font-size="10" fill="#2563eb">PC3 .3.0/24</text>
+  <rect x="140" y="136" width="100" height="36" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="190" y="159" text-anchor="middle" font-size="10" fill="#e5484d">KALI</text>
+  <line x1="60" y1="80" x2="60" y2="46" stroke="#2563eb" stroke-width="2"/>
+  <line x1="190" y1="80" x2="190" y2="46" stroke="#2563eb" stroke-width="2"/>
+  <line x1="320" y1="80" x2="320" y2="46" stroke="#2563eb" stroke-width="2"/>
+  <line x1="190" y1="136" x2="110" y2="46" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 320" font-family="ui-monospace,monospace">
+  <rect x="30" y="14" width="180" height="46" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="120" y="38" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1</text>
+  <text x="120" y="54" text-anchor="middle" font-size="8" fill="#6b7480">.1.1 · 10.0.0.1/30</text>
+  <rect x="260" y="14" width="180" height="46" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="350" y="38" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R2</text>
+  <text x="350" y="54" text-anchor="middle" font-size="8" fill="#6b7480">.2.1 · 10.0.0.5/30</text>
+  <rect x="490" y="14" width="180" height="46" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="580" y="38" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R3</text>
+  <text x="580" y="54" text-anchor="middle" font-size="8" fill="#6b7480">.3.1 · 10.0.0.10/30</text>
+  <line x1="210" y1="37" x2="260" y2="37" stroke="#6b7480" stroke-width="2.5"/>
+  <line x1="440" y1="37" x2="490" y2="37" stroke="#6b7480" stroke-width="2.5"/>
+  <rect x="30" y="130" width="180" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="120" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN: 192.168.1.0/24</text>
+  <rect x="260" y="130" width="180" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="350" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN: 192.168.2.0/24</text>
+  <rect x="490" y="130" width="180" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="580" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN: 192.168.3.0/24</text>
+  <rect x="240" y="240" width="220" height="54" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="350" y="266" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="700">KALI</text>
+  <text x="350" y="284" text-anchor="middle" font-size="9" fill="#6b7480">blackhole · hijack · loop</text>
+  <line x1="350" y1="240" x2="120" y2="60" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+</svg>
+22|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 180" font-family="ui-monospace,monospace">
+  <rect x="130" y="10" width="120" height="40" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="190" y="33" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">R1 · R2 · R3</text>
+  <rect x="10" y="84" width="100" height="36" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="60" y="107" text-anchor="middle" font-size="9" fill="#2563eb">PC1 (LAN A)</text>
+  <rect x="140" y="84" width="100" height="36" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="190" y="107" text-anchor="middle" font-size="9" fill="#2563eb">PC2 (LAN B)</text>
+  <rect x="270" y="84" width="100" height="36" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="320" y="107" text-anchor="middle" font-size="9" fill="#e5484d">KALI</text>
+  <line x1="60" y1="84" x2="140" y2="50" stroke="#2563eb" stroke-width="2"/>
+  <line x1="190" y1="84" x2="190" y2="50" stroke="#2563eb" stroke-width="2"/>
+  <line x1="320" y1="84" x2="240" y2="50" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" font-family="ui-monospace,monospace">
+  <rect x="160" y="14" width="280" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="300" y="40" text-anchor="middle" font-size="14" fill="#14161a" font-weight="700">3 routers · WAN links</text>
+  <text x="300" y="56" text-anchor="middle" font-size="9" fill="#6b7480">/30 WAN · /27 LANs</text>
+  <rect x="40" y="130" width="160" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="120" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN A: /27</text>
+  <text x="120" y="170" text-anchor="middle" font-size="8" fill="#6b7480">192.168.1.0/27 · 30 hosts</text>
+  <rect x="220" y="130" width="160" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="300" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN B: /27</text>
+  <text x="300" y="170" text-anchor="middle" font-size="8" fill="#6b7480">192.168.1.32/27 · 30 hosts</text>
+  <rect x="400" y="130" width="160" height="46" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="480" y="156" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="600">KALI</text>
+  <text x="480" y="170" text-anchor="middle" font-size="8" fill="#6b7480">overlap · wrong mask</text>
+  <line x1="120" y1="130" x2="210" y2="64" stroke="#2563eb" stroke-width="2"/>
+  <line x1="300" y1="130" x2="300" y2="64" stroke="#2563eb" stroke-width="2"/>
+  <line x1="480" y1="130" x2="400" y2="64" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+</svg>
+23|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" font-family="ui-monospace,monospace">
+  <rect x="130" y="10" width="140" height="40" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="200" y="33" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">R1–R2–R3</text>
+  <rect x="10" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="60" y="101" text-anchor="middle" font-size="9" fill="#2563eb">LAN A /26</text>
+  <rect x="140" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="190" y="101" text-anchor="middle" font-size="9" fill="#2563eb">LAN B /27</text>
+  <rect x="290" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="340" y="101" text-anchor="middle" font-size="9" fill="#2563eb">LAN C /28</text>
+  <rect x="140" y="148" width="120" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="200" y="170" text-anchor="middle" font-size="9" fill="#e5484d">KALI (squatter)</text>
+  <line x1="60" y1="80" x2="145" y2="50" stroke="#2563eb" stroke-width="2"/>
+  <line x1="190" y1="80" x2="200" y2="50" stroke="#2563eb" stroke-width="2"/>
+  <line x1="340" y1="80" x2="255" y2="50" stroke="#2563eb" stroke-width="2"/>
+  <line x1="200" y1="148" x2="200" y2="50" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+</svg>|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 300" font-family="ui-monospace,monospace">
+  <rect x="200" y="14" width="300" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="350" y="40" text-anchor="middle" font-size="14" fill="#14161a" font-weight="700">R1 · R2 · R3 — VLSM Core</text>
+  <text x="350" y="56" text-anchor="middle" font-size="9" fill="#6b7480">Summary: 192.168.1.0/25 → R3</text>
+  <rect x="30" y="130" width="160" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="110" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN A: /26 (50 hosts)</text>
+  <text x="110" y="170" text-anchor="middle" font-size="8" fill="#6b7480">192.168.1.0–63</text>
+  <rect x="240" y="130" width="160" height="46" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="320" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">LAN B: /27 (25 hosts)</text>
+  <text x="320" y="170" text-anchor="middle" font-size="8" fill="#6b7480">192.168.1.64–95</text>
+  <rect x="490" y="130" width="180" height="46" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="580" y="156" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="600">KALI</text>
+  <text x="580" y="170" text-anchor="middle" font-size="8" fill="#6b7480">summary hijack · squatter</text>
+  <line x1="110" y1="130" x2="230" y2="64" stroke="#2563eb" stroke-width="2"/>
+  <line x1="320" y1="130" x2="350" y2="64" stroke="#2563eb" stroke-width="2"/>
+  <line x1="580" y1="130" x2="480" y2="64" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+</svg>
+24|<svg viewBox="0 0 380 160" font-family="monospace"><rect x="10" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="60" y="32" text-anchor="middle" font-size="10" font-weight="600">SW1 (server)</text><rect x="140" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/><text x="190" y="32" text-anchor="middle" font-size="10" font-weight="600">SW2 (client)</text><rect x="270" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/><text x="320" y="32" text-anchor="middle" font-size="10" font-weight="600">SW3 (transparent)</text><line x1="110" y1="27" x2="140" y2="27" stroke="#6b7480" stroke-width="2"/><line x1="240" y1="27" x2="270" y2="27" stroke="#6b7480" stroke-width="2"/><rect x="10" y="76" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="60" y="98" text-anchor="middle" font-size="9" font-weight="600">PC1 (V10)</text><rect x="140" y="76" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="190" y="98" text-anchor="middle" font-size="9" font-weight="600">PC2 (V20)</text><rect x="140" y="120" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="190" y="142" text-anchor="middle" font-size="9" fill="#e5484d" font-weight="600">KALI</text><line x1="60" y1="76" x2="60" y2="44" stroke="#2563eb" stroke-width="2"/><line x1="190" y1="76" x2="190" y2="44" stroke="#2563eb" stroke-width="2"/><line x1="190" y1="120" x2="190" y2="44" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/></svg>|<svg viewBox="0 0 600 240" font-family="monospace"><rect x="30" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#14161a" stroke-width="2"/><text x="110" y="38" text-anchor="middle" font-size="13" font-weight="700">SW1 · VTP Server</text><text x="110" y="54" text-anchor="middle" font-size="8" fill="#6b7480">revision 5 · VLANs 1,10,20</text><rect x="220" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#6b7480" stroke-width="2"/><text x="300" y="38" text-anchor="middle" font-size="13" font-weight="700">SW2 · VTP Client</text><text x="300" y="54" text-anchor="middle" font-size="8" fill="#6b7480">revision 5 · learns VLANs</text><rect x="410" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#6b7480" stroke-width="2"/><text x="490" y="38" text-anchor="middle" font-size="13" font-weight="700">SW3 · Transparent</text><text x="490" y="54" text-anchor="middle" font-size="8" fill="#6b7480">same VTP domain · forwards</text><line x1="190" y1="37" x2="220" y2="37" stroke="#6b7480" stroke-width="2"/><line x1="380" y1="37" x2="410" y2="37" stroke="#6b7480" stroke-width="2"/><rect x="30" y="130" width="160" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="110" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC1 · VLAN 10</text><rect x="410" y="130" width="160" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="490" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC2 · VLAN 20</text><rect x="200" y="190" width="200" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="2"/><text x="300" y="214" text-anchor="middle" font-size="11" fill="#e5484d" font-weight="600">KALI · VTP poison · DTP hijack</text><line x1="110" y1="130" x2="110" y2="60" stroke="#2563eb" stroke-width="2"/><line x1="490" y1="130" x2="490" y2="60" stroke="#2563eb" stroke-width="2"/><line x1="300" y1="190" x2="220" y2="60" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/></svg>
+25|<svg viewBox="0 0 380 160" font-family="monospace"><rect x="10" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="60" y="32" text-anchor="middle" font-size="10" font-weight="600">SW1 (root)</text><rect x="140" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/><text x="190" y="32" text-anchor="middle" font-size="10" font-weight="600">SW2</text><rect x="270" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/><text x="320" y="32" text-anchor="middle" font-size="10" font-weight="600">SW3</text><line x1="110" y1="27" x2="140" y2="27" stroke="#6b7480" stroke-width="2"/><line x1="240" y1="27" x2="270" y2="27" stroke="#6b7480" stroke-width="2"/><line x1="190" y1="44" x2="320" y2="44" stroke="#6b7480" stroke-width="2" stroke-dasharray="5 3"/><rect x="10" y="76" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="60" y="98" text-anchor="middle" font-size="9" font-weight="600">PC1</text><rect x="140" y="76" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="190" y="98" text-anchor="middle" font-size="9" font-weight="600">PC2</text><rect x="140" y="120" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="190" y="142" text-anchor="middle" font-size="9" fill="#e5484d" font-weight="600">KALI</text><line x1="60" y1="76" x2="60" y2="44" stroke="#2563eb" stroke-width="2"/><line x1="190" y1="76" x2="190" y2="44" stroke="#2563eb" stroke-width="2"/><line x1="190" y1="120" x2="190" y2="44" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/></svg>|<svg viewBox="0 0 600 240" font-family="monospace"><rect x="30" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="110" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#2563eb">SW1 · Root</text><text x="110" y="54" text-anchor="middle" font-size="8" fill="#6b7480">RSTP · priority 4096</text><rect x="220" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#6b7480" stroke-width="2"/><text x="300" y="38" text-anchor="middle" font-size="13" font-weight="700">SW2</text><text x="300" y="54" text-anchor="middle" font-size="8" fill="#6b7480">alternate port blocked</text><rect x="410" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#6b7480" stroke-width="2"/><text x="490" y="38" text-anchor="middle" font-size="13" font-weight="700">SW3</text><text x="490" y="54" text-anchor="middle" font-size="8" fill="#6b7480">Gi0/3 blocked ⸺</text><line x1="190" y1="37" x2="220" y2="37" stroke="#6b7480" stroke-width="2"/><line x1="380" y1="37" x2="410" y2="37" stroke="#6b7480" stroke-width="2"/><rect x="30" y="130" width="160" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="110" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC1 · edge port</text><rect x="410" y="130" width="160" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="490" y="156" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC2 · edge port</text><rect x="200" y="190" width="200" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="2"/><text x="300" y="214" text-anchor="middle" font-size="11" fill="#e5484d" font-weight="600">KALI · BPDU flood · RSTP poison</text><line x1="110" y1="130" x2="110" y2="60" stroke="#2563eb" stroke-width="2"/><line x1="490" y1="130" x2="490" y2="60" stroke="#2563eb" stroke-width="2"/><line x1="300" y1="190" x2="270" y2="60" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/></svg>
+26|<svg viewBox="0 0 380 120" font-family="monospace"><rect x="10" y="10" width="120" height="40" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/><text x="70" y="33" text-anchor="middle" font-size="11" font-weight="600">SW1</text><rect x="250" y="10" width="120" height="40" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/><text x="310" y="33" text-anchor="middle" font-size="11" font-weight="600">SW2</text><line x1="130" y1="30" x2="180" y2="30" stroke="#2563eb" stroke-width="3"/><line x1="200" y1="30" x2="250" y2="30" stroke="#2563eb" stroke-width="3"/><text x="190" y="24" text-anchor="middle" font-size="8" fill="#2563eb">Po1</text><rect x="140" y="74" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="190" y="96" text-anchor="middle" font-size="9" fill="#e5484d" font-weight="600">KALI</text><line x1="190" y1="74" x2="70" y2="50" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/></svg>|<svg viewBox="0 0 550 210" font-family="monospace">
+  <rect x="30" y="20" width="180" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="120" y="46" text-anchor="middle" font-size="14" font-weight="700">SW1</text>
+  <text x="120" y="62" text-anchor="middle" font-size="9" fill="#6b7480">Gi0/23 + Gi0/24 → Po1</text>
+  <rect x="310" y="20" width="180" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="400" y="46" text-anchor="middle" font-size="14" font-weight="700">SW2</text>
+  <text x="400" y="62" text-anchor="middle" font-size="9" fill="#6b7480">LACP active</text>
+  <line x1="210" y1="45" x2="310" y2="45" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="210" y1="35" x2="310" y2="35" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="210" y1="55" x2="310" y2="55" stroke="#2563eb" stroke-width="2.5"/>
+  <text x="270" y="28" font-size="8" fill="#2563eb">Po1</text>
+  <rect x="170" y="140" width="180" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="260" y="164" text-anchor="middle" font-size="11" fill="#e5484d" font-weight="600">KALI · LACP spoof</text>
+  <line x1="260" y1="140" x2="170" y2="70" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/>
+  <rect x="30" y="140" width="100" height="40" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="80" y="164" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">PC1</text>
+  <line x1="80" y1="140" x2="120" y2="70" stroke="#2563eb" stroke-width="2"/>
+</svg>
+27|<svg viewBox="0 0 380 140" font-family="monospace"><rect x="10" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="60" y="32" text-anchor="middle" font-size="10" font-weight="600">R1</text><rect x="140" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="190" y="32" text-anchor="middle" font-size="10" font-weight="600">R2</text><rect x="270" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="320" y="32" text-anchor="middle" font-size="10" font-weight="600">R3</text><line x1="110" y1="27" x2="140" y2="27" stroke="#2563eb" stroke-width="2"/><line x1="240" y1="27" x2="270" y2="27" stroke="#2563eb" stroke-width="2"/><text x="190" y="24" text-anchor="middle" font-size="7" fill="#2563eb">RIP</text><rect x="10" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="60" y="102" text-anchor="middle" font-size="9" font-weight="600">PC1</text><rect x="270" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="320" y="102" text-anchor="middle" font-size="9" fill="#e5484d" font-weight="600">KALI (FRR)</text><line x1="60" y1="80" x2="60" y2="44" stroke="#2563eb" stroke-width="2"/><line x1="320" y1="80" x2="280" y2="44" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/></svg>|<svg viewBox="0 0 600 220" font-family="monospace"><rect x="20" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#14161a" stroke-width="2"/><text x="100" y="38" text-anchor="middle" font-size="13" font-weight="700">R1 · RIP</text><text x="100" y="54" text-anchor="middle" font-size="8" fill="#6b7480">learning from R2+R3</text><rect x="220" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#14161a" stroke-width="2"/><text x="300" y="38" text-anchor="middle" font-size="13" font-weight="700">R2 · RIP</text><text x="300" y="54" text-anchor="middle" font-size="8" fill="#6b7480">redistributes</text><rect x="420" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#14161a" stroke-width="2"/><text x="500" y="38" text-anchor="middle" font-size="13" font-weight="700">R3 · RIP</text><text x="500" y="54" text-anchor="middle" font-size="8" fill="#6b7480">redistributes</text><line x1="180" y1="37" x2="220" y2="37" stroke="#2563eb" stroke-width="2"/><line x1="380" y1="37" x2="420" y2="37" stroke="#2563eb" stroke-width="2"/><rect x="160" y="140" width="280" height="50" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/><text x="300" y="166" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="700">KALI · FRR Rogue RIP</text><text x="300" y="182" text-anchor="middle" font-size="9" fill="#6b7480">injecting 0.0.0.0/0 · metric 1</text><line x1="180" y1="140" x2="140" y2="60" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/></svg>
+28|<svg viewBox="0 0 380 140" font-family="monospace"><rect x="130" y="10" width="120" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="190" y="32" text-anchor="middle" font-size="11" font-weight="600">R1 (IPv6)</text><rect x="10" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="60" y="102" text-anchor="middle" font-size="9" font-weight="600">PC1</text><rect x="140" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="190" y="102" text-anchor="middle" font-size="9" font-weight="600">PC2</text><rect x="270" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="320" y="102" text-anchor="middle" font-size="9" fill="#e5484d" font-weight="600">KALI</text><line x1="60" y1="80" x2="155" y2="44" stroke="#2563eb" stroke-width="2"/><line x1="190" y1="80" x2="190" y2="44" stroke="#2563eb" stroke-width="2"/><line x1="320" y1="80" x2="225" y2="44" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/></svg>|<svg viewBox="0 0 600 220" font-family="monospace"><rect x="180" y="14" width="240" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/><text x="300" y="40" text-anchor="middle" font-size="14" font-weight="700">R1 · IPv6 Gateway</text><text x="300" y="56" text-anchor="middle" font-size="9" fill="#6b7480">2001:db8:1::1/64 · RA every 200s</text><rect x="30" y="120" width="160" height="50" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="110" y="146" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC1 · SLAAC</text><text x="110" y="162" text-anchor="middle" font-size="8" fill="#6b7480">EUI-64 auto IP</text><rect x="410" y="120" width="160" height="50" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/><text x="490" y="146" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="600">KALI</text><text x="490" y="162" text-anchor="middle" font-size="8" fill="#6b7480">rogue RA · EUI-64 predict</text><line x1="110" y1="120" x2="210" y2="64" stroke="#2563eb" stroke-width="2"/><line x1="490" y1="120" x2="400" y2="64" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/></svg>
+29|<svg viewBox="0 0 380 140" font-family="monospace"><rect x="10" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="60" y="32" text-anchor="middle" font-size="10" font-weight="600">PC1 (client)</text><rect x="140" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/><text x="190" y="32" text-anchor="middle" font-size="10" font-weight="600">R1</text><rect x="270" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="320" y="32" text-anchor="middle" font-size="10" font-weight="600">PC2 (server)</text><line x1="110" y1="27" x2="140" y2="27" stroke="#2563eb" stroke-width="2"/><line x1="240" y1="27" x2="270" y2="27" stroke="#6b7480" stroke-width="2"/><rect x="140" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="190" y="102" text-anchor="middle" font-size="9" fill="#e5484d" font-weight="600">KALI</text><line x1="190" y1="80" x2="190" y2="44" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/></svg>|<svg viewBox="0 0 600 220" font-family="monospace"><rect x="40" y="14" width="160" height="50" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="120" y="40" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC1 (client)</text><text x="120" y="56" text-anchor="middle" font-size="8" fill="#6b7480">HTTP client</text><rect x="220" y="14" width="160" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/><text x="300" y="40" text-anchor="middle" font-size="13" font-weight="600">R1 · TCP intercept</text><text x="300" y="56" text-anchor="middle" font-size="8" fill="#6b7480">rate-limit UDP</text><rect x="400" y="14" width="160" height="50" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="480" y="40" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC2 (server)</text><text x="480" y="56" text-anchor="middle" font-size="8" fill="#6b7480">HTTP · port 80</text><line x1="200" y1="39" x2="220" y2="39" stroke="#2563eb" stroke-width="2"/><line x1="380" y1="39" x2="400" y2="39" stroke="#6b7480" stroke-width="2"/><rect x="160" y="150" width="280" height="50" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/><text x="300" y="176" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="700">KALI</text><text x="300" y="192" text-anchor="middle" font-size="9" fill="#6b7480">SYN flood · UDP flood · port scan</text><line x1="300" y1="150" x2="300" y2="64" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/></svg>
+30|<svg viewBox="0 0 380 140" font-family="monospace"><rect x="130" y="10" width="120" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="190" y="32" text-anchor="middle" font-size="11" font-weight="600">R1 (ACL)</text><rect x="10" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="60" y="102" text-anchor="middle" font-size="9" font-weight="600">PC1 (.1.x)</text><rect x="270" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="320" y="102" text-anchor="middle" font-size="9" font-weight="600">PC2 (.2.x)</text><rect x="10" y="80" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="60" y="150" ...></svg>|<svg viewBox="0 0 500 200" font-family="monospace">...</svg>
+31|<svg viewBox="0 0 380 120" font-family="monospace"><rect x="10" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="60" y="32" text-anchor="middle" font-size="10" font-weight="600">R1 (NTP svr)</text><rect x="140" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/><text x="190" y="32" text-anchor="middle" font-size="10" font-weight="600">SW1 (client)</text><rect x="270" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="320" y="32" text-anchor="middle" font-size="10" fill="#e5484d" font-weight="600">KALI</text><line x1="110" y1="27" x2="140" y2="27" stroke="#6b7480" stroke-width="2"/><line x1="240" y1="27" x2="270" y2="27" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/></svg>|<svg viewBox="0 0 600 180" font-family="monospace"><rect x="30" y="20" width="180" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/><text x="120" y="46" text-anchor="middle" font-size="13" font-weight="700">R1 · NTP stratum 3</text><text x="120" y="62" text-anchor="middle" font-size="8" fill="#6b7480">authenticated NTP</text><rect x="250" y="20" width="160" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/><text x="330" y="46" text-anchor="middle" font-size="13" font-weight="700">SW1 · client</text><text x="330" y="62" text-anchor="middle" font-size="8" fill="#6b7480">key 1 · MD5</text><line x1="210" y1="45" x2="250" y2="45" stroke="#6b7480" stroke-width="2"/><rect x="420" y="20" width="160" height="50" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/><text x="500" y="46" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="700">KALI · NTP spoof</text><text x="500" y="62" text-anchor="middle" font-size="8" fill="#6b7480">forged NTP · amplification</text><line x1="410" y1="45" x2="420" y2="45" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/></svg>
+32|<svg viewBox="0 0 380 120" font-family="monospace"><rect x="10" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#6b7480" stroke-width="1.5"/><text x="60" y="32" text-anchor="middle" font-size="10" font-weight="600">SW1 (SNMP)</text><rect x="270" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="320" y="32" text-anchor="middle" font-size="10" fill="#e5484d" font-weight="600">KALI (NMS)</text><line x1="110" y1="27" x2="270" y2="27" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/></svg>|<svg viewBox="0 0 500 150" font-family="monospace"><rect x="30" y="20" width="200" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/><text x="130" y="46" text-anchor="middle" font-size="13" font-weight="700">SW1 · SNMP Agent</text><text x="130" y="62" text-anchor="middle" font-size="8" fill="#6b7480">public/private → v3 only</text><rect x="280" y="20" width="200" height="50" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/><text x="380" y="46" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="700">KALI · SNMP Tools</text><text x="380" y="62" text-anchor="middle" font-size="8" fill="#6b7480">snmpwalk · snmpset · onesixtyone</text><line x1="230" y1="45" x2="280" y2="45" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/></svg>
+33|<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="30" y="50" width="100" height="34" rx="7" fill="#fff" stroke="#14161a" stroke-width="1.4"/>
+  <text x="80" y="72" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">R1</text>
+  <rect x="190" y="50" width="100" height="34" rx="7" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="240" y="68" text-anchor="middle" font-size="10" fill="#c02a30" font-weight="600">KALI</text>
+  <text x="240" y="79" text-anchor="middle" font-size="8" fill="#6b7480">collector + attacker</text>
+  <line x1="130" y1="67" x2="190" y2="67" stroke="#6b7480" stroke-width="2"/>
+  <text x="160" y="100" text-anchor="middle" font-size="8" fill="#6b7480">UDP 514</text>
+</svg>|<svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="60" y="80" width="160" height="52" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="140" y="103" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1</text>
+  <text x="140" y="120" text-anchor="middle" font-size="9" fill="#6b7480">logging host + seq-numbers</text>
+  <rect x="380" y="80" width="170" height="56" rx="9" fill="#fff" stroke="#c02a30" stroke-width="1.8"/>
+  <text x="465" y="103" text-anchor="middle" font-size="13" fill="#c02a30" font-weight="700">KALI</text>
+  <text x="465" y="120" text-anchor="middle" font-size="9" fill="#6b7480">rsyslog collector</text>
+  <text x="465" y="132" text-anchor="middle" font-size="8" fill="#6b7480">+ forged UDP source</text>
+  <line x1="220" y1="106" x2="380" y2="106" stroke="#6b7480" stroke-width="2.5"/>
+  <text x="300" y="96" text-anchor="middle" font-size="9" fill="#6b7480">UDP 514 → TCP 6514</text>
+</svg>
+34|<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="30" y="50" width="100" height="34" rx="7" fill="#fff" stroke="#14161a" stroke-width="1.4"/>
+  <text x="80" y="72" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">R1</text>
+  <rect x="190" y="50" width="100" height="34" rx="7" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="240" y="68" text-anchor="middle" font-size="10" fill="#c02a30" font-weight="600">KALI</text>
+  <text x="240" y="79" text-anchor="middle" font-size="8" fill="#6b7480">TFTP + FTP server</text>
+  <line x1="130" y1="67" x2="190" y2="67" stroke="#c02a30" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="160" y="100" text-anchor="middle" font-size="8" fill="#6b7480">unauth'd transfer</text>
+</svg>|<svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="60" y="80" width="170" height="56" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="145" y="103" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1</text>
+  <text x="145" y="120" text-anchor="middle" font-size="9" fill="#6b7480">config + enable pw (type 7)</text>
+  <rect x="370" y="80" width="180" height="56" rx="9" fill="#fff" stroke="#c02a30" stroke-width="1.8"/>
+  <text x="460" y="103" text-anchor="middle" font-size="13" fill="#c02a30" font-weight="700">KALI</text>
+  <text x="460" y="120" text-anchor="middle" font-size="9" fill="#6b7480">TFTP get + FTP sniff</text>
+  <text x="460" y="132" text-anchor="middle" font-size="8" fill="#6b7480">+ type-7 decrypt</text>
+  <line x1="230" y1="106" x2="370" y2="106" stroke="#c02a30" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <text x="300" y="96" text-anchor="middle" font-size="9" fill="#6b7480">TFTP 69 / FTP 21 → SCP 22</text>
+</svg>
+35|<svg viewBox="0 0 340 140" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="130" y="50" width="80" height="34" rx="7" fill="#fff" stroke="#14161a" stroke-width="1.4"/>
+  <text x="170" y="72" text-anchor="middle" font-size="10" fill="#14161a" font-weight="600">R1 ↔ R2</text>
+  <rect x="10" y="10" width="90" height="30" rx="6" fill="#fff" stroke="#1d4fc7" stroke-width="1.5"/>
+  <text x="55" y="30" text-anchor="middle" font-size="9" fill="#1d4fc7" font-weight="600">PC1 (voice)</text>
+  <rect x="240" y="10" width="90" height="30" rx="6" fill="#fff" stroke="#c02a30" stroke-width="1.5"/>
+  <text x="285" y="30" text-anchor="middle" font-size="9" fill="#c02a30" font-weight="600">KALI (bulk)</text>
+  <line x1="55" y1="40" x2="130" y2="60" stroke="#1d4fc7" stroke-width="2"/>
+  <line x1="285" y1="40" x2="210" y2="60" stroke="#c02a30" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="170" y="100" text-anchor="middle" font-size="8" fill="#6b7480">512 kbps contended link</text>
+</svg>|<svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="270" y="100" width="160" height="56" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.8"/>
+  <text x="350" y="124" text-anchor="middle" font-size="13" fill="#14161a" font-weight="700">R1 → R2</text>
+  <text x="350" y="140" text-anchor="middle" font-size="9" fill="#6b7480">512 kbps · LLQ policy</text>
+  <rect x="40" y="30" width="150" height="52" rx="9" fill="#fff" stroke="#1d4fc7" stroke-width="1.8"/>
+  <text x="115" y="53" text-anchor="middle" font-size="12" fill="#1d4fc7" font-weight="600">PC1 · voice</text>
+  <text x="115" y="69" text-anchor="middle" font-size="8" fill="#6b7480">20ms interval · DSCP EF</text>
+  <rect x="510" y="30" width="150" height="52" rx="9" fill="#fff" stroke="#c02a30" stroke-width="1.8"/>
+  <text x="585" y="53" text-anchor="middle" font-size="12" fill="#c02a30" font-weight="600">KALI · bulk</text>
+  <text x="585" y="69" text-anchor="middle" font-size="8" fill="#6b7480">iperf3 · saturating flood</text>
+  <line x1="115" y1="82" x2="300" y2="100" stroke="#1d4fc7" stroke-width="2.5"/>
+  <line x1="585" y1="82" x2="400" y2="100" stroke="#c02a30" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <rect x="270" y="190" width="160" height="46" rx="8" fill="#fff" stroke="#0d7050" stroke-width="1.6"/>
+  <text x="350" y="212" text-anchor="middle" font-size="11" fill="#0d7050" font-weight="600">priority 20% · voice</text>
+  <text x="350" y="226" text-anchor="middle" font-size="9" fill="#6b7480">class-default: fair-queue</text>
+  <line x1="350" y1="156" x2="350" y2="190" stroke="#0d7050" stroke-width="2"/>
+</svg>
+36|<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="120" y="50" width="100" height="34" rx="7" fill="#fff" stroke="#14161a" stroke-width="1.4"/>
+  <text x="170" y="72" text-anchor="middle" font-size="11" fill="#14161a" font-weight="600">SW1</text>
+  <rect x="10" y="10" width="90" height="30" rx="6" fill="#fff" stroke="#1d4fc7" stroke-width="1.5"/>
+  <text x="55" y="30" text-anchor="middle" font-size="9" fill="#1d4fc7" font-weight="600">PC1 (locked)</text>
+  <rect x="10" y="100" width="120" height="32" rx="6" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="70" y="120" text-anchor="middle" font-size="9" fill="#c02a30" font-weight="600">KALI (spoofed MAC)</text>
+  <line x1="55" y1="40" x2="150" y2="60" stroke="#1d4fc7" stroke-width="2"/>
+  <line x1="70" y1="100" x2="150" y2="72" stroke="#c02a30" stroke-width="2" stroke-dasharray="5 4"/>
+</svg>|<svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+   <rect x="270" y="90" width="160" height="56" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.8"/>
+   <text x="350" y="113" text-anchor="middle" font-size="13" fill="#14161a" font-weight="700">SW1</text>
+   <text x="350" y="130" text-anchor="middle" font-size="9" fill="#6b7480">Fa0/1 · port-security max 1</text>
+   <rect x="40" y="30" width="160" height="52" rx="9" fill="#fff" stroke="#1d4fc7" stroke-width="1.8"/>
+   <text x="120" y="53" text-anchor="middle" font-size="12" fill="#1d4fc7" font-weight="600">PC1 · authorized</text>
+   <text x="120" y="69" text-anchor="middle" font-size="8" fill="#6b7480">sticky-learned MAC</text>
+   <rect x="40" y="170" width="200" height="56" rx="9" fill="#fff" stroke="#c02a30" stroke-width="1.8"/>
+   <text x="140" y="193" text-anchor="middle" font-size="12" fill="#c02a30" font-weight="600">KALI · macchanger</text>
+   <text x="140" y="209" text-anchor="middle" font-size="8" fill="#6b7480">clones PC1 MAC exactly</text>
+   <rect x="450" y="170" width="160" height="52" rx="9" fill="#fff" stroke="#1d4fc7" stroke-width="1.8"/>
+   <text x="530" y="193" text-anchor="middle" font-size="12" fill="#1d4fc7" font-weight="600">PC2 · authorized</text>
+   <text x="530" y="209" text-anchor="middle" font-size="8" fill="#6b7480">also protected</text>
+   <line x1="120" y1="82" x2="290" y2="118" stroke="#1d4fc7" stroke-width="2.5"/>
+   <line x1="140" y1="170" x2="290" y2="130" stroke="#c02a30" stroke-width="2.5" stroke-dasharray="6 5"/>
+   <line x1="530" y1="170" x2="380" y2="130" stroke="#1d4fc7" stroke-width="2.5"/>
+ </svg>
+37|<svg viewBox="0 0 720 320" role="img" aria-label="Switch with a trusted uplink to the real DHCP server and untrusted client ports, one of which hosts a rogue server">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">real DHCP · 10.0.10.1</text>
+      <rect x="300" y="30" width="130" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">snooping enabled</text>
+      <!-- trusted uplink -->
+      <line x1="190" y1="55" x2="300" y2="55" stroke="#16a34a" stroke-width="3"/>
+      <text x="245" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a" font-weight="700">e0/0 · TRUSTED</text>
+      <!-- untrusted downlinks -->
+      <line x1="330" y1="80" x2="160" y2="230" stroke="#64748b" stroke-width="2"/>
+      <line x1="400" y1="80" x2="575" y2="230" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="238" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/1 · untrusted</text>
+      <text x="470" y="160" font-family="monospace" font-size="9" fill="#e5484d">e0/3 · untrusted</text>
+      <rect x="100" y="230" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="160" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-A</text>
+      <text x="160" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">legit client</text>
+      <rect x="515" y="230" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="575" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="575" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">rogue server</text>
+      <text x="360" y="308" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">server replies are legal only from the trusted uplink — anywhere else, dropped</text>
+    </svg>|<svg viewBox="0 0 720 320" role="img" aria-label="Switch with a trusted uplink to the real DHCP server and untrusted client ports, one of which hosts a rogue server">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">real DHCP · 10.0.10.1</text>
+      <rect x="300" y="30" width="130" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">snooping enabled</text>
+      <!-- trusted uplink -->
+      <line x1="190" y1="55" x2="300" y2="55" stroke="#16a34a" stroke-width="3"/>
+      <text x="245" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a" font-weight="700">e0/0 · TRUSTED</text>
+      <!-- untrusted downlinks -->
+      <line x1="330" y1="80" x2="160" y2="230" stroke="#64748b" stroke-width="2"/>
+      <line x1="400" y1="80" x2="575" y2="230" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="238" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/1 · untrusted</text>
+      <text x="470" y="160" font-family="monospace" font-size="9" fill="#e5484d">e0/3 · untrusted</text>
+      <rect x="100" y="230" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="160" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC1</text>
+      <text x="160" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">legit client</text>
+      <rect x="515" y="230" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="575" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="575" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">rogue server</text>
+      <text x="360" y="308" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">server replies are legal only from the trusted uplink — anywhere else, dropped</text>
+    </svg>
+38|<svg viewBox="0 0 720 320" role="img" aria-label="Router gateway, switch with DHCP snooping, a client, and a Kali attacker poisoning ARP to sit between them">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">gateway · 10.0.10.1</text>
+      <rect x="300" y="30" width="130" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">snooping + DAI</text>
+      <line x1="190" y1="55" x2="300" y2="55" stroke="#16a34a" stroke-width="3"/>
+      <text x="245" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a" font-weight="700">e0/0 · trusted</text>
+      <line x1="330" y1="80" x2="200" y2="230" stroke="#64748b" stroke-width="2"/>
+      <line x1="400" y1="80" x2="560" y2="230" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="250" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/1 · untrusted</text>
+      <text x="460" y="160" font-family="monospace" font-size="9" fill="#e5484d">e0/3 · untrusted</text>
+      <rect x="130" y="230" width="130" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="195" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-A</text>
+      <text x="195" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">10.0.10.10 (DHCP)</text>
+      <rect x="500" y="230" width="130" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="565" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="565" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">claims to be .1</text>
+      <text x="360" y="308" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">Kali tells PC-A "I am 10.0.10.1" — DAI checks that claim against the binding table</text>
+    </svg>|<svg viewBox="0 0 720 320" role="img" aria-label="Router gateway, switch with DHCP snooping, a client, and a Kali attacker poisoning ARP to sit between them">
+      <rect x="40" y="30" width="150" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="115" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+      <text x="115" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">gateway · 10.0.10.1</text>
+      <rect x="300" y="30" width="130" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="365" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="365" y="68" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">snooping + DAI</text>
+      <line x1="190" y1="55" x2="300" y2="55" stroke="#16a34a" stroke-width="3"/>
+      <text x="245" y="46" text-anchor="middle" font-family="monospace" font-size="9" fill="#16a34a" font-weight="700">e0/0 · trusted</text>
+      <line x1="330" y1="80" x2="200" y2="230" stroke="#64748b" stroke-width="2"/>
+      <line x1="400" y1="80" x2="560" y2="230" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="250" y="160" font-family="monospace" font-size="9" fill="#64748b">e0/1 · untrusted</text>
+      <text x="460" y="160" font-family="monospace" font-size="9" fill="#e5484d">e0/3 · untrusted</text>
+      <rect x="130" y="230" width="130" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="195" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-A</text>
+      <text x="195" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">10.0.10.10 (DHCP)</text>
+      <rect x="500" y="230" width="130" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="565" y="252" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="565" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">claims to be .1</text>
+      <text x="360" y="308" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">Kali tells PC-A "I am 10.0.10.1" — DAI checks that claim against the binding table</text>
+    </svg>
+39|<svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="120" y="55" width="90" height="34" rx="7" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="165" y="77" text-anchor="middle" font-size="10" fill="#c02a30" font-weight="600">SW1 (everything)</text>
+  <rect x="10" y="10" width="80" height="28" rx="6" fill="#fff" stroke="#1d4fc7" stroke-width="1.4"/>
+  <text x="50" y="28" text-anchor="middle" font-size="9" fill="#1d4fc7">PC1</text>
+  <rect x="10" y="100" width="80" height="28" rx="6" fill="#fff" stroke="#1d4fc7" stroke-width="1.4"/>
+  <text x="50" y="118" text-anchor="middle" font-size="9" fill="#1d4fc7">PC2</text>
+  <rect x="230" y="55" width="80" height="30" rx="6" fill="#fff" stroke="#0d7050" stroke-width="1.4"/>
+  <text x="270" y="74" text-anchor="middle" font-size="9" fill="#0d7050">R1</text>
+  <line x1="50" y1="38" x2="130" y2="65" stroke="#1d4fc7" stroke-width="2"/>
+  <line x1="50" y1="100" x2="130" y2="80" stroke="#1d4fc7" stroke-width="2"/>
+  <line x1="210" y1="72" x2="230" y2="72" stroke="#0d7050" stroke-width="2"/>
+</svg>|<svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="30" y="110" width="150" height="46" rx="8" fill="#fff" stroke="#1d4fc7" stroke-width="1.6"/>
+  <text x="105" y="132" text-anchor="middle" font-size="12" fill="#1d4fc7" font-weight="600">PC1 / PC2</text>
+  <text x="105" y="147" text-anchor="middle" font-size="8" fill="#6b7480">access tier</text>
+  <rect x="230" y="30" width="150" height="46" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.6"/>
+  <text x="305" y="52" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW1 · access</text>
+  <rect x="230" y="190" width="150" height="46" rx="8" fill="#fff" stroke="#14161a" stroke-width="1.6"/>
+  <text x="305" y="212" text-anchor="middle" font-size="12" fill="#14161a" font-weight="600">SW1 · access</text>
+  <rect x="470" y="110" width="170" height="50" rx="9" fill="#fff" stroke="#0d7050" stroke-width="1.8"/>
+  <text x="555" y="132" text-anchor="middle" font-size="12" fill="#0d7050" font-weight="600">SW2 · dist/core</text>
+  <text x="555" y="147" text-anchor="middle" font-size="8" fill="#6b7480">redundant uplinks + STP</text>
+  <line x1="180" y1="130" x2="240" y2="70" stroke="#6b7480" stroke-width="2"/>
+  <line x1="380" y1="53" x2="475" y2="120" stroke="#0d7050" stroke-width="2.5"/>
+  <line x1="380" y1="213" x2="475" y2="145" stroke="#0d7050" stroke-width="2.5" stroke-dasharray="5 4"/>
+  <text x="430" y="180" text-anchor="middle" font-size="8" fill="#6b7480">two uplinks — one can fail safely</text>
+</svg>
+40|<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="20" y="40" width="110" height="60" rx="8" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="75" y="65" text-anchor="middle" font-size="10" fill="#c02a30" font-weight="600">tenant-a</text>
+  <rect x="190" y="40" width="110" height="60" rx="8" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="245" y="65" text-anchor="middle" font-size="10" fill="#c02a30" font-weight="600">tenant-b</text>
+  <line x1="130" y1="70" x2="190" y2="70" stroke="#c02a30" stroke-width="2.5" stroke-dasharray="5 4"/>
+  <text x="160" y="60" text-anchor="middle" font-size="8" fill="#6b7480">shared bridge</text>
+</svg>|<svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="60" y="80" width="220" height="80" rx="10" fill="#fff" stroke="#1d4fc7" stroke-width="1.8"/>
+  <text x="170" y="110" text-anchor="middle" font-size="13" fill="#1d4fc7" font-weight="700">tenant-a-net</text>
+  <text x="170" y="128" text-anchor="middle" font-size="9" fill="#6b7480">--internal · isolated</text>
+  <text x="170" y="144" text-anchor="middle" font-size="9" fill="#6b7480">container: tenant-a</text>
+  <rect x="420" y="80" width="220" height="80" rx="10" fill="#fff" stroke="#0d7050" stroke-width="1.8"/>
+  <text x="530" y="110" text-anchor="middle" font-size="13" fill="#0d7050" font-weight="700">tenant-b-net</text>
+  <text x="530" y="128" text-anchor="middle" font-size="9" fill="#6b7480">--internal · isolated</text>
+  <text x="530" y="144" text-anchor="middle" font-size="9" fill="#6b7480">container: tenant-b</text>
+  <line x1="280" y1="120" x2="420" y2="120" stroke="#c02a30" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="350" y="110" text-anchor="middle" font-size="9" fill="#c02a30">no route exists</text>
+</svg>
+41|<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <circle cx="80" cy="70" r="30" fill="#fff" stroke="#0d7050" stroke-width="1.6"/>
+  <text x="80" y="74" text-anchor="middle" font-size="9" fill="#0d7050" font-weight="600">AP</text>
+  <rect x="200" y="55" width="90" height="30" rx="6" fill="#fff" stroke="#c02a30" stroke-width="1.6"/>
+  <text x="245" y="74" text-anchor="middle" font-size="9" fill="#c02a30" font-weight="600">KALI mon0</text>
+  <path d="M 110 60 Q 150 40 195 62" stroke="#0d7050" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
+  <path d="M 110 80 Q 150 100 195 78" stroke="#0d7050" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
+</svg>|<svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <circle cx="160" cy="120" r="60" fill="#fff" stroke="#0d7050" stroke-width="1.8"/>
+  <text x="160" y="116" text-anchor="middle" font-size="13" fill="#0d7050" font-weight="700">AP</text>
+  <text x="160" y="132" text-anchor="middle" font-size="8" fill="#6b7480">beacons + PMF</text>
+  <rect x="330" y="40" width="160" height="46" rx="8" fill="#fff" stroke="#1d4fc7" stroke-width="1.6"/>
+  <text x="410" y="62" text-anchor="middle" font-size="12" fill="#1d4fc7" font-weight="600">Client</text>
+  <text x="410" y="76" text-anchor="middle" font-size="8" fill="#6b7480">4-way handshake</text>
+  <rect x="500" y="150" width="170" height="50" rx="9" fill="#fff" stroke="#c02a30" stroke-width="1.8"/>
+  <text x="585" y="172" text-anchor="middle" font-size="12" fill="#c02a30" font-weight="600">KALI · monitor mode</text>
+  <text x="585" y="188" text-anchor="middle" font-size="8" fill="#6b7480">captures + forged deauth (blocked by PMF)</text>
+  <path d="M 220 100 Q 280 60 330 63" stroke="#0d7050" stroke-width="2" fill="none"/>
+  <path d="M 220 140 Q 350 200 500 175" stroke="#c02a30" stroke-width="2" fill="none" stroke-dasharray="6 5"/>
+</svg>
+42|<svg viewBox="0 0 380 80" font-family="monospace"><rect x="10" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="60" y="32" text-anchor="middle" font-size="10" font-weight="600">WLC</text><rect x="140" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="190" y="32" text-anchor="middle" font-size="10">AP</text><rect x="270" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="320" y="32" text-anchor="middle" font-size="10" fill="#e5484d">KALI</text><line x1="110" y1="27" x2="140" y2="27" stroke="#6b7480" stroke-width="2"/><line x1="240" y1="27" x2="270" y2="27" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/></svg>|<svg viewBox="0 0 500 120" font-family="monospace"><rect x="30" y="14" width="140" height="46" rx="8" fill="#fff" stroke="#14161a" stroke-width="2"/><text x="100" y="40" text-anchor="middle" font-size="13" font-weight="700">WLC</text><text x="100" y="56" text-anchor="middle" font-size="8" fill="#6b7480">CAPWAP controller</text><rect x="200" y="14" width="120" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="260" y="40" text-anchor="middle" font-size="13" fill="#2563eb">AP</text><rect x="350" y="14" width="140" height="46" rx="8" fill="#fff" stroke="#e5484d" stroke-width="2"/><text x="420" y="40" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="700">KALI</text><line x1="170" y1="37" x2="200" y2="37" stroke="#6b7480" stroke-width="2"/><line x1="320" y1="37" x2="350" y2="37" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/></svg>
+43|<svg viewBox="0 0 380 80" font-family="monospace"><rect x="10" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="60" y="32" text-anchor="middle" font-size="10" font-weight="600">R1</text><rect x="270" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="320" y="32" text-anchor="middle" font-size="10" fill="#2563eb">KALI</text><line x1="110" y1="27" x2="270" y2="27" stroke="#2563eb" stroke-width="2"/></svg>|<svg viewBox="0 0 500 120" font-family="monospace"><rect x="30" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#14161a" stroke-width="2"/><text x="110" y="40" text-anchor="middle" font-size="13" font-weight="700">R1 · RESTCONF</text><text x="110" y="56" text-anchor="middle" font-size="8" fill="#6b7480">HTTPS · YANG data model</text><rect x="260" y="14" width="200" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="360" y="40" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="700">KALI · curl + Postman</text><text x="360" y="56" text-anchor="middle" font-size="8" fill="#6b7480">RESTCONF API calls</text><line x1="190" y1="37" x2="260" y2="37" stroke="#2563eb" stroke-width="2"/></svg>
+44|<svg viewBox="0 0 380 80" font-family="monospace"><rect x="10" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="60" y="32" text-anchor="middle" font-size="10" font-weight="600">R1</text><rect x="270" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="320" y="32" text-anchor="middle" font-size="10" fill="#2563eb">KALI</text><line x1="110" y1="27" x2="270" y2="27" stroke="#2563eb" stroke-width="2"/></svg>|<svg viewBox="0 0 500 120" font-family="monospace"><rect x="30" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#14161a" stroke-width="2"/><text x="110" y="40" text-anchor="middle" font-size="13" font-weight="700">R1 · NETCONF</text><text x="110" y="56" text-anchor="middle" font-size="8" fill="#6b7480">SSH port 830 · YANG</text><rect x="260" y="14" width="200" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="360" y="40" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="700">KALI · SSH + XML</text><text x="360" y="56" text-anchor="middle" font-size="8" fill="#6b7480">NETCONF get-config/edit-config</text><line x1="190" y1="37" x2="260" y2="37" stroke="#2563eb" stroke-width="2"/></svg>
+45|<svg viewBox="0 0 380 80" font-family="monospace"><rect x="10" y="10" width="120" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/><text x="70" y="32" text-anchor="middle" font-size="10" font-weight="600">Ansible</text><rect x="160" y="10" width="80" height="34" rx="6" fill="#fff" stroke="#14161a" stroke-width="1.5"/><text x="200" y="32" text-anchor="middle" font-size="10">R1</text><rect x="270" y="10" width="100" height="34" rx="6" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><text x="320" y="32" text-anchor="middle" font-size="10" fill="#e5484d">KALI</text><line x1="130" y1="27" x2="160" y2="27" stroke="#2563eb" stroke-width="2"/><line x1="240" y1="27" x2="270" y2="27" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/></svg>|<svg viewBox="0 0 600 120" font-family="monospace"><rect x="30" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="110" y="40" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="700">Ansible control</text><text x="110" y="56" text-anchor="middle" font-size="8" fill="#6b7480">playbook + inventory</text><rect x="220" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#14161a" stroke-width="2"/><text x="300" y="40" text-anchor="middle" font-size="13" font-weight="700">R1 · managed</text><text x="300" y="56" text-anchor="middle" font-size="8" fill="#6b7480">IOS config pushed</text><rect x="410" y="14" width="160" height="46" rx="8" fill="#fff" stroke="#e5484d" stroke-width="2"/><text x="490" y="40" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="700">KALI · rogue</text><text x="490" y="56" text-anchor="middle" font-size="8" fill="#6b7480">malicious playbook</text><line x1="190" y1="37" x2="220" y2="37" stroke="#2563eb" stroke-width="2"/><line x1="380" y1="37" x2="410" y2="37" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 5"/></svg>
+46|<svg viewBox="0 0 720 300" role="img" aria-label="Network topology: one switch with two legitimate hosts and one Kali attacker">
+      <!-- switch -->
+      <rect x="290" y="30" width="140" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="360" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="360" y="68" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">IOU L2 · VLAN 10</text>
+
+      <!-- links -->
+      <line x1="330" y1="76" x2="150" y2="210" stroke="#2563eb" stroke-width="2"/>
+      <line x1="360" y1="76" x2="360" y2="210" stroke="#2563eb" stroke-width="2"/>
+      <line x1="390" y1="76" x2="575" y2="210" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+
+      <!-- port labels -->
+      <text x="250" y="140" font-family="monospace" font-size="10" fill="#64748b">e0/1</text>
+      <text x="368" y="140" font-family="monospace" font-size="10" fill="#64748b">e0/2</text>
+      <text x="470" y="140" font-family="monospace" font-size="10" fill="#e5484d">e0/3</text>
+
+      <!-- PC-A -->
+      <rect x="90" y="210" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="150" y="232" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-A</text>
+      <text x="150" y="248" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.10.10 · finance</text>
+
+      <!-- PC-B -->
+      <rect x="300" y="210" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="360" y="232" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-B</text>
+      <text x="360" y="248" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.10.20 · server</text>
+
+      <!-- Kali -->
+      <rect x="515" y="210" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="575" y="232" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="575" y="248" text-anchor="middle" font-family="monospace" font-size="10" fill="#e5484d">10.0.10.66 · attacker</text>
+
+      <text x="575" y="292" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">same VLAN, access port — no L3 hop needed</text>
+    </svg>|<svg viewBox="0 0 720 300" role="img" aria-label="Network topology: one switch with two legitimate hosts and one Kali attacker">
+      <!-- switch -->
+      <rect x="290" y="30" width="140" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="360" y="52" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">SW1</text>
+      <text x="360" y="68" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">IOU L2 · VLAN 10</text>
+
+      <!-- links -->
+      <line x1="330" y1="76" x2="150" y2="210" stroke="#2563eb" stroke-width="2"/>
+      <line x1="360" y1="76" x2="360" y2="210" stroke="#2563eb" stroke-width="2"/>
+      <line x1="390" y1="76" x2="575" y2="210" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+
+      <!-- port labels -->
+      <text x="250" y="140" font-family="monospace" font-size="10" fill="#64748b">e0/1</text>
+      <text x="368" y="140" font-family="monospace" font-size="10" fill="#64748b">e0/2</text>
+      <text x="470" y="140" font-family="monospace" font-size="10" fill="#e5484d">e0/3</text>
+
+      <!-- PC-A -->
+      <rect x="90" y="210" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="150" y="232" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-A</text>
+      <text x="150" y="248" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.10.10 · finance</text>
+
+      <!-- PC-B -->
+      <rect x="300" y="210" width="120" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="360" y="232" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">PC-B</text>
+      <text x="360" y="248" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">10.0.10.20 · server</text>
+
+      <!-- Kali -->
+      <rect x="515" y="210" width="120" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+      <text x="575" y="232" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+      <text x="575" y="248" text-anchor="middle" font-family="monospace" font-size="10" fill="#e5484d">10.0.10.66 · attacker</text>
+
+      <text x="575" y="292" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">same VLAN, access port — no L3 hop needed</text>
+    </svg>

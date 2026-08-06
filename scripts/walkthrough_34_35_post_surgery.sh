@@ -30,7 +30,7 @@ REG=$(curl -s -X POST -H "Content-Type: application/json" \
   -d "{\"email\":\"${EMAIL}\",\"password\":\"${PASS}\",\"name\":\"Walk34\"}" \
   "$API/auth/register")
 TOKEN=$(echo "$REG" | python3 -c "import sys,json;print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null)
-UID_=$(echo "$REG" | python3 -c "import sys,json;print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
+UID_=$(echo "$REG" | python3 -c "import sys,json;print(json.load(sys.stdin).get('user',{}).get('id',''))" 2>/dev/null)
 [ -z "$TOKEN" ] && { echo "❌ register failed: $REG"; exit 1; }
 echo "  ✅ registered $EMAIL (id=$UID_)"
 
@@ -53,14 +53,14 @@ walk_lab() {
   echo "  LAB $LAB — launch fresh session"
   echo "  EXPECT node_map keys: $EXPECT"
   echo "═══════════════════════════════════════════════════════"
-  SESS=$(curl -s -X POST -H "Authorization: Bearer $TOKEN" "$API/labs/${LAB}/session")
+  SESS=$(curl -s -X POST -H "Authorization: Bearer ${TOKEN}" "$API/labs/${LAB}/session")
   SID=$(echo "$SESS" | python3 -c "import sys,json;print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
   [ -z "$SID" ] && { echo "❌ launch failed: $SESS"; return 1; }
   echo "  session $SID"
 
   # Wait for provisioning → running
   for i in $(seq 1 15); do
-    ST=$(curl -s -H "Authorization: Bearer $TOKEN" "$API/labsessions/$SID" \
+    ST=$(curl -s -H "Authorization: Bearer ${TOKEN}" "$API/labsessions/$SID" \
       | python3 -c "import sys,json;print(json.load(sys.stdin).get('status',''))" 2>/dev/null)
     echo "  t${i}: status=$ST"
     [ "$ST" = "running" ] && break
@@ -69,7 +69,7 @@ walk_lab() {
   done
 
   # THE CHECK — node_map from live session
-  NODES=$(curl -s -H "Authorization: Bearer $TOKEN" "$API/labsessions/$SID" \
+  NODES=$(curl -s -H "Authorization: Bearer ${TOKEN}" "$API/labsessions/$SID" \
     | python3 -c "import sys,json;d=json.load(sys.stdin);print(' '.join(sorted(d.get('node_map',{}).keys())))" 2>/dev/null)
   echo ""
   echo "  ┌─ node_map keys: $NODES"
@@ -82,11 +82,11 @@ walk_lab() {
 
   # Console reachability spot-check (R1 via telnet)
   echo "  console ports:"
-  curl -s -H "Authorization: Bearer $TOKEN" "$API/labsessions/$SID" \
+  curl -s -H "Authorization: Bearer ${TOKEN}" "$API/labsessions/$SID" \
     | python3 -c "import sys,json;d=json.load(sys.stdin);[print(f'    {k}: {v.get(\"console_port\",\"?\")}') for k,v in sorted(d.get('node_map',{}).items())]"
 
   echo "  → End Session (DELETE)"
-  curl -s -X DELETE -H "Authorization: Bearer $TOKEN" "$API/labsessions/$SID" -o /dev/null -w "  delete status: %{http_code}\n"
+  curl -s -X DELETE -H "Authorization: Bearer ${TOKEN}" "$API/labsessions/$SID" -o /dev/null -w "  delete status: %{http_code}\n"
   echo "  ✅ session ended"
 }
 

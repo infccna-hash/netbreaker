@@ -1,0 +1,11 @@
+<svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="60" y="80" width="170" height="56" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="145" y="103" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1</text>
+  <text x="145" y="120" text-anchor="middle" font-size="9" fill="#6b7480">config + enable pw (type 7)</text>
+  <rect x="370" y="80" width="180" height="56" rx="9" fill="#fff" stroke="#c02a30" stroke-width="1.8"/>
+  <text x="460" y="103" text-anchor="middle" font-size="13" fill="#c02a30" font-weight="700">KALI</text>
+  <text x="460" y="120" text-anchor="middle" font-size="9" fill="#6b7480">TFTP get + FTP sniff</text>
+  <text x="460" y="132" text-anchor="middle" font-size="8" fill="#6b7480">+ type-7 decrypt</text>
+  <line x1="230" y1="106" x2="370" y2="106" stroke="#c02a30" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <text x="300" y="96" text-anchor="middle" font-size="9" fill="#6b7480">TFTP 69 / FTP 21 → SCP 22</text>
+</svg>

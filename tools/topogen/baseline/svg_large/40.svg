@@ -1,0 +1,12 @@
+<svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <rect x="60" y="80" width="220" height="80" rx="10" fill="#fff" stroke="#1d4fc7" stroke-width="1.8"/>
+  <text x="170" y="110" text-anchor="middle" font-size="13" fill="#1d4fc7" font-weight="700">tenant-a-net</text>
+  <text x="170" y="128" text-anchor="middle" font-size="9" fill="#6b7480">--internal · isolated</text>
+  <text x="170" y="144" text-anchor="middle" font-size="9" fill="#6b7480">container: tenant-a</text>
+  <rect x="420" y="80" width="220" height="80" rx="10" fill="#fff" stroke="#0d7050" stroke-width="1.8"/>
+  <text x="530" y="110" text-anchor="middle" font-size="13" fill="#0d7050" font-weight="700">tenant-b-net</text>
+  <text x="530" y="128" text-anchor="middle" font-size="9" fill="#6b7480">--internal · isolated</text>
+  <text x="530" y="144" text-anchor="middle" font-size="9" fill="#6b7480">container: tenant-b</text>
+  <line x1="280" y1="120" x2="420" y2="120" stroke="#c02a30" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="350" y="110" text-anchor="middle" font-size="9" fill="#c02a30">no route exists</text>
+</svg>

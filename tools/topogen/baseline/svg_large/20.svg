@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 340" font-family="ui-monospace,monospace">
+  <rect x="220" y="14" width="260" height="50" rx="10" fill="#fff" stroke="#6b7480" stroke-width="2"/>
+  <text x="350" y="40" text-anchor="middle" font-size="15" fill="#14161a" font-weight="600">SW1 · L2 Switch</text>
+  <text x="350" y="56" text-anchor="middle" font-size="9" fill="#6b7480">Gi0/1: V10 · Gi0/2: V20 · Gi0/24: trunk</text>
+  <line x1="120" y1="130" x2="280" y2="64" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="420" y1="64" x2="580" y2="130" stroke="#14161a" stroke-width="2.5"/>
+  <line x1="350" y1="64" x2="350" y2="220" stroke="#e5484d" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <rect x="30" y="130" width="180" height="50" rx="10" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="120" y="156" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC1 · VLAN 10</text>
+  <text x="120" y="174" text-anchor="middle" font-size="9" fill="#6b7480">192.168.10.10/24 · access port</text>
+  <rect x="490" y="130" width="180" height="50" rx="10" fill="#fff" stroke="#14161a" stroke-width="2"/>
+  <text x="580" y="156" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1 · Router</text>
+  <text x="580" y="174" text-anchor="middle" font-size="9" fill="#6b7480">Gi0/0: routed · Lo0: 1.1.1.1</text>
+  <rect x="220" y="220" width="260" height="60" rx="10" fill="#fff" stroke="#e5484d" stroke-width="2"/>
+  <text x="350" y="246" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="700">KALI</text>
+  <text x="350" y="264" text-anchor="middle" font-size="9" fill="#6b7480">DTP spoof · duplex mismatch · port flap</text>
+</svg>

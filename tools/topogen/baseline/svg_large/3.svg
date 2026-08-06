@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 260" font-family="ui-monospace,monospace">
+  <rect x="180" y="18" width="200" height="52" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="280" y="42" text-anchor="middle" font-size="15" fill="#14161a" font-weight="600">SW1</text>
+  <text x="280" y="60" text-anchor="middle" font-size="9" fill="#6b7480">CAM table · MAC flooding target</text>
+  <line x1="100" y1="160" x2="210" y2="70" stroke="#6b7480" stroke-width="2"/>
+  <text x="165" y="108" text-anchor="middle" font-size="8" fill="#6b7480">Et0/1</text>
+  <line x1="280" y1="70" x2="460" y2="160" stroke="#6b7480" stroke-width="2"/>
+  <text x="370" y="108" text-anchor="middle" font-size="8" fill="#6b7480">Et0/2</text>
+  <line x1="280" y1="70" x2="280" y2="186" stroke="#e5484d" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="294" y="130" font-size="8" fill="#e5484d">Et0/3</text>
+  <rect x="12" y="160" width="150" height="44" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="87" y="184" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC1</text>
+  <text x="87" y="198" text-anchor="middle" font-size="9" fill="#6b7480">10.0.0.10 /24</text>
+  <rect x="398" y="160" width="150" height="44" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="473" y="184" text-anchor="middle" font-size="13" fill="#2563eb" font-weight="600">PC2</text>
+  <text x="473" y="198" text-anchor="middle" font-size="9" fill="#6b7480">10.0.0.20 /24</text>
+  <rect x="200" y="196" width="160" height="44" rx="8" fill="#fff" stroke="#e5484d" stroke-width="1.5"/>
+  <text x="280" y="220" text-anchor="middle" font-size="13" fill="#e5484d" font-weight="600">KALI (attacker)</text>
+  <text x="280" y="234" text-anchor="middle" font-size="9" fill="#6b7480">macof · dsniff</text>
+</svg>

@@ -1,0 +1,43 @@
+<svg viewBox="0 0 760 440" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+  <!-- links -->
+  <line x1="380" y1="72" x2="212" y2="168" stroke="#6b7480" stroke-width="2.5"/>
+  <text x="300" y="112" text-anchor="middle" font-size="10" fill="#6b7480">trunk</text>
+  <line x1="272" y1="196" x2="488" y2="196" stroke="#6b7480" stroke-width="4"/>
+  <line x1="118" y1="330" x2="180" y2="222" stroke="#2563eb" stroke-width="2"/>
+  <line x1="310" y1="338" x2="238" y2="222" stroke="#e5484d" stroke-width="2.2" stroke-dasharray="6 4"/>
+  <line x1="628" y1="330" x2="556" y2="222" stroke="#7c3aed" stroke-width="2"/>
+
+  <!-- trunk label -->
+  <rect x="316" y="185" width="128" height="22" rx="11" fill="#fff" stroke="#e6e8ec"/>
+  <text x="380" y="200" text-anchor="middle" font-size="10.5" fill="#6b7480">802.1Q TRUNK</text>
+
+  <!-- R1 -->
+  <rect x="328" y="28" width="104" height="44" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="380" y="49" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">R1</text>
+  <text x="380" y="63" text-anchor="middle" font-size="9" fill="#6b7480">router-on-a-stick</text>
+
+  <!-- SW1 -->
+  <rect x="140" y="170" width="132" height="52" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="206" y="193" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">SW1</text>
+  <text x="206" y="210" text-anchor="middle" font-size="9" fill="#6b7480">VLAN 10 · 20 · 99</text>
+
+  <!-- SW2 -->
+  <rect x="488" y="170" width="132" height="52" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.5"/>
+  <text x="554" y="193" text-anchor="middle" font-size="13" fill="#14161a" font-weight="600">SW2</text>
+  <text x="554" y="210" text-anchor="middle" font-size="9" fill="#6b7480">VLAN 10 · 20 · 99</text>
+
+  <!-- PC1 -->
+  <rect x="56" y="330" width="118" height="46" rx="9" fill="#fff" stroke="#2563eb" stroke-width="1.6"/>
+  <text x="115" y="352" text-anchor="middle" font-size="12" fill="#2563eb" font-weight="600">PC1</text>
+  <text x="115" y="367" text-anchor="middle" font-size="8.5" fill="#6b7480">VLAN 10 · 10.0.10.10</text>
+
+  <!-- KALI -->
+  <rect x="250" y="338" width="128" height="50" rx="9" fill="#fff" stroke="#e5484d" stroke-width="1.8"/>
+  <text x="314" y="360" text-anchor="middle" font-size="12" fill="#e5484d" font-weight="700">KALI · attacker</text>
+  <text x="314" y="375" text-anchor="middle" font-size="8.5" fill="#6b7480">Fa0/3 · dynamic-auto ⚠</text>
+
+  <!-- SRV1 -->
+  <rect x="560" y="330" width="140" height="48" rx="9" fill="#fff" stroke="#7c3aed" stroke-width="1.8"/>
+  <text x="630" y="352" text-anchor="middle" font-size="12" fill="#7c3aed" font-weight="700">SRV1 · 🏆</text>
+  <text x="630" y="367" text-anchor="middle" font-size="8.5" fill="#6b7480">VLAN 20 · 10.0.20.10</text>
+</svg>
