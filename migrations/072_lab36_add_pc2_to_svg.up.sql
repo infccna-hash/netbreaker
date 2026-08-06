@@ -1,0 +1,22 @@
+-- 072_lab36_add_pc2_to_svg.up.sql
+-- Fix SVG: add missing PC2 node + PC2↔SW1 link
+
+UPDATE lab_topologies
+SET svg_large = '<svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, monospace">
+   <rect x="270" y="90" width="160" height="56" rx="9" fill="#fff" stroke="#14161a" stroke-width="1.8"/>
+   <text x="350" y="113" text-anchor="middle" font-size="13" fill="#14161a" font-weight="700">SW1</text>
+   <text x="350" y="130" text-anchor="middle" font-size="9" fill="#6b7480">Fa0/1 · port-security max 1</text>
+   <rect x="40" y="30" width="160" height="52" rx="9" fill="#fff" stroke="#1d4fc7" stroke-width="1.8"/>
+   <text x="120" y="53" text-anchor="middle" font-size="12" fill="#1d4fc7" font-weight="600">PC1 · authorized</text>
+   <text x="120" y="69" text-anchor="middle" font-size="8" fill="#6b7480">sticky-learned MAC</text>
+   <rect x="40" y="170" width="200" height="56" rx="9" fill="#fff" stroke="#c02a30" stroke-width="1.8"/>
+   <text x="140" y="193" text-anchor="middle" font-size="12" fill="#c02a30" font-weight="600">KALI · macchanger</text>
+   <text x="140" y="209" text-anchor="middle" font-size="8" fill="#6b7480">clones PC1 MAC exactly</text>
+   <rect x="450" y="170" width="160" height="52" rx="9" fill="#fff" stroke="#1d4fc7" stroke-width="1.8"/>
+   <text x="530" y="193" text-anchor="middle" font-size="12" fill="#1d4fc7" font-weight="600">PC2 · authorized</text>
+   <text x="530" y="209" text-anchor="middle" font-size="8" fill="#6b7480">also protected</text>
+   <line x1="120" y1="82" x2="290" y2="118" stroke="#1d4fc7" stroke-width="2.5"/>
+   <line x1="140" y1="170" x2="290" y2="130" stroke="#c02a30" stroke-width="2.5" stroke-dasharray="6 5"/>
+   <line x1="530" y1="170" x2="380" y2="130" stroke="#1d4fc7" stroke-width="2.5"/>
+ </svg>'
+WHERE lab_id = 36;

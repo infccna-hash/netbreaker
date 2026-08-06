@@ -1,0 +1,28 @@
+-- 069_lab06_add_sw1_to_svg.up.sql
+-- Fix SVG: add missing SW1 between KALI and R1 (was direct KALI↔R1)
+-- Three new links match Go topology: KALI↔SW1(Et0/1), SW1↔R1(Et0/0), R1↔SERVER(Fa0/1)
+
+UPDATE lab_topologies
+SET svg_large = '<svg viewBox="0 0 720 250" role="img" aria-label="Kali outside, a switch, a router enforcing an inbound ACL, and an internal server behind it">
+       <rect x="40" y="95" width="130" height="56" rx="8" fill="#fef2f2" stroke="#e5484d" stroke-width="1.5"/>
+       <text x="105" y="117" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#e5484d">KALI</text>
+       <text x="105" y="133" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#e5484d">outside · 203.0.113.66</text>
+       <rect x="210" y="95" width="120" height="56" rx="8" fill="#fff" stroke="#6b7480" stroke-width="1.5"/>
+       <text x="270" y="117" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">SW1</text>
+       <text x="270" y="133" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">IOU L2 · VLAN 20</text>
+       <rect x="370" y="90" width="140" height="66" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+       <text x="440" y="114" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#2563eb">R1</text>
+       <text x="440" y="132" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">ACL OUTSIDE-IN (in)</text>
+       <text x="440" y="146" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">c3725</text>
+       <rect x="550" y="95" width="130" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+       <text x="615" y="117" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#0f172a">SERVER</text>
+       <text x="615" y="133" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">10.0.20.10 · :80</text>
+       <line x1="170" y1="123" x2="210" y2="123" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+       <text x="190" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">Et0/1</text>
+       <line x1="330" y1="123" x2="370" y2="123" stroke="#6b7480" stroke-width="2"/>
+       <text x="350" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">Et0/0</text>
+       <line x1="510" y1="123" x2="550" y2="123" stroke="#2563eb" stroke-width="2"/>
+       <text x="530" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">f0/1 · inside</text>
+       <text x="360" y="230" text-anchor="middle" font-family="monospace" font-size="10" fill="#94a3b8">the inbound ACL is meant to block outside→inside except "replies" — that exception is the hole</text>
+     </svg>'
+WHERE lab_id = 6;
