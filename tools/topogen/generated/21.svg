@@ -85,8 +85,8 @@
         <title>R1 Gi1/2</title>
       </g>
       <g data-port="R2" data-iface="Fa0/0">
-        <rect x="370" y="176" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="391" y="189" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Fa0/0</text>
+        <rect x="289" y="107" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="310" y="120" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Fa0/0</text>
         <title>R2 Fa0/0</title>
       </g>
       <g data-port="R2" data-iface="Fa0/1">
@@ -100,8 +100,8 @@
         <title>R2 Gi1/1</title>
       </g>
       <g data-port="R3" data-iface="Fa0/0">
-        <rect x="561" y="173" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="582" y="186" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Fa0/0</text>
+        <rect x="482" y="108" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="503" y="121" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Fa0/0</text>
         <title>R3 Fa0/0</title>
       </g>
       <g data-port="R3" data-iface="Fa0/1">

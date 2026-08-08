@@ -40,23 +40,23 @@
         <title>KALI eth0 ↔ SW1 Et0/1</title>
       </g>
       <g data-port="R1" data-iface="Fa0/0">
-        <rect x="228" y="125" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="249" y="138" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Fa0/0</text>
+        <rect x="328" y="127" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="349" y="140" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Fa0/0</text>
         <title>R1 Fa0/0</title>
       </g>
       <g data-port="SW1" data-iface="Et0/0">
-        <rect x="422" y="189" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="443" y="202" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
+        <rect x="306" y="109" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="327" y="122" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
         <title>SW1 Et0/0</title>
       </g>
       <g data-port="SW1" data-iface="Et0/1">
-        <rect x="419" y="216" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="440" y="229" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
+        <rect x="431" y="94" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="452" y="107" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
         <title>SW1 Et0/1</title>
       </g>
       <g data-port="KALI" data-iface="eth0">
-        <rect x="512" y="151" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="533" y="164" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
+        <rect x="394" y="119" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="415" y="132" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
         <title>KALI eth0</title>
       </g>
       <g data-node="R1" data-role="core">

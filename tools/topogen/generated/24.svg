@@ -60,8 +60,8 @@
         <title>SW1 Et0/2</title>
       </g>
       <g data-port="SW2" data-iface="Et0/0">
-        <rect x="286" y="149" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="307" y="162" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
+        <rect x="206" y="83" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="227" y="96" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
         <title>SW2 Et0/0</title>
       </g>
       <g data-port="PC1" data-iface="eth0">

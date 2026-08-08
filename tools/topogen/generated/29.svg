@@ -55,8 +55,8 @@
         <title>R1 Fa0/0</title>
       </g>
       <g data-port="SW1" data-iface="Et0/0">
-        <rect x="423" y="187" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="444" y="200" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
+        <rect x="305" y="107" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="326" y="120" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
         <title>SW1 Et0/0</title>
       </g>
       <g data-port="SW1" data-iface="Et0/1">
@@ -70,8 +70,8 @@
         <title>SW1 Et0/2</title>
       </g>
       <g data-port="SW1" data-iface="Et0/3">
-        <rect x="423" y="214" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="444" y="227" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/3</text>
+        <rect x="431" y="88" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="452" y="101" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/3</text>
         <title>SW1 Et0/3</title>
       </g>
       <g data-port="PC1" data-iface="eth0">
@@ -80,13 +80,13 @@
         <title>PC1 eth0</title>
       </g>
       <g data-port="PC2" data-iface="eth0">
-        <rect x="421" y="105" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="442" y="118" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
+        <rect x="400" y="111" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="421" y="124" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
         <title>PC2 eth0</title>
       </g>
       <g data-port="KALI" data-iface="eth0">
-        <rect x="240" y="149" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="261" y="162" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
+        <rect x="342" y="173" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="363" y="186" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
         <title>KALI eth0</title>
       </g>
       <g data-node="R1" data-role="core">
