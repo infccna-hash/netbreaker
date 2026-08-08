@@ -656,6 +656,7 @@ func renderLab(labID int, pos map[string]NodePos) string {
 	relaxChips(placed)
 	flipChips(placed, byName)
 	applyChipOverrides(labID, placed)
+	unshoveChips(labID, placed, byName)
 	for _, pc := range placed {
 		writeChip(&b, pc.Spec.NodeName, pc.Spec.Iface, pc.CX, pc.CY)
 	}
@@ -894,6 +895,124 @@ func applyChipOverrides(labID int, placed []placedChip) {
 			placed[i].CY += d[1]
 		}
 	}
+}
+
+// unshoveChips (Category B fix, 2026-08-08) resolves chips that END inside
+// their own owner's box after the full placement pipeline (G10 own-node
+// class: Labs 21/24/28). relaxChips pushes overlapping chip pairs apart along
+// their center vector with no knowledge of node footprints — in a tight
+// triangle the push can shove a chip INTO its own owner's box, and the anchor
+// pull (0.2/iter over 8 iters) may not pull it back out before the loop ends.
+// flipChips tries box hits (own included) but its candidate family
+// (rotations + anchor + link-axis slides) can miss a chip that needs a
+// strictly-outward push along its own ray.
+//
+// Runs LAST in the pipeline (after relaxChips, flipChips AND
+// applyChipOverrides) so it sees the final chip positions — overrides can
+// re-break a chip, and flip can move blocking neighbors out of the way before
+// unshove's acceptance check. It only moves chips whose FINAL position
+// violates the own-box epsilon, so previously-PASS labs (no own-box
+// violations by definition) regenerate byte-identical — the mandatory
+// acceptance test for any chip-position logic.
+//
+// Strategy per offending chip: walk outward along the ray from the owner's
+// center through the chip's current position, in 2px steps, up to the G4
+// bound (120px), and take the FIRST position that clears the own box. The
+// walk starts at the chip's CURRENT distance from the owner (not at 2px) so
+// the chip only ever moves AWAY from the owner along the ray — minimal
+// displacement, never pulled back toward the owner, stays near the link (the
+// chip's scheduled angle pointed at its peer). Chips deep inside a box often
+// need the full 120px budget: a chip sitting 10px past the near edge with a
+// box 70px wide needs to clear the FAR edge + chip half-width + eps, i.e.
+// d ≈ 70+21+6 ≈ 97px from the owner center (Labs 21/24/28/31/39 measured
+// d=73-81 → clear at d≈97). Acceptance uses chipBoxHit (ALL boxes — own eps
+// 6, foreign eps 2) plus G1/G8/G9/G4/G5, the same family as flipChips. If no
+// step clears everything, the chip keeps its position and G10 flags the lab
+// for manual attention.
+func unshoveChips(labID int, placed []placedChip, byName map[string]nodeShape) {
+	for i := range placed {
+		pc := &placed[i]
+		if !ownBoxHit(pc.CX, pc.CY, pc.Spec.NodeName, byName) {
+			continue // not in its own box — leave untouched
+		}
+		owner, ok := byName[pc.Spec.NodeName]
+		if !ok {
+			continue
+		}
+		dx := pc.CX - owner.CX
+		dy := pc.CY - owner.CY
+		rayLen := math.Hypot(dx, dy)
+		if rayLen == 0 {
+			dx, dy, rayLen = 0, -1, 1
+		}
+		ux, uy := dx/rayLen, dy/rayLen
+		// start at the chip's current distance so the move is strictly
+		// outward; budget to the G4 bound (120px)
+		for d := rayLen + 2; d <= 120; d += 2 {
+			nx, ny := owner.CX+ux*d, owner.CY+uy*d
+			// accept only a position clear of ALL boxes (own eps 6,
+			// foreign eps 2) — the same chipBoxHit the gate uses
+			if chipBoxHit(nx, ny, pc.Spec.NodeName, byName) {
+				continue // still inside some box
+			}
+			// canvas bounds (G1)
+			if nx-21 < 0 || nx+21 > viewW || ny-9 < 0 || ny+9 > viewH {
+				continue
+			}
+			// header clearance (G8)
+			if ny-9 < 40 {
+				continue
+			}
+			// legend clearance (G9)
+			if ny+9 > 405 {
+				continue
+			}
+			// keep the chip near its owner (G4 bound)
+			if math.Hypot(nx-owner.CX, ny-owner.CY) > 120 {
+				continue
+			}
+			if chipChipHit(nx, ny, placed, i) {
+				continue
+			}
+			pc.CX, pc.CY = nx, ny
+			break
+		}
+	}
+}
+
+// ownBoxHit reports whether a chip rect (42x18 centered at cx,cy) pokes into
+// ITS OWN owner's footprint by more than the own epsilon (6px) — the exact
+// own-node branch of chipBoxHit (rect-rect overlap for rect nodes,
+// closest-point distance for host circles). Used by unshoveChips as the
+// trigger: only chips whose FINAL position violates the own-box epsilon are
+// walked outward. Foreign boxes are deliberately NOT the trigger — foreign
+// pokes are flipChips' job; unshove must not move a chip that flipChips
+// already accepted at its foreign-relative position.
+func ownBoxHit(cx, cy float64, ownerName string, byName map[string]nodeShape) bool {
+	const epsOwn = 6.0
+	s, ok := byName[ownerName]
+	if !ok {
+		return false
+	}
+	// The gate (qa_geometry.py) parses the RENDERED SVG, which rounds chip
+	// coordinates to integers (%.0f in writeChip). To keep fix-detection and
+	// gate-detection in lockstep, evaluate the ROUNDED rect — a raw float at
+	// the exact epsilon boundary (e.g. 6.000000000000028 > 6) would fire the
+	// fix but render as 6.0 which the gate passes (Lab 26 SW1:Et0/1 moved
+	// 2px for nothing, 2026-08-08).
+	x1, y1, x2, y2 := math.Round(cx)-21, math.Round(cy)-9, math.Round(cx)+21, math.Round(cy)+9
+	if s.IsHost {
+		// circle host: closest point on chip rect to circle center
+		clx := maxF(x1, minF(s.CX, x2))
+		cly := maxF(y1, minF(s.CY, y2))
+		d2 := (s.CX-clx)*(s.CX-clx) + (s.CY-cly)*(s.CY-cly)
+		return d2 < (hostR-epsOwn)*(hostR-epsOwn)
+	}
+	hw, hh := 70.0, 30.0
+	nx1, ny1, nx2, ny2 := s.CX-hw, s.CY-hh, s.CX+hw, s.CY+hh
+	ox := minF(x2, nx2) - maxF(x1, nx1)
+	oy := minF(y2, ny2) - maxF(y1, ny1)
+	return ox > epsOwn && oy > epsOwn
 }
 
 // chipBoxHit reports whether a chip rect (42x18 centered at cx,cy) pokes into
