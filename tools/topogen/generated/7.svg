@@ -45,8 +45,8 @@
         <title>R1 Fa0/0</title>
       </g>
       <g data-port="SW1" data-iface="Et0/1">
-        <rect x="209" y="141" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="230" y="154" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
+        <rect x="216" y="137" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="237" y="150" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/1</text>
         <title>SW1 Et0/1</title>
       </g>
       <g data-port="SW1" data-iface="Et0/2">
@@ -55,8 +55,8 @@
         <title>SW1 Et0/2</title>
       </g>
       <g data-port="KALI" data-iface="eth0">
-        <rect x="384" y="110" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="405" y="123" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
+        <rect x="395" y="112" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="416" y="125" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">eth0</text>
         <title>KALI eth0</title>
       </g>
       <g data-node="R1" data-role="core">

@@ -522,6 +522,8 @@ func renderLab(labID int, pos map[string]NodePos) string {
 		}
 	}
 	relaxChips(placed)
+	flipChips(placed, byName)
+	applyChipOverrides(labID, placed)
 	for _, pc := range placed {
 		writeChip(&b, pc.Spec.NodeName, pc.Spec.Iface, pc.CX, pc.CY)
 	}
@@ -720,6 +722,241 @@ func relaxChips(chips []placedChip) {
 			chips[i].CY += (chips[i].AnchorY - chips[i].CY) * 0.2
 		}
 	}
+}
+
+// chipOverrides — hand-tuned per-chip position offsets applied AFTER
+// relaxChips. Only for dense clusters the relaxation cannot converge on:
+// the anchor pull rewinds the pairwise push (SW1-SW2-SW3 triangle in Lab
+// 25, SW1/PC1 corner touch in Lab 9). Deltas, not absolutes, so the
+// override stays stable across regenerations even if the base layout
+// shifts slightly. Key: labID -> "node:iface" -> [dx, dy].
+//
+// Lab 9:  SW1.Et0/1 pushed down 8px — clears the 3px corner touch with
+//         PC1.eth0 (dy becomes 23 => oy=-5).
+// Lab 25: SW1.Et0/0 up 8, SW2.Et0/0 down 8 — separates the SW1↔SW2 trunk
+//         chips (dy 12 -> 28). SW2.Et0/1 down-left 8, SW3.Et0/0 down-right
+//         8 — separates the SW2↔SW3 trunk chips (dx 39 -> 55).
+var chipOverrides = map[int]map[string][2]float64{
+	9: {
+		"SW1:Et0/1": {0, 8},
+	},
+	25: {
+		"SW1:Et0/0": {0, -8},
+		"SW2:Et0/0": {0, 8},
+		"SW2:Et0/1": {-8, 8},
+		"SW3:Et0/0": {8, 8},
+	},
+}
+
+// applyChipOverrides applies the per-lab hand-tuned deltas after relaxation.
+// Unknown labs / chips are no-ops — the table is additive and safe by design.
+func applyChipOverrides(labID int, placed []placedChip) {
+	ov, ok := chipOverrides[labID]
+	if !ok {
+		return
+	}
+	for i := range placed {
+		key := placed[i].Spec.NodeName + ":" + placed[i].Spec.Iface
+		if d, ok := ov[key]; ok {
+			placed[i].CX += d[0]
+			placed[i].CY += d[1]
+		}
+	}
+}
+
+// chipBoxHit reports whether a chip rect (42x18 centered at cx,cy) pokes into
+// ANY node footprint by more than its epsilon — mirroring the G10 gate
+// exactly (rect-rect overlap for rect nodes, circle distance check for host
+// circles). Foreign hits (chip hidden under another node) use eps=2 — always
+// a bug. Own hits use eps=6 — only overlaps > 6px clip the label text
+// (Lab 2/11 class: relaxation pushed the chip into its own box while
+// resolving a chip-vs-chip collision); smaller own overlaps are invisible
+// and left alone. Using a rect approximation for circles here would flag
+// corners that the gate accepts (Lab 36 PC2: chip corner touches the circle
+// at exactly r=30, text stays outside) and flip a clean chip 72px away.
+func chipBoxHit(cx, cy float64, ownerName string, byName map[string]nodeShape) bool {
+	const epsForeign, epsOwn = 2.0, 6.0
+	x1, y1, x2, y2 := cx-21, cy-9, cx+21, cy+9
+	for name, s := range byName {
+		eps := epsForeign
+		if name == ownerName {
+			eps = epsOwn
+		}
+		if s.IsHost {
+			// circle host: closest point on chip rect to circle center
+			clx := maxF(x1, minF(s.CX, x2))
+			cly := maxF(y1, minF(s.CY, y2))
+			d2 := (s.CX-clx)*(s.CX-clx) + (s.CY-cly)*(s.CY-cly)
+			if d2 < (hostR-eps)*(hostR-eps) {
+				return true
+			}
+			continue
+		}
+		hw, hh := 70.0, 30.0
+		nx1, ny1, nx2, ny2 := s.CX-hw, s.CY-hh, s.CX+hw, s.CY+hh
+		ox := minF(x2, nx2) - maxF(x1, nx1)
+		oy := minF(y2, ny2) - maxF(y1, ny1)
+		if ox > eps && oy > eps {
+			return true
+		}
+	}
+	return false
+}
+
+// flipChips resolves chip-vs-node-box collisions (G10 class) WITHOUT moving
+// node positions — the renderer adapts, positions stay the honest record
+// (G8 principle). Two resolution strategies, both keeping the chip attached
+// to its original link line:
+//
+//  A. SLIDE along the original link axis: keep the chip's angle from the
+//     owner center, try increasing distances (24px → 200px in 8px steps).
+//     This is the primary strategy — the chip stays ON its link, just
+//     pushed outward until it clears every box (or inward if outward
+//     hits another box). Rotation-only flips (180°/±90°) throw the chip
+//     off its link entirely (Lab 45 KALI landed 97px from the link).
+//  B. ROTATE around the owner center: 180° reflection, then ±90°. Only
+//     tried if no slide position fits — a chip stranded mid-air is worse
+//     than a chip on a rotated angle.
+//
+// A candidate is valid only if it clears every node box (no new G10), stays
+// inside the canvas (G1), clears the header/legend chrome (G8/G9), and
+// doesn't collide with another chip (G5). Among valid candidates the one
+// CLOSEST to the original link line wins. If nothing fits, the chip keeps
+// its original position — the G10 gate still flags it for manual attention.
+func flipChips(placed []placedChip, byName map[string]nodeShape) {
+	for i := range placed {
+		pc := &placed[i]
+		owner, ok := byName[pc.Spec.NodeName]
+		if !ok {
+			continue
+		}
+		if !chipBoxHit(pc.CX, pc.CY, pc.Spec.NodeName, byName) {
+			continue // chip is clear — nothing to flip
+		}
+		other, okOther := byName[pc.Spec.Other.Name]
+		if !okOther {
+			other = pc.Spec.Other
+		}
+		// Candidates keep the chip near its owner (G4 bound ~120px) while
+		// resolving box collisions (G10):
+		//  A. rotations around the owner center at the current radius
+		//     (180° reflection, ±90°) — never violates G4 by construction
+		//  B. the pre-relaxation anchor — often already near the link axis
+		//  C. short slides along the LINK axis (owner → other node), capped
+		//     at the G4 bound — only when the link is short and the box
+		//     collision blocks the rotation candidates
+		bestIdx := -1
+		bestScore := math.Inf(1)
+		cdx, cdy := pc.CX-owner.CX, pc.CY-owner.CY
+		cands := [][2]float64{
+			{owner.CX - cdx, owner.CY - cdy}, // 180° reflection
+			{owner.CX - cdy, owner.CY + cdx}, // +90°
+			{owner.CX + cdy, owner.CY - cdx}, // -90°
+			{pc.AnchorX, pc.AnchorY},         // pre-relaxation anchor
+		}
+		// short slides along the link axis within the G4 bound (120px)
+		dx, dy := other.CX-owner.CX, other.CY-owner.CY
+		lenLink := math.Hypot(dx, dy)
+		if lenLink > 0 {
+			ux, uy := dx/lenLink, dy/lenLink
+			for step := 0; step <= 12; step++ { // 24 + step*8 → 24..120px
+				d := 24.0 + float64(step)*8
+				if d > 120 {
+					break
+				}
+				cands = append(cands, [2]float64{owner.CX + ux*d, owner.CY + uy*d})
+			}
+		}
+		for ci, c := range cands {
+			if chipBoxHit(c[0], c[1], pc.Spec.NodeName, byName) {
+				continue
+			}
+			// canvas bounds (G1)
+			if c[0]-21 < 0 || c[0]+21 > viewW || c[1]-9 < 0 || c[1]+9 > viewH {
+				continue
+			}
+			// header clearance (G8) — the terminal bar occupies the top
+			// ~40px; a flipped chip landing there is canvas-valid but
+			// visually hidden under the chrome (Labs 2/6/9/24 class).
+			if c[1]-9 < 40 {
+				continue
+			}
+			// legend clearance (G9) — the legend divider sits at y=405
+			if c[1]+9 > 405 {
+				continue
+			}
+			// keep the chip near its owner (G4 bound)
+			ownerDist := math.Hypot(c[0]-owner.CX, c[1]-owner.CY)
+			if ownerDist > 120 {
+				continue
+			}
+			if chipChipHit(c[0], c[1], placed, i) {
+				continue
+			}
+			// score: distance to the link line (must stay visually
+			// attached), lightly weighted by distance from the owner
+			// (ties break toward the closer position)
+			d := distToLink(c[0], c[1], owner.CX, owner.CY, other.CX, other.CY)
+			score := d + ownerDist*0.1
+			if score < bestScore {
+				bestScore = score
+				bestIdx = ci
+			}
+		}
+		if bestIdx >= 0 {
+			pc.CX, pc.CY = cands[bestIdx][0], cands[bestIdx][1]
+		}
+	}
+}
+
+// distToLink returns the distance from point (px,py) to the segment between
+// two link endpoints (ax,ay)-(bx,by). The original link line is the anchor a
+// chip must stay near — a flip that lands 97px off it reads as orphaned.
+func distToLink(px, py, ax, ay, bx, by float64) float64 {
+	dx, dy := bx-ax, by-ay
+	l2 := dx*dx + dy*dy
+	if l2 == 0 {
+		return math.Hypot(px-ax, py-ay)
+	}
+	t := ((px-ax)*dx + (py-ay)*dy) / l2
+	t = math.Max(0, math.Min(1, t))
+	cx, cy := ax+t*dx, ay+t*dy
+	return math.Hypot(px-cx, py-cy)
+}
+
+// chipChipHit reports whether a chip rect at (cx,cy) overlaps any OTHER
+// placed chip (G5 class). skipIdx is the chip being moved.
+func chipChipHit(cx, cy float64, placed []placedChip, skipIdx int) bool {
+	for j, other := range placed {
+		if j == skipIdx {
+			continue
+		}
+		if absF(other.CX-cx) < 42 && absF(other.CY-cy) < 18 {
+			return true
+		}
+	}
+	return false
+}
+
+func minF(a, b float64) float64 {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func maxF(a, b float64) float64 {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func absF(a float64) float64 {
+	if a < 0 {
+		return -a
+	}
+	return a
 }
 
 func writeChip(b *strings.Builder, nodeName, iface string, cx, cy float64) {

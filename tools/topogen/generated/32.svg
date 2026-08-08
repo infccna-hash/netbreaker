@@ -45,8 +45,8 @@
         <title>PC1 eth0 ↔ SW1 Et0/2</title>
       </g>
       <g data-port="R1" data-iface="Fa0/0">
-        <rect x="272" y="110" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="293" y="123" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Fa0/0</text>
+        <rect x="279" y="119" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="300" y="132" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Fa0/0</text>
         <title>R1 Fa0/0</title>
       </g>
       <g data-port="SW1" data-iface="Et0/0">

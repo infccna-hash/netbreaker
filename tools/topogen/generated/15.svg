@@ -110,8 +110,8 @@
         <title>SW1 Et0/3</title>
       </g>
       <g data-port="R1" data-iface="Et0/0">
-        <rect x="494" y="177" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="515" y="190" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
+        <rect x="500" y="172" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="521" y="185" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
         <title>R1 Et0/0</title>
       </g>
       <g data-port="R1" data-iface="Et0/1">

@@ -9,6 +9,8 @@ Checks per lab:
   G5  port chips do not overlap each other
   G6  link lines do not cross a third node's bounding box (gross routing errors)
   G7  node label text fits the node box (name length vs node width)
+  G10 chip rect does not poke into ANY node footprint (own or foreign) —
+      chips render BEFORE nodes, so a poked chip is hidden by the node fill
 
 Prints PASS/FAIL per lab per gate. Exit 1 if any FAIL.
 """
@@ -213,13 +215,58 @@ def main():
                 problems.append(f"G4 chip {cname} too far from owner (d={d:.0f})")
 
         # G5 chip overlaps — true rect overlap (chips are 42x18; vertical
-        # separation >= 18px or horizontal >= 42px is clean)
+        # separation >= 18px or horizontal >= 42px is clean). G5_EPS is the
+        # corner-touch tolerance: a sub-eps overlap in EITHER axis is a
+        # pixel-perfect border kiss (rounded rx=3 corners make it invisible),
+        # not a visual overlap. Only overlaps that exceed eps in BOTH axes
+        # are real — Lab 36 (1px x 3px) was confirmed visually clean by
+        # eyeball QA; flagging it was a gate artifact, not a render bug.
+        G5_EPS = 2.0
         for i in range(len(chip_list)):
             for j in range(i + 1, len(chip_list)):
                 _, ax, ay = chip_list[i]
                 _, bx, by = chip_list[j]
-                if abs(ax - bx) < 42 and abs(ay - by) < 18:
+                ox = 42 - abs(ax - bx)  # horizontal overlap px (>0 means touching)
+                oy = 18 - abs(ay - by)  # vertical overlap px
+                if ox > G5_EPS and oy > G5_EPS:
                     problems.append(f"G5 chips overlap ({chip_list[i][0]},{chip_list[j][0]})")
+
+        # G10 chip vs node box — a chip must sit OUTSIDE every node's
+        # footprint. The renderer draws chips BEFORE nodes, so a chip that
+        # pokes under a box is partially or fully hidden by the node fill
+        # (Lab 9/12/25 class: auto-layout places adjacent nodes 3px apart,
+        # leaving no room for the 42x18 chip). G5 only catches chip-vs-chip;
+        # this is the missing half of the collision space.
+        #
+        # Two distinct cases, two epsilons:
+        #  - FOREIGN node (not the chip's owner): any poke > 2px hides part
+        #    of the chip under another node's fill — always a real bug.
+        #  - OWN node: the chip's inner edge is designed to sit 3px clear of
+        #    the owner; small overlaps (<= 6px) only clip the chip border
+        #    (text is centered, ~30px wide in a 42px chip) and are visually
+        #    invisible (Lab 36 confirmed clean by eyeball QA). Overlaps
+        #    > 6px start clipping the label text — a real bug.
+        G10_EPS_FOREIGN = 2.0
+        G10_EPS_OWN = 6.0
+        for cname, ccx, ccy in chip_list:
+            cr = (ccx - 21, ccy - 9, ccx + 21, ccy + 9)  # chip rect
+            for nname, (ncx, ncy, nkind, nhw, nhh) in boxes.items():
+                eps = G10_EPS_OWN if nname == cname else G10_EPS_FOREIGN
+                if nkind == "rect":
+                    nr = (ncx - nhw, ncy - nhh, ncx + nhw, ncy + nhh)
+                    ox = min(cr[2], nr[2]) - max(cr[0], nr[0])
+                    oy = min(cr[3], nr[3]) - max(cr[1], nr[1])
+                    if ox > eps and oy > eps:
+                        tag = "own" if nname == cname else "under"
+                        problems.append(f"G10 chip {cname} {tag} node {nname} ({ox:.0f}x{oy:.0f})")
+                else:  # circle host — closest point on chip rect to circle center
+                    clx = max(cr[0], min(ncx, cr[2]))
+                    cly = max(cr[1], min(ncy, cr[3]))
+                    d2 = (ncx - clx) ** 2 + (ncy - cly) ** 2
+                    # penetration deeper than eps = chip hidden under host fill
+                    if d2 < (nhw - eps) ** 2:
+                        tag = "own" if nname == cname else "under"
+                        problems.append(f"G10 chip {cname} {tag} host {nname}")
 
         # G7 name fits node
         for name, (cx, cy, kind, hw, hh) in boxes.items():

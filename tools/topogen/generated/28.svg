@@ -55,8 +55,8 @@
         <title>R1 Fa0/0</title>
       </g>
       <g data-port="SW1" data-iface="Et0/0">
-        <rect x="379" y="97" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
-        <text x="400" y="110" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
+        <rect x="455" y="181" width="42" height="18" rx="3" fill="#0b0f14" stroke="#3fb950" stroke-width="1" />
+        <text x="476" y="194" text-anchor="middle" font-family="Courier New, monospace" fontSize="10" fill="#3fb950">Et0/0</text>
         <title>SW1 Et0/0</title>
       </g>
       <g data-port="SW1" data-iface="Et0/1">
