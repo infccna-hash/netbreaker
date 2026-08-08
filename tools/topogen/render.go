@@ -198,6 +198,128 @@ func autoLayout(shapes []nodeShape, used map[string]bool) []nodeShape {
 	return shapes
 }
 
+// minGapChip = 24 (chip offset from node edge) + 18 (chip height) + 24 =
+// the clearance two facing chips need between node edges.
+const minGapChip = 66.0
+
+// enforceAutoMinGap pushes AUTO-LAYOUT nodes (not in `used`) apart from
+// same-column neighbors until the chip-clearance gap holds. Extracted nodes
+// are never moved — their positions are the honest record (G8). Iterates
+// because a push that fixes one gap can create another; bounded at 8 rounds
+// so a pathological layout just stays flagged by the gates (G10) instead of
+// oscillating. Only the vertical axis is pushed (the dominant failure mode:
+// auto rows land 3-13px under extracted rows). A direction is chosen only
+// if it reduces total violations and never causes overlap — the naive
+// "push toward the smaller gap" flipped SW1 into R1 in Lab 9 during the
+// simulation, so each direction is scored across ALL same-column neighbors.
+func enforceAutoMinGap(shapes []nodeShape, used map[string]bool) {
+	for iter := 0; iter < 8; iter++ {
+		moved := false
+		for i := range shapes {
+			if used[shapes[i].Name] {
+				continue // extracted — never move
+			}
+			s := &shapes[i]
+			halfH := 30.0
+			if s.IsHost {
+				halfH = hostR
+			}
+			bestDir := 0
+			bestNet := 0.0
+			for _, dir := range []float64{1, -1} { // +1 down, -1 up
+				net := 0.0
+				valid := true
+				for j := range shapes {
+					if j == i {
+						continue
+					}
+					o := &shapes[j]
+					oh := 30.0
+					if o.IsHost {
+						oh = hostR
+					}
+					// same column: horizontal overlap
+					if s.CX-70 > o.CX+70 || s.CX+70 < o.CX-70 {
+						continue
+					}
+					var curGap, newGap float64
+					if dir > 0 { // move down
+						if o.CY+oh <= s.CY-halfH { // o above s
+							curGap = s.CY - halfH - (o.CY + oh)
+							newGap = curGap + minGapChip
+						} else if o.CY-oh >= s.CY+halfH { // o below s
+							curGap = o.CY - oh - (s.CY + halfH)
+							newGap = curGap - minGapChip
+						} else {
+							continue // already overlapping in y — skip
+						}
+					} else { // move up
+						if o.CY+oh <= s.CY-halfH {
+							curGap = s.CY - halfH - (o.CY + oh)
+							newGap = curGap - minGapChip
+						} else if o.CY-oh >= s.CY+halfH {
+							curGap = o.CY - oh - (s.CY + halfH)
+							newGap = curGap + minGapChip
+						} else {
+							continue
+						}
+					}
+					if curGap < minGapChip {
+						net -= minGapChip - curGap
+					}
+					if newGap < minGapChip {
+						net += minGapChip - newGap
+					}
+					if newGap < 0 {
+						valid = false // would overlap — reject this direction
+					}
+				}
+				if valid && net < bestNet {
+					bestNet = net
+					bestDir = int(dir)
+				}
+			}
+			if bestDir == 0 || bestNet >= 0 {
+				continue
+			}
+			// apply: push by the largest needed amount in the chosen direction
+			need := 0.0
+			for j := range shapes {
+				if j == i {
+					continue
+				}
+				o := &shapes[j]
+				oh := 30.0
+				if o.IsHost {
+					oh = hostR
+				}
+				if s.CX-70 > o.CX+70 || s.CX+70 < o.CX-70 {
+					continue
+				}
+				var gap float64
+				if bestDir > 0 && o.CY+oh <= s.CY-halfH {
+					gap = s.CY - halfH - (o.CY + oh)
+					if minGapChip-gap > need {
+						need = minGapChip - gap
+					}
+				} else if bestDir < 0 && o.CY-oh >= s.CY+halfH {
+					gap = o.CY - oh - (s.CY + halfH)
+					if minGapChip-gap > need {
+						need = minGapChip - gap
+					}
+				}
+			}
+			if need > 0 {
+				s.CY += need * float64(bestDir)
+				moved = true
+			}
+		}
+		if !moved {
+			return
+		}
+	}
+}
+
 // placeLeaf places leaf nodes with a custom row height (used when dense labs
 // need tighter vertical spacing to stay above the legend footer).
 func placeLeaf(shapes []nodeShape, idxs []int, startY, cellHh float64) {
@@ -268,6 +390,16 @@ func layoutLab(labID int, pos map[string]NodePos) ([]nodeShape, map[string]nodeS
 			shapes = append(shapes, s)
 		}
 		shapes = autoLayout(shapes, used)
+		// Min-gap enforcement for AUTO-LAYOUT nodes only (Category A1).
+		// Extracted positions are the honest record of the hand-authored
+		// layout (G8) and are never moved here. Auto nodes placed on the
+		// grid can land 3-13px from extracted neighbors (Lab 9/13/19/29/
+		// 43/44 class), leaving no room for the 42x18 port chips between
+		// them (G10). Push each auto node away from same-column neighbors
+		// until the chip-clearance gap (66px) holds, iterating so a push
+		// that fixes one gap cannot create another (the radial-cluster
+		// regression lesson). Only nodes NOT in `used` are auto-laid.
+		enforceAutoMinGap(shapes, used)
 		for _, s := range shapes {
 			byName[s.Name] = s
 		}
