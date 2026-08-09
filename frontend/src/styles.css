@@ -461,3 +461,99 @@ tbody tr:hover { background: var(--surface-2); }
   font-family: var(--mono); font-size: 0.72rem; color: var(--muted);
   display: inline-flex; align-items: center; gap: 4px;
 }
+
+/* ── Structured walkthrough (phase/step) — labs 46+ ── */
+/* Authored as trusted HTML in lab_phases.content: a .phase wrapper
+   containing .step blocks with terminal pre blocks. The prompts,
+   comments and copy buttons are styled spans; without this CSS the
+   whole walkthrough renders as unstyled text soup. */
+
+.lab-content .phase {
+  margin: 8px 0 20px;
+}
+
+.lab-content .phase-head {
+  display: flex; align-items: baseline; gap: 10px;
+  margin: 18px 0 10px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lab-content .phase-head h3 {
+  margin: 0; font-size: 1.02rem; color: var(--fg);
+}
+
+.lab-content .phase-tag {
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 2px 8px; border-radius: var(--radius-sm);
+  background: var(--surface-2); color: var(--muted);
+  border: 1px solid var(--line);
+}
+.lab-content .phase.attack .phase-tag   { background: var(--attack-tint); color: #a3282c; border-color: #f3c3c4; }
+.lab-content .phase.harden .phase-tag   { background: var(--harden-tint); color: #0c6247; border-color: #bfe3d3; }
+.lab-content .phase.build .phase-tag    { background: var(--build-tint);  color: #1f47b0; border-color: #cfddfb; }
+
+.lab-content .goal {
+  margin: 4px 0 14px; color: var(--muted); font-size: 0.92rem; line-height: 1.55;
+}
+
+.lab-content .step {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.lab-content .step-label {
+  display: flex; align-items: baseline; gap: 8px;
+  font-weight: 600; font-size: 0.94rem; margin-bottom: 10px;
+  color: var(--fg);
+}
+
+.lab-content .step-label .n {
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
+  background: var(--surface-2); color: var(--muted);
+  border: 1px solid var(--line); border-radius: 999px;
+  min-width: 22px; height: 22px; display: inline-flex;
+  align-items: center; justify-content: center;
+}
+
+.lab-content .step > p {
+  margin: 8px 0; font-size: 0.92rem; line-height: 1.55; color: var(--fg-soft, var(--fg));
+}
+
+.lab-content .step pre {
+  position: relative;
+  margin: 10px 0;
+  padding: 30px 14px 12px;
+  background: #0d1117; color: #d4dae3;
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  font-family: var(--mono); font-size: 0.8rem; line-height: 1.6;
+  white-space: pre-wrap; word-break: break-word;
+}
+
+.lab-content .step pre .copy-btn {
+  position: absolute; top: 6px; right: 8px;
+  font-family: var(--mono); font-size: 0.68rem; cursor: pointer;
+  background: transparent; color: #7a828d; border: 1px solid #2c323b;
+  border-radius: 4px; padding: 2px 8px;
+}
+.lab-content .step pre .copy-btn:hover { color: #d4dae3; border-color: #4b5563; }
+
+.lab-content .step pre .prompt { color: #6ea8fe; font-weight: 600; }
+.lab-content .step pre .cmt    { color: #7a828d; font-style: italic; }
+.lab-content .step pre .attackline { color: #ff6b70; }
+
+.lab-content .note {
+  margin: 10px 0 2px; padding: 10px 12px; border-radius: var(--radius-sm);
+  font-size: 0.88rem; line-height: 1.55;
+}
+.lab-content .note.why {
+  background: var(--build-tint); border: 1px solid #cfddfb; color: #1f47b0;
+}
+.lab-content .note.watch {
+  background: var(--attack-tint); border: 1px solid #f3c3c4; color: #a3282c;
+}
+.lab-content .note strong { color: inherit; }
