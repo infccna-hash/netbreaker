@@ -214,6 +214,27 @@ func (v *Verifier) ExpectReachable(name, target string) *Verifier {
 	})
 }
 
+// ExpectNotReachable asserts that a target does NOT respond to ping
+// from the collector node — used by firewall/ACL labs where the
+// Harden phase must prove traffic is blocked (e.g. Lab 47: KALI on
+// the outside must no longer reach inside hosts after FortiGate
+// policies are tightened).
+func (v *Verifier) ExpectNotReachable(name, target string) *Verifier {
+	return v.add(fmt.Sprintf("%s NOT reachable", name), func(ctx context.Context, ev *EvidenceStore) (bool, string) {
+		if target == "" {
+			return false, fmt.Sprintf("IP not configured for host %s", name)
+		}
+		ok, err := ev.Reachable(ctx, target)
+		if err != nil {
+			return false, err.Error()
+		}
+		if ok {
+			return false, fmt.Sprintf("%s (%s) responded but should be blocked", target, name)
+		}
+		return true, fmt.Sprintf("%s correctly blocked", target)
+	})
+}
+
 // Run executes every assertion against a fresh EvidenceStore, so
 // each verify call gets its own dedup cache but shares it across
 // all assertions in this run.

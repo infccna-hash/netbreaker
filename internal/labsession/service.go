@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	ErrPlanGate     = errors.New("lab sessions require a Pro or Bootcamp plan")
-	ErrSlotConflict = errors.New("max concurrent sessions reached")
+	ErrPlanGate      = errors.New("lab sessions require a Pro or Bootcamp plan")
+	ErrSlotConflict  = errors.New("max concurrent sessions reached")
 	ErrConceptualLab = errors.New("this lab is content-only and has no live session")
 )
 
@@ -102,7 +102,7 @@ func (s *Service) provision(sessionID uuid.UUID, labID int) {
 		return
 	}
 
-		template := lookupTopologyTemplate(labID)
+	template := lookupTopologyTemplate(labID)
 	nodes, err := s.gns3.ProvisionTopology(ctx, projectID, template)
 	if err != nil {
 		log.Printf("labsession: provision topology: %v", err)
@@ -244,6 +244,8 @@ func lookupTopologyTemplate(labID int) TopologyTemplate {
 		return Lab45Topology
 	case 46:
 		return Lab46Topology
+	case 47:
+		return Lab47Topology
 	default:
 		return TopologyTemplate{LabID: labID, Nodes: []NodeTemplate{}}
 	}

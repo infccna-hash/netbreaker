@@ -313,6 +313,30 @@ func TestExpectReachable_EmptyIP(t *testing.T) {
 
 // --- the actual point of the EvidenceStore: caching ---
 
+func TestExpectNotReachable(t *testing.T) {
+	m := newMockCollector()
+	m.reachability["10.0.10.10"] = false
+	m.reachability["10.0.10.99"] = true
+
+	// Blocked target: check passes because the host does NOT respond.
+	pass := verify.New().ExpectNotReachable("KALI", "10.0.10.10").Run(context.Background(), m)
+	if !pass.Passed {
+		t.Fatalf("expected pass for blocked host, got: %+v", pass.Checks)
+	}
+
+	// Leaking target: check fails because the host responds (should be blocked).
+	fail := verify.New().ExpectNotReachable("KALI", "10.0.10.99").Run(context.Background(), m)
+	if fail.Passed {
+		t.Fatal("expected failure when blocked host responds")
+	}
+
+	// Empty IP guard mirrors ExpectReachable.
+	empty := verify.New().ExpectNotReachable("KALI", "").Run(context.Background(), m)
+	if empty.Passed {
+		t.Fatal("expected failure for empty IP target")
+	}
+}
+
 func TestEvidenceStore_MACTableFetchedOnce(t *testing.T) {
 	m := newMockCollector()
 	m.macTable = verify.MACTable{{MAC: "aa:00", Port: "Et0/0"}}

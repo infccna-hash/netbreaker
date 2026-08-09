@@ -129,6 +129,7 @@ func main() {
 	labsession.RegisterLab16Verifiers(verifyReg)
 	labsession.RegisterLab02Verifiers(verifyReg)
 	labsession.RegisterLab03Verifiers(verifyReg)
+	labsession.RegisterLab47Verifiers(verifyReg)
 
 	// ── Verification handler (supports both legacy + console-truth) ─────
 	verifyHandler := verification.NewHandler(progressRepo, sessionRepo, sessionSvc, verifyReg, cfg)
