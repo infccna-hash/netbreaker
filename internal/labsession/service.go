@@ -250,3 +250,22 @@ func lookupTopologyTemplate(labID int) TopologyTemplate {
 		return TopologyTemplate{LabID: labID, Nodes: []NodeTemplate{}}
 	}
 }
+
+// EnsureProjectRunning reopens the session's GNS3 project and restarts
+// its nodes if they were stopped (e.g. GNS3 auto-closed the project
+// when console connections dropped). Console handlers call this before
+// dialing a node port so a reconnect actually reconnects.
+func (s *Service) EnsureProjectRunning(ctx context.Context, projectID string) error {
+	if projectID == "" {
+		return nil
+	}
+	return s.gns3.EnsureProjectRunning(ctx, projectID)
+}
+
+// derefStr safely dereferences a *string, returning "" for nil.
+func derefStr(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
+}

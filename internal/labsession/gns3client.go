@@ -11,6 +11,7 @@ type GNS3Client interface {
 	ProvisionTopology(ctx context.Context, projectID string, template TopologyTemplate) (NodeMap, error)
 	StartNodes(ctx context.Context, projectID string) error
 	StopNodes(ctx context.Context, projectID string) error
+	EnsureProjectRunning(ctx context.Context, projectID string) error
 
 	// EnsureKaliImage verifies the pinned Kali image exists on the
 	// compute node. Returns nil if present, an error with a "run

@@ -346,6 +346,12 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 		ws.Close()
 	})
 
+	// Self-heal: if the project was auto-closed while the student was away,
+	// reopen it and restart the nodes so the console actually reconnects.
+	if err := h.svc.EnsureProjectRunning(r.Context(), derefStr(sess.GNS3ProjectID)); err != nil {
+		log.Printf("console ensure-running session=%s node=%s err=%v", sessionID, nodeName, err)
+	}
+
 	// GNS3 console ports are plain telnet on the compute host.
 	telnetAddr := fmt.Sprintf("%s:%d", h.svc.computeHost, nodeInfo.ConsolePort)
 	tcpConn, err := net.DialTimeout("tcp", telnetAddr, 5*time.Second)
@@ -424,6 +430,12 @@ func (h *Handler) consoleVNC(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer ws.Close()
+
+	// Self-heal: reopen the project + restart nodes if it was auto-closed
+	// while the student was away (the VNC disconnect-mid-config bug).
+	if err := h.svc.EnsureProjectRunning(r.Context(), derefStr(sess.GNS3ProjectID)); err != nil {
+		log.Printf("vnc ensure-running session=%s node=%s err=%v", sessionID, nodeName, err)
+	}
 
 	// GNS3 VNC ports are raw RFB on the compute host.
 	vncAddr := fmt.Sprintf("%s:%d", h.svc.computeHost, nodeInfo.ConsolePort)

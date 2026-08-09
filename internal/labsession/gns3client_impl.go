@@ -147,9 +147,14 @@ func (c *HTTPGNS3Client) CreateProject(ctx context.Context, computeID string, us
 	// isolation guarantee — never reuse a project across students, per spec.
 	name := fmt.Sprintf("nb-u%d-l%d-%d", userID, labID, time.Now().Unix())
 
+	// auto_close: false is critical. GNS3 defaults to closing the project
+	// when the last console/websocket connection drops; with a browser
+	// console that would tear down all nodes mid-configuration. We keep
+	// the project alive until the session is explicitly ended.
 	var proj gns3Project
 	err := c.do(ctx, http.MethodPost, "/v2/projects", map[string]any{
-		"name": name,
+		"name":       name,
+		"auto_close": false,
 	}, &proj)
 	if err != nil {
 		return "", err
@@ -428,6 +433,23 @@ func (c *HTTPGNS3Client) createLinks(ctx context.Context, projectID string, temp
 func (c *HTTPGNS3Client) StartNodes(ctx context.Context, projectID string) error {
 	path := fmt.Sprintf("/v2/projects/%s/nodes/start", projectID)
 	return c.do(ctx, http.MethodPost, path, nil, nil)
+}
+
+// EnsureProjectRunning reopens a closed GNS3 project and restarts its
+// nodes. Console handlers call this before dialing a node's console
+// port: if the project was auto-closed (or stopped for any reason)
+// while the student was away, this self-heals so the browser console
+// reconnects instead of showing a dead socket.
+//
+// The project is idempotent — opening an already-open project and
+// starting already-started nodes are no-ops in GNS3.
+func (c *HTTPGNS3Client) EnsureProjectRunning(ctx context.Context, projectID string) error {
+	// Open (or no-op if already open)
+	if err := c.do(ctx, http.MethodPost, fmt.Sprintf("/v2/projects/%s/open", projectID), nil, nil); err != nil {
+		return err
+	}
+	// Start nodes (or no-op if already started)
+	return c.StartNodes(ctx, projectID)
 }
 
 // doStatus is like do but returns the HTTP status code and does NOT treat a
