@@ -156,7 +156,12 @@ export default function ConsoleWindow() {
                   </p>
                 </div>
               ) : (
-                <ConsolePanel sessionId={session.id} nodeName={name} active={activeNode === name} />
+                <ConsolePanel
+                  sessionId={session.id}
+                  nodeName={name}
+                  active={activeNode === name}
+                  nodeInfo={session.node_map[name]}
+                />
               )}
             </div>
           );

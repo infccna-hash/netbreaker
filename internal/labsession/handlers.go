@@ -27,6 +27,7 @@ func (h *Handler) Routes(r chi.Router) {
 	r.Post("/labsessions/{id}/heartbeat", h.heartbeat)
 	r.Delete("/labsessions/{id}", h.end)
 	r.Get("/labsessions/{id}/console/{node}", h.console)
+	r.Get("/labsessions/{id}/console/{node}/vnc", h.consoleVNC)
 }
 
 func (h *Handler) launch(w http.ResponseWriter, r *http.Request) {

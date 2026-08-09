@@ -19,6 +19,9 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  4096,
 	WriteBufferSize: 4096,
+	// noVNC requests the "binary" subprotocol in its WebSocket handshake;
+	// if the server doesn't echo it back, the browser aborts the connection.
+	Subprotocols: []string{"binary"},
 	// Same-origin by design (Caddy proxies same-origin to the API).
 	// Tightened from the wide-open CheckOrigin to a proper check below.
 	CheckOrigin: checkSameOrigin,
@@ -304,18 +307,11 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 	// moment we provision, so keying only off ConsoleType leaves the user
 	// staring at a bare "[disconnected]" with no guidance. NodeType is known
 	// deterministically from the topology template and is populated at provision.
+	// VNC nodes use the dedicated VNC proxy endpoint (noVNC in the browser).
+	// Anything reaching the telnet-style handler is a stale client — tell it
+	// which URL to use instead.
 	if usesVNCConsole(nodeInfo) {
-		ws, err := upgrader.Upgrade(w, r, nil)
-		if err != nil {
-			log.Printf("console upgrade failed: %v", err)
-			return
-		}
-		defer ws.Close()
-		msg := fmt.Sprintf(
-			"\r\n\x1b[33m[This node has a VNC console, which the browser terminal can't display.\r\n"+
-				"Connect a VNC client (e.g. TigerVNC) to %s:%d to use it.]\x1b[0m\r\n",
-			h.svc.computeHost, nodeInfo.ConsolePort)
-		ws.WriteMessage(websocket.TextMessage, []byte(msg))
+		http.Error(w, "this node has a VNC console; use /console/{node}/vnc", http.StatusBadRequest)
 		return
 	}
 
@@ -372,6 +368,86 @@ func (h *Handler) console(w http.ResponseWriter, r *http.Request) {
 		_ = h.svc.Heartbeat(ctx, sessionID)
 	}, func(direction string, closeCode int, closeReason string, readErr error) {
 		log.Printf("console ws-close session=%s node=%s dir=%s code=%d reason=%q readErr=%v",
+			sessionID, nodeName, direction, closeCode, closeReason, readErr)
+	})
+}
+
+
+// consoleVNC proxies the node's RFB (VNC) protocol to the browser over
+// a binary WebSocket. noVNC on the frontend speaks RFB directly through
+// this pipe — the student sees the VNC console inline, no external
+// client needed.
+//
+// Unlike the telnet console, no ConsoleLock is taken here: the FortiGate
+// (the only VNC node today) is verified from R1's telnet side, so a
+// student with the VNC console open never races a verifier on this node.
+func (h *Handler) consoleVNC(w http.ResponseWriter, r *http.Request) {
+	userID, _ := authFromContext(r.Context())
+
+	sessionID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "invalid session id", http.StatusBadRequest)
+		return
+	}
+	nodeName := chi.URLParam(r, "node")
+
+	sess, err := h.svc.Get(r.Context(), sessionID)
+	if err != nil {
+		http.Error(w, "session not found", http.StatusNotFound)
+		return
+	}
+
+	if sess.UserID != userID {
+		http.Error(w, "session does not belong to this user", http.StatusForbidden)
+		return
+	}
+
+	if sess.Status != StatusRunning {
+		http.Error(w, "session not running", http.StatusConflict)
+		return
+	}
+
+	nodeInfo, ok := sess.NodeMap[nodeName]
+	if !ok {
+		http.Error(w, "unknown node", http.StatusNotFound)
+		return
+	}
+
+	if !usesVNCConsole(nodeInfo) {
+		http.Error(w, "node does not have a VNC console", http.StatusBadRequest)
+		return
+	}
+
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Printf("vnc upgrade failed: %v", err)
+		return
+	}
+	defer ws.Close()
+
+	// GNS3 VNC ports are raw RFB on the compute host.
+	vncAddr := fmt.Sprintf("%s:%d", h.svc.computeHost, nodeInfo.ConsolePort)
+	tcpConn, err := net.DialTimeout("tcp", vncAddr, 5*time.Second)
+	if err != nil {
+		ws.WriteMessage(websocket.BinaryMessage, []byte("\r\n\x1b[31m[console: compute host unreachable]\x1b[0m\r\n"))
+		return
+	}
+	defer tcpConn.Close()
+
+	if tcp, ok := tcpConn.(*net.TCPConn); ok {
+		tcp.SetKeepAlive(true)
+		tcp.SetKeepAlivePeriod(30 * time.Second)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background()) // bg: survive chi Timeout(30s) middleware
+	defer cancel()
+
+	// Reuse the same binary bridge as telnet: RFB is just bytes over TCP,
+	// and noVNC frames arrive as binary websocket messages.
+	bridgeConsole(ctx, cancel, ws, tcpConn, DefaultBridgeConfig, func() {
+		_ = h.svc.Heartbeat(ctx, sessionID)
+	}, func(direction string, closeCode int, closeReason string, readErr error) {
+		log.Printf("vnc ws-close session=%s node=%s dir=%s code=%d reason=%q readErr=%v",
 			sessionID, nodeName, direction, closeCode, closeReason, readErr)
 	})
 }
